@@ -20,16 +20,10 @@ curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh |
 irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
 ```
 
-Os scripts baixam a release mais recente (`hubsaude-cli-v*`) deste
+Os scripts baixam a release mais recente deste
 repositório, verificam o `checksums.txt` (SHA-256) e instalam sem exigir
 privilégios de administrador.
 
-> **Nota:** enquanto este repositório não tiver releases publicadas, os
-> scripts encerram com a mensagem controlada
-> `nenhuma release 'hubsaude-cli-v*' encontrada`. Para instalar a partir da
-> distribuição de origem, use
-> `HUBSAUDE_CLI_REPO=kyriosdata/runner` (Unix) ou
-> `$env:HUBSAUDE_CLI_REPO = 'kyriosdata/runner'` (PowerShell).
 
 ### Variáveis de ambiente
 
