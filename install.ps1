@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2026 SES-GO / UFG
+# Copyright (c) 2026 SES-GO / UFG
 # Todos os direitos reservados.
 
 <#
