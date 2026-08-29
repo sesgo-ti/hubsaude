@@ -1,3 +1,83 @@
-# hubsaude
-Implementa a página principal de acesso do integrador, hoje é página exibida por [https://hub.saude.go.gov.br](https://hub.saude.go.gov.br/). 
-De fato, ao seguir o navegador deve ser redirecionado possivelmente para a página hospedada aqui no próprio GitHub. 
+# HubSaúde — distribuição e página do integrador
+
+Réplica **independente** da página principal do HubSaúde
+([hub.saude.go.gov.br](https://hub.saude.go.gov.br/)) e dos artefatos de
+distribuição do HubSaúde CLI, publicada via GitHub Pages em
+**<https://sesgo-ti.github.io/hubsaude/>**.
+
+Criado conforme
+[FabricaDeSoftwareINF/server-hubsaude#3632](https://github.com/FabricaDeSoftwareINF/server-hubsaude/issues/3632).
+Não há dependência nem sincronização com o `hubsaude-metadata` (que serve a
+página em produção) nem com `kyriosdata/runner` (distribuição de origem):
+as cópias evoluem de forma independente.
+
+## Instalação do HubSaúde CLI
+
+**macOS / Linux**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash
+```
+
+**Windows (PowerShell)**
+
+```powershell
+irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
+```
+
+Os scripts baixam a release mais recente (`hubsaude-cli-v*`) deste
+repositório, verificam o `checksums.txt` (SHA-256) e instalam sem exigir
+privilégios de administrador.
+
+> **Nota:** enquanto este repositório não tiver releases publicadas, os
+> scripts encerram com a mensagem controlada
+> `nenhuma release 'hubsaude-cli-v*' encontrada`. Para instalar a partir da
+> distribuição de origem, use
+> `HUBSAUDE_CLI_REPO=kyriosdata/runner` (Unix) ou
+> `$env:HUBSAUDE_CLI_REPO = 'kyriosdata/runner'` (PowerShell).
+
+### Variáveis de ambiente
+
+| Variável | Efeito | Padrão |
+|---|---|---|
+| `HUBSAUDE_CLI_REPO` | repositório `owner/repo` de onde baixar | `sesgo-ti/hubsaude` |
+| `HUBSAUDE_CLI_VERSION` | versão específica (ex.: `0.2.2`) | mais recente |
+| `HUBSAUDE_CLI_BIN_DIR` | diretório de instalação | `~/.local/bin` |
+
+## Manifesto de distribuição (`release.json`)
+
+`release.json` + `release.json.sig` são cópias **byte a byte** de
+`kyriosdata/runner@main`
+(commit [`93aeee7`](https://github.com/kyriosdata/runner/commit/93aeee76a8518e3595e666a21706aaf22f4a7617)),
+preservando a assinatura **Ed25519 destacada** (64 bytes, base64) sobre os
+bytes exatos do manifesto. As URLs internas do manifesto continuam
+apontando para as releases do `kyriosdata/runner` até que a publicação
+seja redirecionada para este repositório.
+
+Verificação da assinatura com a chave pública institucional
+(a mesma pinada no binário do CLI —
+fingerprint SHA-256 `e7f3f103a13382e4baed3931a4315cf10319d68c060f967763f8f7fa5d1bf4a4`):
+
+```bash
+printf '302a300506032b6570032100' | xxd -r -p > pub.der
+echo 'iAquSfKHKanLjmlFxeHfbVeAXcq8vmrIzk2IkcNkLsM=' | base64 -d >> pub.der
+openssl pkey -pubin -inform DER -in pub.der -out pub.pem
+base64 -d release.json.sig > release.json.sig.bin
+openssl pkeyutl -verify -pubin -inkey pub.pem -rawin \
+  -in release.json -sigfile release.json.sig.bin
+```
+
+## Conteúdo
+
+| Caminho | Descrição |
+|---|---|
+| `site/index.html` | página estática publicada no GitHub Pages |
+| `install.sh` / `install.ps1` | instaladores do HubSaúde CLI (default `sesgo-ti/hubsaude`) |
+| `release.json` / `release.json.sig` | manifesto de distribuição assinado (cópia verbatim) |
+| `.github/workflows/pages.yml` | deploy do site via GitHub Actions |
+
+## Descoberta da API
+
+Os endpoints do HubSaúde (`/metadata`, `/.well-known/smart-configuration`,
+`/cds-services`) **não** são replicados aqui: a página aponta para os
+endpoints de produção em `hub.saude.go.gov.br`.

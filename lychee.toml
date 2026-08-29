@@ -1,0 +1,12 @@
+# Configuração do lychee (link checker) — AC-4 da issue
+# FabricaDeSoftwareINF/server-hubsaude#3632.
+#
+# Exclusões justificadas: os dois alvos abaixo respondem 404 na
+# PRÓPRIA produção hoje (2026-08-29) e os mesmos links relativos são
+# embarcados pela página viva servida pelo hubsaude-metadata. O 404 é
+# pré-existente na origem — não foi introduzido por esta réplica — e
+# deve ser tratado no serviço/gateway de produção, não aqui.
+exclude = [
+  '^https://hub\.saude\.go\.gov\.br/smart-token$',
+  '^https://hub\.saude\.go\.gov\.br/\.well-known/smart-configuration$',
+]
