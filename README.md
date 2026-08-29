@@ -5,11 +5,6 @@ Réplica **independente** da página principal do HubSaúde
 distribuição do HubSaúde CLI, publicada via GitHub Pages em
 **<https://sesgo-ti.github.io/hubsaude/>**.
 
-Criado conforme
-[FabricaDeSoftwareINF/server-hubsaude#3632](https://github.com/FabricaDeSoftwareINF/server-hubsaude/issues/3632).
-Não há dependência nem sincronização com o `hubsaude-metadata` (que serve a
-página em produção) nem com `kyriosdata/runner` (distribuição de origem):
-as cópias evoluem de forma independente.
 
 ## Instalação do HubSaúde CLI
 
