@@ -1,9 +1,9 @@
 # HubSaúde — distribuição e página do integrador
 
-Réplica **independente** da página principal do HubSaúde
-([hub.saude.go.gov.br](https://hub.saude.go.gov.br/)) e dos artefatos de
-distribuição do HubSaúde CLI, publicada via GitHub Pages em
-**<https://sesgo-ti.github.io/hubsaude/>**.
+Implementação da página principal do HubSaúde,
+dedicada a gestores e, em especial, integradores.
+
+> A página encontra-se disponível em **<https://sesgo-ti.github.io/hubsaude/>**.
 
 
 ## Instalação do HubSaúde CLI
