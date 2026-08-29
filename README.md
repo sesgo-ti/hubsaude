@@ -71,8 +71,3 @@ openssl pkeyutl -verify -pubin -inkey pub.pem -rawin \
 | `release.json` / `release.json.sig` | manifesto de distribuição assinado (cópia verbatim) |
 | `.github/workflows/pages.yml` | deploy do site via GitHub Actions |
 
-## Descoberta da API
-
-Os endpoints do HubSaúde (`/metadata`, `/.well-known/smart-configuration`,
-`/cds-services`) **não** são replicados aqui: a página aponta para os
-endpoints de produção em `hub.saude.go.gov.br`.
