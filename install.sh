@@ -132,13 +132,18 @@ if [[ -n "$VERSION" ]]; then
 else
   info "Descobrindo a versão mais recente do CLI em ${REPO}..."
   # O repositório de distribuição hospeda releases de vários componentes;
-  # filtramos estritamente pelo prefixo do CLI e tomamos a mais recente
-  # (a API retorna as releases em ordem cronológica decrescente).
-  tag="$(curl_auth -fsSL "${GH_API}/repos/${REPO}/releases?per_page=100" \
+  # filtramos estritamente pelo prefixo do CLI e escolhemos a MAIOR versão.
+  # Não confie na ordem da listagem: a API ordena por created_at (data do
+  # commit alvo da tag, não a da publicação) e releases espelhadas que
+  # compartilham o commit alvo empatam e saem fora de ordem (#1487).
+  # Ordenação numérica por MAJOR.MINOR.PATCH (portável, sem GNU sort -V).
+  version="$(curl_auth -fsSL "${GH_API}/repos/${REPO}/releases?per_page=100" \
     | grep -o "\"tag_name\"[[:space:]]*:[[:space:]]*\"${TAG_PREFIX}[^\"]*\"" \
-    | sed -E "s/.*\"(${TAG_PREFIX}[^\"]*)\".*/\1/" \
-    | head -n1 || true)"
-  [[ -n "$tag" ]] || die "nenhuma release '${TAG_PREFIX}*' encontrada em ${REPO}. Informe --version."
+    | sed -E "s/.*\"${TAG_PREFIX}([^\"]*)\".*/\1/" \
+    | sort -t . -k1,1n -k2,2n -k3,3n \
+    | tail -n1 || true)"
+  [[ -n "$version" ]] || die "nenhuma release '${TAG_PREFIX}*' encontrada em ${REPO}. Informe --version."
+  tag="${TAG_PREFIX}${version}"
 fi
 version="${tag#"$TAG_PREFIX"}"
 ok "Versão alvo: ${version} (tag ${tag})"
