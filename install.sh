@@ -5,20 +5,20 @@
 #
 # Instalador do hubsaude-cli para Linux e macOS.
 #
-# Baixa o binário mais recente publicado nas GitHub Releases do repositório
-# público de distribuição, verifica o checksum SHA-256 e o instala em um
-# diretório do usuário (sem sudo).
+# Baixa o binario mais recente publicado nas GitHub Releases do repositorio
+# publico de distribuicao, verifica o checksum SHA-256 e o instala em um
+# diretorio do usuario (sem sudo).
 #
-# Uso rápido:
+# Uso rapido:
 #   curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash
 #
 # Uso local:
 #   ./install.sh [--version <X.Y.Z>] [--bin-dir <DIR>] [--help]
 #
-# Variáveis de ambiente (todas opcionais):
-#   HUBSAUDE_CLI_REPO     repositório owner/repo (padrão: sesgo-ti/hubsaude)
-#   HUBSAUDE_CLI_VERSION  versão a instalar (padrão: a mais recente)
-#   HUBSAUDE_CLI_BIN_DIR  diretório de instalação (padrão: ~/.local/bin)
+# Variaveis de ambiente (todas opcionais):
+#   HUBSAUDE_CLI_REPO     repositorio owner/repo (padrao: sesgo-ti/hubsaude)
+#   HUBSAUDE_CLI_VERSION  versao a instalar (padrao: a mais recente)
+#   HUBSAUDE_CLI_BIN_DIR  diretorio de instalacao (padrao: ~/.local/bin)
 #   GITHUB_TOKEN          token opcional, apenas para elevar o rate limit da API
 #
 set -euo pipefail
@@ -32,7 +32,7 @@ GH_API="${GITHUB_API_URL:-https://api.github.com}"
 GH_DL="${GITHUB_DOWNLOAD_URL:-https://github.com}"
 
 # ----------------------------------------------------------------------------
-# Saída (mensagens vão para stderr; stdout permanece limpo)
+# Saida (mensagens vao para stderr; stdout permanece limpo)
 # ----------------------------------------------------------------------------
 if [[ -t 2 && -z "${NO_COLOR:-}" ]]; then
   C_RED=$'\033[31m'; C_GRN=$'\033[32m'; C_YEL=$'\033[33m'; C_BLD=$'\033[1m'; C_RST=$'\033[0m'
@@ -50,15 +50,15 @@ usage() {
 Instalador do hubsaude-cli (Linux/macOS).
 
 USO:
-  ./install.sh [opções]
+  ./install.sh [opcoes]
   curl -fsSL https://raw.githubusercontent.com/${REPO}/main/install.sh | bash
 
-OPÇÕES:
-  --version <X.Y.Z>   Instala uma versão específica (padrão: a mais recente).
-  --bin-dir <DIR>     Diretório de instalação (padrão: \$HOME/.local/bin).
+OPCOES:
+  --version <X.Y.Z>   Instala uma versao especifica (padrao: a mais recente).
+  --bin-dir <DIR>     Diretorio de instalacao (padrao: \$HOME/.local/bin).
   -h, --help          Exibe esta ajuda.
 
-VARIÁVEIS DE AMBIENTE:
+VARIAVEIS DE AMBIENTE:
   HUBSAUDE_CLI_REPO, HUBSAUDE_CLI_VERSION, HUBSAUDE_CLI_BIN_DIR, GITHUB_TOKEN
 EOF
 }
@@ -78,7 +78,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ----------------------------------------------------------------------------
-# Dependências
+# Dependencias
 # ----------------------------------------------------------------------------
 command -v curl  >/dev/null 2>&1 || die "comando requerido ausente: curl"
 command -v uname >/dev/null 2>&1 || die "comando requerido ausente: uname"
@@ -87,30 +87,30 @@ if command -v sha256sum >/dev/null 2>&1; then
 elif command -v shasum >/dev/null 2>&1; then
   sha256() { shasum -a 256 "$1" | awk '{print $1}'; }
 else
-  die "necessário 'sha256sum' (Linux) ou 'shasum' (macOS) para verificar a integridade"
+  die "necessario 'sha256sum' (Linux) ou 'shasum' (macOS) para verificar a integridade"
 fi
 
 # ----------------------------------------------------------------------------
-# Detecção de plataforma
+# Deteccao de plataforma
 # ----------------------------------------------------------------------------
 os_raw="$(uname -s)"
 case "$os_raw" in
   Linux)  os="linux" ;;
   Darwin) os="darwin" ;;
-  *) die "sistema operacional não suportado: ${os_raw} (no Windows use install.ps1)" ;;
+  *) die "sistema operacional nao suportado: ${os_raw} (no Windows use install.ps1)" ;;
 esac
 arch_raw="$(uname -m)"
 case "$arch_raw" in
   x86_64|amd64)  arch="amd64" ;;
   aarch64|arm64) arch="arm64" ;;
-  *) die "arquitetura não suportada: ${arch_raw}" ;;
+  *) die "arquitetura nao suportada: ${arch_raw}" ;;
 esac
 asset="${BIN_NAME}-${os}-${arch}"
-info "Plataforma detectada: ${os}/${arch} (binário: ${asset})"
+info "Plataforma detectada: ${os}/${arch} (binario: ${asset})"
 
-# Cabeçalho de autenticação opcional (apenas para rate limit da API).
+# Cabecalho de autenticacao opcional (apenas para rate limit da API).
 # Em Bash 3 (macOS runner), expandir array vazia com `set -u` aborta o script;
-# o helper abaixo evita essa expansão quando não há token.
+# o helper abaixo evita essa expansao quando nao ha token.
 curl_auth() {
   if [[ -n "${GITHUB_TOKEN:-}" ]]; then
     curl -H "Authorization: Bearer ${GITHUB_TOKEN}" "$@"
@@ -120,7 +120,7 @@ curl_auth() {
 }
 
 # ----------------------------------------------------------------------------
-# Resolução da versão / tag
+# Resolucao da versao / tag
 # ----------------------------------------------------------------------------
 if [[ -n "$VERSION" ]]; then
   case "$VERSION" in
@@ -128,15 +128,15 @@ if [[ -n "$VERSION" ]]; then
     v*)             tag="${TAG_PREFIX}${VERSION#v}" ;;
     *)              tag="${TAG_PREFIX}${VERSION}" ;;
   esac
-  info "Versão fixada: ${tag}"
+  info "Versao fixada: ${tag}"
 else
-  info "Descobrindo a versão mais recente do CLI em ${REPO}..."
-  # O repositório de distribuição hospeda releases de vários componentes;
-  # filtramos estritamente pelo prefixo do CLI e escolhemos a MAIOR versão.
-  # Não confie na ordem da listagem: a API ordena por created_at (data do
-  # commit alvo da tag, não a da publicação) e releases espelhadas que
+  info "Descobrindo a versao mais recente do CLI em ${REPO}..."
+  # O repositorio de distribuicao hospeda releases de varios componentes;
+  # filtramos estritamente pelo prefixo do CLI e escolhemos a MAIOR versao.
+  # Nao confie na ordem da listagem: a API ordena por created_at (data do
+  # commit alvo da tag, nao a da publicacao) e releases espelhadas que
   # compartilham o commit alvo empatam e saem fora de ordem (#1487).
-  # Ordenação numérica por MAJOR.MINOR.PATCH (portável, sem GNU sort -V).
+  # Ordenacao numerica por MAJOR.MINOR.PATCH (portavel, sem GNU sort -V).
   version="$(curl_auth -fsSL "${GH_API}/repos/${REPO}/releases?per_page=100" \
     | grep -o "\"tag_name\"[[:space:]]*:[[:space:]]*\"${TAG_PREFIX}[^\"]*\"" \
     | sed -E "s/.*\"${TAG_PREFIX}([^\"]*)\".*/\1/" \
@@ -146,7 +146,7 @@ else
   tag="${TAG_PREFIX}${version}"
 fi
 version="${tag#"$TAG_PREFIX"}"
-ok "Versão alvo: ${version} (tag ${tag})"
+ok "Versao alvo: ${version} (tag ${tag})"
 
 # ----------------------------------------------------------------------------
 # Download
@@ -158,27 +158,27 @@ base="${GH_DL}/${REPO}/releases/download/${tag}"
 
 info "Baixando ${asset}..."
 curl_auth -fSL --progress-bar "${base}/${asset}" -o "${tmp}/${asset}" \
-  || die "falha ao baixar ${asset} (a release ${tag} contém o binário desta plataforma?)"
+  || die "falha ao baixar ${asset} (a release ${tag} contem o binario desta plataforma?)"
 info "Baixando checksums.txt..."
 curl_auth -fsSL "${base}/checksums.txt" -o "${tmp}/checksums.txt" \
   || die "falha ao baixar checksums.txt da release ${tag}"
 
 # ----------------------------------------------------------------------------
-# Verificação de integridade
+# Verificacao de integridade
 # ----------------------------------------------------------------------------
 info "Verificando integridade (SHA-256)..."
 expected="$(awk -v a="$asset" '$2==a {print $1; exit}' "${tmp}/checksums.txt")"
 [[ -n "$expected" ]] || die "checksum de ${asset} ausente em checksums.txt"
 actual="$(sha256 "${tmp}/${asset}")"
 if [[ "$expected" != "$actual" ]]; then
-  die "checksum NÃO confere para ${asset}:
+  die "checksum NAO confere para ${asset}:
        esperado: ${expected}
        obtido:   ${actual}"
 fi
 ok "Checksum verificado: ${actual}"
 
 # ----------------------------------------------------------------------------
-# Instalação
+# Instalacao
 # ----------------------------------------------------------------------------
 mkdir -p "$BIN_DIR"
 dest="${BIN_DIR}/${BIN_NAME}"
@@ -193,14 +193,14 @@ ok "Instalado: ${dest}"
 case ":${PATH}:" in
   *":${BIN_DIR}:"*) : ;;
   *)
-    warn "${BIN_DIR} não está no seu PATH. Adicione ao arquivo de inicialização do shell:"
+    warn "${BIN_DIR} nao esta no seu PATH. Adicione ao arquivo de inicializacao do shell:"
     printf '      export PATH="%s:$PATH"\n' "$BIN_DIR" >&2
     ;;
 esac
 
-# Verificação final (não fatal)
+# Verificacao final (nao fatal)
 if "$dest" version >/dev/null 2>&1 || "$dest" --version >/dev/null 2>&1; then
   ok "hubsaude ${version} instalado com sucesso. Experimente: ${BIN_NAME} --help"
 else
-  warn "Binário instalado em ${dest}, mas a verificação de execução não retornou sucesso."
+  warn "Binario instalado em ${dest}, mas a verificacao de execucao nao retornou sucesso."
 fi
