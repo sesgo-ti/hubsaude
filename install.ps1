@@ -1,4 +1,4 @@
-# Copyright (c) 2026 SES-GO / UFG
+﻿# Copyright (c) 2026 SES-GO / UFG
 # Todos os direitos reservados.
 
 <#
@@ -102,9 +102,17 @@ if ($Version) {
 else {
   Write-Info "Descobrindo a versão mais recente do CLI em $Repo..."
   # O repositório de distribuição hospeda releases de vários componentes;
-  # filtramos estritamente pelo prefixo do CLI e tomamos a mais recente.
+  # filtramos estritamente pelo prefixo do CLI e escolhemos a MAIOR versão.
+  # Não confie na ordem da listagem: a API ordena por created_at (data do
+  # commit alvo da tag) e releases espelhadas empatam e saem fora de
+  # ordem (#1487). Sufixo não parseável ordena como 0.0.0.
   $releases = Invoke-RestMethod -Headers $headers -Uri "$ApiBase/repos/$Repo/releases?per_page=100"
-  $match = $releases | Where-Object { $_.tag_name -like "$TagPrefix*" } | Select-Object -First 1
+  $match = $releases |
+    Where-Object { $_.tag_name -like "$TagPrefix*" } |
+    Sort-Object -Descending {
+      try { [version]$_.tag_name.Substring($TagPrefix.Length) } catch { [version]'0.0.0' }
+    } |
+    Select-Object -First 1
   if (-not $match) { Die "nenhuma release '$TagPrefix*' encontrada em $Repo. Informe -Version." }
   $tag = $match.tag_name
 }
