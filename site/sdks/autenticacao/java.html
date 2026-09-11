@@ -46,13 +46,31 @@
       <h2 id="ititle">Instalação</h2>
       <p>A release <code>0.4.0</code> está disponível, somente leitura, no
          GitHub Packages legado. Novas versões serão promovidas pelo
-         repositório atual, até a publicação no Maven Central.</p>
+         repositório atual, até a publicação no Maven Central. O GitHub
+         Packages exige repositório e credenciais configurados mesmo para
+         leitura pública — a dependência sozinha não resolve.</p>
     </div>
     <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;dependency&gt;
     &lt;groupId&gt;br.gov.go.saude.hubsaude&lt;/groupId&gt;
     &lt;artifactId&gt;hubsaude-cliente-java&lt;/artifactId&gt;
     &lt;version&gt;0.4.0&lt;/version&gt;
 &lt;/dependency&gt;</code></pre></div>
+    <p class="subnote">Adicione o repositório no <code>pom.xml</code>:</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;github&lt;/id&gt;
+        &lt;url&gt;https://maven.pkg.github.com/sesgo-ti/hubsaude-cliente-java&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;</code></pre></div>
+    <p class="subnote">E as credenciais no <code>~/.m2/settings.xml</code>
+       (um token pessoal com escopo <code>read:packages</code>):</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;servers&gt;
+    &lt;server&gt;
+        &lt;id&gt;github&lt;/id&gt;
+        &lt;username&gt;SEU_USUARIO_GITHUB&lt;/username&gt;
+        &lt;password&gt;SEU_TOKEN_COM_READ_PACKAGES&lt;/password&gt;
+    &lt;/server&gt;
+&lt;/servers&gt;</code></pre></div>
   </section>
 
   <!-- ── USO BÁSICO ── -->
@@ -89,6 +107,8 @@ String token = client.obtainToken("system/Patient.rs");</code></pre></div>
     </div>
     <h3 class="subhead subhead-first">PEM com senha</h3>
     <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
         .privateKeyPem(Path.of("chave-encrypted.pem"))
         .privateKeyPassword("minha-senha".toCharArray())
         .build();</code></pre></div>
@@ -104,6 +124,7 @@ SigningStrategy strategy = SigningStrategyFactory.fromKeyStore(
         ks, "alias-da-chave", "senha-chave".toCharArray());
 
 var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
         .clientId("meu-sistema")
         .signingStrategy(strategy)
         .clientKeyStore(ks, "alias-da-chave", "senha-chave".toCharArray())
@@ -117,6 +138,8 @@ SigningStrategy strategy = SigningStrategyFactory.fromPkcs11(
         pkcs11, "alias-chave-hsm", "123456".toCharArray());
 
 var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
         .signingStrategy(strategy)
         .build();</code></pre></div>
   </section>
