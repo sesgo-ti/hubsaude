@@ -3,8 +3,8 @@ html{scroll-behavior:smooth}
 body{font-family:var(--fs);background:var(--bg);min-height:100vh;color:var(--tx);
   -webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.6}
 a{color:inherit;text-decoration:none}
-:focus-visible{outline:3px solid var(--acc-br);outline-offset:3px;border-radius:6px}
+:focus-visible{outline:3px solid var(--tx);outline-offset:2px;box-shadow:0 0 0 5px var(--acc-br);border-radius:6px}
 .skip{position:absolute;left:-999px;top:0;background:var(--acc);color:#04120a;padding:.7rem 1.2rem;font-weight:800;z-index:200;border-radius:0 0 10px 0}
 .skip:focus{left:0}
 
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.caret{animation:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.caret{animation:none!important}html{scroll-behavior:auto}}
