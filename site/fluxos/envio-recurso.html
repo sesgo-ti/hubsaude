@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Como submeter um recurso FHIR R4 autenticado ao HubSaúde.">
+<title>Enviando um recurso FHIR · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+<script src="../assets/js/code-tabs.js" defer></script>
+</head>
+<body>
+<hs-header active="fluxos" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">Fluxos</span>
+      <h1 id="ptitle">Enviando um recurso FHIR</h1>
+      <p>Com o token de acesso em mãos (veja
+         <a href="autenticacao.html">Autenticação</a>), o próximo passo é enviar
+         o registro de saúde. Aqui há uma diferença importante em relação a APIs
+         comuns: o HubSaúde confirma o recebimento na hora, mas processa o
+         conteúdo depois. Seu sistema envia, recebe um comprovante e consulta
+         esse comprovante até o processamento terminar.</p>
+    </div>
+  </section>
+
+  <!-- ── O PADRÃO ASSÍNCRONO ── -->
+  <section id="assincrono" class="block" aria-labelledby="atitle">
+    <div class="bhead">
+      <span class="eyebrow">1. Padrão assíncrono</span>
+      <h2 id="atitle">Como funciona o envio em duas etapas</h2>
+      <p>O envio é um <code>POST /fhir/{tipo}</code>, ou <code>PUT</code>,
+         <code>PATCH</code> e <code>DELETE</code> em
+         <code>/fhir/{tipo}/{id}</code> para alterar e remover. Quatro
+         cabeçalhos são obrigatórios:
+         <code>Content-Type: application/fhir+json</code>, <code>Accept</code>,
+         <code>Prefer: respond-async</code> e <code>Idempotency-Key</code>.
+         Faltando qualquer um deles, a requisição volta com <code>400</code>.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s2">
+        <h3>Primeiro, o comprovante</h3>
+        <p>A resposta é <code>202</code> com corpo vazio, o equivalente a
+           "recebi e vou processar". O cabeçalho <code>Content-Location</code>
+           traz o endereço de uma <code>Task</code>, um recurso FHIR próprio
+           para acompanhar pedidos em andamento (não é o paciente nem o
+           resultado final), e <code>Retry-After</code> sugere quanto esperar
+           antes de consultar.</p>
+      </article>
+      <article class="tile s2">
+        <h3>Depois, o resultado</h3>
+        <p>Consulte com <code>GET</code> o endereço recebido em
+           <code>Content-Location</code> (<code>/Task/{id}</code>) até que
+           <code>Task.status</code> indique conclusão. Em criação, atualização e
+           correção, <code>Task.output.resultReference</code> aponta para o
+           recurso final. Em remoção, o sucesso vem como
+           <code>valueBoolean=true</code>.</p>
+      </article>
+      <article class="tile s2">
+        <h3>Se a rede falhar</h3>
+        <p>Quando você não souber se o envio chegou, reenvie com a mesma
+           <code>Idempotency-Key</code>. O HubSaúde reconhece a repetição, não
+           duplica nada e devolve o mesmo <code>202</code>, acrescentando
+           <code>Idempotency-Replayed: true</code> quando a operação já
+           terminou.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── AUTENTICAÇÃO VINCULADA A CERTIFICADO ── -->
+  <section id="certificado" class="block" aria-labelledby="ctitle">
+    <div class="bhead">
+      <span class="eyebrow">2. mTLS</span>
+      <h2 id="ctitle">Autenticação vinculada a certificado</h2>
+      <p>Se o token foi emitido numa conexão com certificado de cliente, ele
+         carrega o campo <code>cnf</code> e fica atrelado a esse certificado
+         (veja <a href="autenticacao.html#cache-mtls">Cache e mTLS</a>). Isso
+         quer dizer que o cabeçalho <code>Authorization: Bearer</code> sozinho
+         não basta: a chamada a <code>/fhir/*</code> precisa acontecer na mesma
+         conexão mTLS, apresentando o mesmo certificado usado para obter o
+         token. Caso contrário a resposta é <code>401</code>, acompanhada de
+         <code>WWW-Authenticate: Bearer error="invalid_token"</code> e de um
+         <code>OperationOutcome</code> explicando a recusa.</p>
+    </div>
+  </section>
+
+  <!-- ── EXEMPLO COMPLETO ── -->
+  <section id="exemplo" class="block" aria-labelledby="xtitle">
+    <div class="bhead">
+      <span class="eyebrow">3. Exemplo completo</span>
+      <h2 id="xtitle">Criando um Patient</h2>
+      <p>O exemplo abaixo monta um paciente com o mínimo de informação, envia e
+         consulta o resultado. Repare que são chamadas HTTP diretas: os SDKs
+         oficiais cuidam apenas da autenticação, e o envio dos dados fica por
+         sua conta.</p>
+    </div>
+    <hs-code-tabs>
+<template data-lang="python" data-label="Python">
+import httpx
+import time
+import uuid
+
+paciente = {
+    "resourceType": "Patient",
+    "identifier": [{"system": "urn:oid:2.16.76.1.3.3", "value": "123456789"}],
+    "name": [{"use": "official", "text": "Maria da Silva"}],
+    "birthDate": "1990-01-01",
+}
+
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/fhir+json",
+    "Accept": "application/fhir+json",
+    "Prefer": "respond-async",
+    "Idempotency-Key": str(uuid.uuid4()),
+}
+
+# O mesmo certificado de cliente usado para obter o token (RFC 8705)
+with httpx.Client(cert=("certificado.pem", "chave-privada.pem")) as http:
+    resp = http.post("https://hub.saude.go.gov.br/fhir/Patient", json=paciente, headers=headers)
+    task_url = resp.headers["Content-Location"]
+
+    while True:
+        task = http.get(task_url, headers={"Authorization": f"Bearer {token}"}).json()
+        if task["status"] not in ("accepted", "in-progress"):
+            break
+        time.sleep(1)
+
+    if task["status"] == "rejected":
+        raise RuntimeError(f"Task rejeitada: {task}")
+
+    print(task["output"][0]["valueReference"])
+</template>
+<template data-lang="java" data-label="Java">
+var paciente = """
+    {
+      "resourceType": "Patient",
+      "identifier": [{"system": "urn:oid:2.16.76.1.3.3", "value": "123456789"}],
+      "name": [{"use": "official", "text": "Maria da Silva"}],
+      "birthDate": "1990-01-01"
+    }
+    """;
+
+// httpClient deve estar configurado com o mesmo certificado de cliente usado para obter o token (RFC 8705)
+var request = HttpRequest.newBuilder(URI.create("https://hub.saude.go.gov.br/fhir/Patient"))
+        .header("Authorization", "Bearer " + token)
+        .header("Content-Type", "application/fhir+json")
+        .header("Accept", "application/fhir+json")
+        .header("Prefer", "respond-async")
+        .header("Idempotency-Key", UUID.randomUUID().toString())
+        .POST(HttpRequest.BodyPublishers.ofString(paciente))
+        .build();
+
+var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+String taskUrl = response.headers().firstValue("Content-Location").orElseThrow();
+
+JsonNode task;
+String status;
+do {
+    Thread.sleep(1000);
+    var taskRequest = HttpRequest.newBuilder(URI.create(taskUrl))
+            .header("Authorization", "Bearer " + token)
+            .GET()
+            .build();
+    var taskResponse = httpClient.send(taskRequest, HttpResponse.BodyHandlers.ofString());
+    task = objectMapper.readTree(taskResponse.body());
+    status = task.get("status").asText();
+} while (status.equals("accepted") || status.equals("in-progress"));
+
+if (status.equals("rejected")) {
+    throw new IllegalStateException("Task rejeitada: " + task);
+}
+</template>
+<template data-lang="typescript" data-label="TypeScript">
+import { Agent } from "undici";
+
+const paciente = {
+  resourceType: "Patient",
+  identifier: [{ system: "urn:oid:2.16.76.1.3.3", value: "123456789" }],
+  name: [{ use: "official", text: "Maria da Silva" }],
+  birthDate: "1990-01-01",
+};
+
+// O mesmo certificado de cliente usado para obter o token (RFC 8705)
+const mtlsAgent = new Agent({ connect: { cert: clientCert, key: clientKey } });
+
+const response = await fetch("https://hub.saude.go.gov.br/fhir/Patient", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/fhir+json",
+    Accept: "application/fhir+json",
+    Prefer: "respond-async",
+    "Idempotency-Key": crypto.randomUUID(),
+  },
+  body: JSON.stringify(paciente),
+  dispatcher: mtlsAgent,
+});
+
+const taskUrl = response.headers.get("Content-Location")!;
+
+let task: any;
+do {
+  await new Promise((r) => setTimeout(r, 1000));
+  const taskResponse = await fetch(taskUrl, {
+    headers: { Authorization: `Bearer ${token}` },
+    dispatcher: mtlsAgent,
+  });
+  task = await taskResponse.json();
+} while (task.status === "accepted" || task.status === "in-progress");
+
+if (task.status === "rejected") {
+  throw new Error(`Task rejeitada: ${JSON.stringify(task)}`);
+}
+</template>
+<template data-lang="csharp" data-label="C#">
+var paciente = new
+{
+    resourceType = "Patient",
+    identifier = new[] { new { system = "urn:oid:2.16.76.1.3.3", value = "123456789" } },
+    name = new[] { new { use = "official", text = "Maria da Silva" } },
+    birthDate = "1990-01-01",
+};
+
+// httpClient deve estar configurado com o mesmo certificado de cliente usado para obter o token (RFC 8705)
+using var request = new HttpRequestMessage(HttpMethod.Post, "https://hub.saude.go.gov.br/fhir/Patient")
+{
+    Content = JsonContent.Create(paciente, new MediaTypeHeaderValue("application/fhir+json")),
+};
+request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/fhir+json"));
+request.Headers.Add("Prefer", "respond-async");
+request.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+
+var response = await httpClient.SendAsync(request);
+string taskUrl = response.Content.Headers.ContentLocation!.ToString();
+
+JsonDocument task;
+string status;
+do
+{
+    await Task.Delay(1000);
+    using var taskRequest = new HttpRequestMessage(HttpMethod.Get, taskUrl);
+    taskRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    var taskResponse = await httpClient.SendAsync(taskRequest);
+    task = JsonDocument.Parse(await taskResponse.Content.ReadAsStreamAsync());
+    status = task.RootElement.GetProperty("status").GetString()!;
+} while (status is "accepted" or "in-progress");
+
+if (status == "rejected")
+{
+    throw new InvalidOperationException($"Task rejeitada: {task.RootElement}");
+}
+</template>
+</hs-code-tabs>
+  </section>
+
+  <!-- ── TESTE LOCAL ── -->
+  <section id="teste-local" class="block" aria-labelledby="ltitle">
+    <div class="bhead">
+      <span class="eyebrow">4. Teste local</span>
+      <h2 id="ltitle">Testando localmente antes de produção</h2>
+      <p>Vale exercitar tudo isso na sua máquina antes de apontar para o
+         ambiente real. O <a href="../ferramentas/cli.html">HubSaúde CLI</a>
+         sobe dois ambientes locais, cada um resolvendo um problema
+         diferente.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s6">
+        <h3>Simulador: o fluxo completo</h3>
+        <p><code>hubsaude sim start</code> sobe uma cópia local do HubSaúde em
+           HTTPS na porta 8443, exigindo mTLS como a produção. É onde você
+           testa autenticação e envio de ponta a ponta. Os dados ficam apenas
+           em memória e desaparecem ao reiniciar.</p>
+      </article>
+      <article class="tile s6">
+        <h3>Servidor FHIR: o formato do recurso</h3>
+        <p><code>hubsaude server start</code> sobe um servidor HAPI FHIR local,
+           sem autenticação, útil para conferir se o recurso está bem formado
+           antes de enviá-lo para produção. Use
+           <code>hubsaude server start --reset</code> para começar do zero.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── ERROS COMUNS ── -->
+  <section id="erros" class="block" aria-labelledby="ertitle2">
+    <div class="bhead">
+      <span class="eyebrow">5. Erros comuns</span>
+      <h2 id="ertitle2">Erros comuns</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead>
+        <tr><th>Status</th><th>Causa</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>400 OperationOutcome(required)</td><td>Header obrigatório ausente (<code>Accept</code>, <code>Prefer</code>, <code>Idempotency-Key</code>, <code>Content-Type</code>)</td></tr>
+        <tr><td>406</td><td><code>Accept</code> incompatível</td></tr>
+        <tr><td>415 OperationOutcome(not-supported)</td><td><code>Content-Type</code> malformado ou incompatível</td></tr>
+        <tr><td>409</td><td>Replay concorrente da mesma <code>Idempotency-Key</code> (requisição original ainda em voo)</td></tr>
+        <tr><td>413 OperationOutcome(too-long)</td><td>Payload excede o limite</td></tr>
+        <tr><td>Task.status=rejected</td><td>JSON bem formado, mas FHIR inválido. Confira antes no <a href="../ferramentas/validador.html">Validador</a></td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">
+      As regras de cada tipo de recurso, como quais campos são obrigatórios em
+      um <code>BRPaciente</code>, ficam nos
+      <a href="https://fhir.saude.go.gov.br" target="_blank" rel="noopener">Guias de Implementação</a>,
+      onde você consulta a versão vigente de cada perfil.
+    </p>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
