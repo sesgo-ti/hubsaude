@@ -73,7 +73,7 @@ openssl pkeyutl -verify -pubin -inkey pub.pem -rawin \
 
 | Caminho | Descrição |
 |---|---|
-| `site/index.html` | página estática publicada no GitHub Pages |
+| [`website/`](website/README.md) | portal Docusaurus publicado no GitHub Pages; arquitetura, desenvolvimento e autoria na documentação do portal |
 | `install.sh` / `install.ps1` | instaladores do HubSaúde CLI (default `sesgo-ti/hubsaude`) |
 | `release.json` / `release.json.sig` | manifesto de distribuição assinado e sincronizado pelo pipeline |
 | `.github/workflows/pages.yml` | deploy do site via GitHub Actions |
