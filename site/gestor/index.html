@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Jornada do gestor de saúde: credenciamento via Ganesha.">
+<title>Jornada do gestor · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="gestor" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <!-- ── GANESHA (gestão de credenciamento) ── -->
+  <section id="ganesha" class="block" aria-labelledby="gtitle">
+    <div class="bhead">
+      <span class="eyebrow">Para o gestor de saúde</span>
+      <h1 id="gtitle">A jornada do gestor <span class="grad">(credenciamento)</span></h1>
+      <p>O <strong>Ganesha</strong> é o Sistema de Credenciamento do HubSaúde. Por ele, o
+        <strong>gestor</strong> da instituição solicita e mantém o credenciamento de
+        estabelecimentos e profissionais de saúde, desde a coleta de documentação até a
+        entrega das credenciais que liberam o acesso aos dados em FHIR R4.</p>
+    </div>
+
+    <div class="bento">
+      <article class="tile s3">
+        <h3>O que é o Ganesha</h3>
+        <p>É o sistema que <strong>conduz todo o processo de credenciamento</strong>:
+           recebe a documentação, verifica se a instituição é elegível e mantém a
+           situação de cada pedido em dia. Ele conversa com o HubSaúde para
+           definir <strong>quem pode acessar o quê</strong>.</p>
+      </article>
+      <article class="tile s3">
+        <h3>O papel do gestor</h3>
+        <p>Pessoa física responsável pela relação do SIS com o HubSaúde (ex.: diretor de
+           estabelecimento). É quem faz as <strong>solicitações e atualizações</strong> dos
+           pedidos, sempre pelo Ganesha, que intermedia toda a relação com o HubSaúde.</p>
+      </article>
+
+      <article class="tile s6">
+        <h3>Como funciona o credenciamento</h3>
+        <p>Do pedido à entrega das credenciais, em cinco etapas:</p>
+        <div class="levels">
+          <div class="lv"><b>1</b><span>Solicitação (CNES/CPF/CNPJ + nível)</span></div>
+          <div class="lv"><b>2</b><span>Aprovação e atribuição de nível</span></div>
+          <div class="lv"><b>3</b><span>Geração do <code>client_id</code> (UUID)</span></div>
+          <div class="lv"><b>4</b><span>Namespace e cadastro SMART</span></div>
+          <div class="lv"><b>5</b><span>Entrega das credenciais</span></div>
+        </div>
+      </article>
+
+      <article class="tile s6">
+        <h3>Níveis de credenciamento</h3>
+        <p>O nível atribuído define o grau de acesso aos dados em saúde:</p>
+        <div class="levels">
+          <div class="lv"><b>N1</b><span>Básico, só com consentimento</span></div>
+          <div class="lv"><b>N2</b><span>Pleno, inclui emergência</span></div>
+          <div class="lv"><b>N3</b><span>Regulatório, vigilância e LGPD</span></div>
+        </div>
+        <!-- TODO: adicionar link para o sistema Ganesha assim que a URL real for definida -->
+        <div class="tlinks" style="margin-top:1rem">
+          <a class="il" href="https://fhir.saude.go.gov.br" target="_blank" rel="noopener">Documentação ↗</a>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
