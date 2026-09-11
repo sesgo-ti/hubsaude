@@ -12,12 +12,21 @@
     var templates = Array.prototype.slice.call(el.querySelectorAll('template'));
     if (templates.length === 0) return;
 
+    var instanceIdx = Array.prototype.indexOf.call(
+      document.querySelectorAll('hs-code-tabs'), el
+    );
+    var panelId = 'hsct-panel-' + instanceIdx;
+
     var tabs = document.createElement('div');
     tabs.className = 'hsct-tabs';
     tabs.setAttribute('role', 'tablist');
+    tabs.setAttribute('aria-label', 'Linguagem');
 
     var panel = document.createElement('pre');
     panel.className = 'hsct-panel';
+    panel.id = panelId;
+    panel.setAttribute('role', 'tabpanel');
+    panel.tabIndex = 0;
     var code = document.createElement('code');
     panel.appendChild(code);
 
@@ -35,15 +44,32 @@
       var label = tpl.getAttribute('data-label') || lang;
       var btn = document.createElement('button');
       btn.type = 'button';
+      btn.id = 'hsct-tab-' + instanceIdx + '-' + i;
       btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-controls', panelId);
+      btn.tabIndex = -1;
       btn.dataset.lang = lang;
       btn.textContent = label;
-      btn.addEventListener('click', function () { select(lang); });
+      btn.addEventListener('click', function () { select(lang, false); });
+      btn.addEventListener('keydown', function (e) {
+        var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (dir) {
+          e.preventDefault();
+          var next = buttons[(i + dir + buttons.length) % buttons.length];
+          select(next.dataset.lang, true);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          select(buttons[0].dataset.lang, true);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          select(buttons[buttons.length - 1].dataset.lang, true);
+        }
+      });
       tabs.appendChild(btn);
       return btn;
     });
 
-    function select(lang) {
+    function select(lang, focus) {
       var tpl = templates.filter(function (t, idx) {
         var dataLang = t.getAttribute('data-lang');
         return (dataLang || '') === lang || (!dataLang && lang === ('lang-' + idx));
@@ -55,6 +81,11 @@
                  (!tpl.getAttribute('data-lang') && b.dataset.lang === ('lang-' + templates.indexOf(tpl)));
         b.classList.toggle('is-on', on);
         b.setAttribute('aria-selected', on ? 'true' : 'false');
+        b.tabIndex = on ? 0 : -1;
+        if (on) {
+          panel.setAttribute('aria-labelledby', b.id);
+          if (focus) b.focus();
+        }
       });
       try { localStorage.setItem(key, tpl.getAttribute('data-lang') || ''); } catch (e) {}
     }
