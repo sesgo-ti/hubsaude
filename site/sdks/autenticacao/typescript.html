@@ -49,7 +49,7 @@
          <code>npm pack</code> no repositório, ou aponte para o Git
          diretamente.</p>
     </div>
-    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>npm install hubsaude-cliente-js</code></pre></div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>npm install github:sesgo-ti/hubsaude-cliente-ts</code></pre></div>
   </section>
 
   <!-- ── USO BÁSICO ── -->
@@ -113,7 +113,7 @@ const client = await createSmartTokenClient({
        a chave e nunca a expõe: toda assinatura acontece dentro dele. Node
        não tem suporte nativo a PKCS#11 (o padrão usado para acessar o
        HSM), então <code>pkcs11js</code> entra como <em>peer dependency</em>
-       opcional (<code>npm install hubsaude-cliente-js pkcs11js</code>).</p>
+       opcional (<code>npm install github:sesgo-ti/hubsaude-cliente-ts pkcs11js</code>).</p>
     <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>import { createSmartTokenClient, fromPkcs11 } from "hubsaude-cliente-js";
 
 const signingStrategy = await fromPkcs11({
