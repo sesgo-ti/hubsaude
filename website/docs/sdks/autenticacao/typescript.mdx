@@ -1,0 +1,149 @@
+---
+id: typescript
+title: "SDK TypeScript"
+slug: /sdks/autenticacao/typescript/
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ptitle" />
+
+# SDK TypeScript
+
+Biblioteca cliente TypeScript/Node.js (`hubsaude-cliente-js`, consumível também por JavaScript puro). O uso é exclusivamente em servidor, nunca em navegador ou app móvel.
+
+- [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
+
+<Link id="instalacao" />
+
+## Instalação {#ititle}
+
+Ainda não publicado no registro npm público. Até a primeira publicação, instale a partir de um tarball gerado por `npm pack` no repositório, ou aponte para o Git diretamente.
+
+```bash
+npm install github:sesgo-ti/hubsaude-cliente-ts
+```
+
+<Link id="uso-basico" />
+
+## Uso básico {#utitle}
+
+`createSmartTokenClient` é a única forma de construção (a classe não tem construtor público). Chame `close()` uma vez no encerramento, ou use `await using client = await createSmartTokenClient(...)`.
+
+```typescript
+import { createSmartTokenClient } from "hubsaude-cliente-js";
+
+const client = await createSmartTokenClient({
+  tokenEndpoint: "https://hub.saude.go.gov.br/auth/token",
+  clientId: "meu-sistema",
+  privateKeyPem: "chave-privada.pem",
+  certificatePem: "certificado.pem",
+});
+
+const token = await client.obtainToken("system/Patient.rs");
+```
+
+<Link id="fontes-de-chave" />
+
+## Fontes de chave suportadas {#ftitle}
+
+Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com o tipo `SigningStrategy`, uma função que recebe os bytes a assinar e devolve a assinatura, e já traz pronta a construção para as fontes mais comuns.
+
+### PEM com senha
+
+```typescript
+const client = await createSmartTokenClient({
+  tokenEndpoint: "https://hub.saude.go.gov.br/auth/token",
+  clientId: "meu-sistema",
+  privateKeyPem: "chave-encrypted.pem",
+  privateKeyPassword: Buffer.from("minha-senha"),
+});
+```
+
+### PKCS#12 direto (recomendado para produção)
+
+Um único arquivo (`.pfx`/`.p12`) já reúne a chave e o certificado, protegido por senha.
+
+```typescript
+import { readFile } from "node:fs/promises";
+import { createSmartTokenClient, fromPkcs12 } from "hubsaude-cliente-js";
+
+const pfx = await readFile("certificado.pfx");
+
+const client = await createSmartTokenClient({
+  tokenEndpoint: "https://hub.saude.go.gov.br/auth/token",
+  clientId: "meu-sistema",
+  signingStrategy: fromPkcs12(pfx, "senha-pfx"),
+  clientPfx: pfx,
+  clientPfxPassphrase: "senha-pfx",
+});
+```
+
+### HSM via PKCS#11
+
+Um HSM (Hardware Security Module) é um dispositivo dedicado que guarda a chave e nunca a expõe: toda assinatura acontece dentro dele. Node não tem suporte nativo a PKCS#11 (o padrão usado para acessar o HSM), então `pkcs11js` entra como *peer dependency* opcional (`npm install github:sesgo-ti/hubsaude-cliente-ts pkcs11js`).
+
+```typescript
+import { createSmartTokenClient, fromPkcs11 } from "hubsaude-cliente-js";
+
+const signingStrategy = await fromPkcs11({
+  library: "/usr/lib/softhsm/libsofthsm2.so",
+  tokenLabel: "meu-token",
+  keyLabel: "minha-chave-hsm",
+  pin: "123456",
+  jwtAlgorithm: "ES384",
+});
+
+const client = await createSmartTokenClient({
+  tokenEndpoint: "https://hub.saude.go.gov.br/auth/token",
+  clientId: "meu-sistema",
+  signingStrategy,
+});
+```
+
+<Link id="configuracao" />
+
+## Configuração completa {#ctitle}
+
+Todas as opções abaixo são propriedades do objeto passado a `createSmartTokenClient(options)`.
+
+| Opção | Obrigatório | Padrão | Observações |
+| --- | --- | --- | --- |
+| `tokenEndpoint` | sim¹ | — | URL completa do endpoint de token |
+| `fhirBase` | sim¹ | — | Base FHIR para descoberta automática |
+| `clientId` | sim | — | Emitido pelo Ganesha |
+| `privateKeyPem` | sim² | — | Caminho do PEM da chave privada |
+| `privateKeyPassword` | não | — | Senha do PEM criptografado (Buffer) |
+| `signingStrategy` | sim² | — | Estratégia pronta (HSM, cofre etc.) |
+| `certificatePem` | não³ | — | Certificado do cliente (PEM) |
+| `clientPfx / clientPfxPassphrase` | não | — | mTLS via bundle PKCS#12 |
+| `serverTrustAnchor` | não | trust store do sistema | PEM ou certificado |
+| `tlsProtocol` | não | TLSv1.3 | Ex.: TLSv1.2 |
+| `jwtAlgorithm` | não | RS384 | HubSaúde aceita RS384/ES384 |
+| `keyId` | não | — | Inclui kid no header do JWT |
+| `hubContext` | não | — | Inclui o claim hub\_ctx (&#123;ig, versao&#125;) |
+| `connectTimeoutMs` | não | 10000 | Conexão TCP |
+| `requestTimeoutMs` | não | 30000 | Requisição HTTP completa |
+| `assertionTtlSeconds` | não | 60 | Deveria ser ≤300 |
+| `maxRetries` | não | 3 | Tentativas totais |
+| `enableTokenCache` | não | true | Ativa ou desativa o cache de tokens |
+| `tokenCacheMarginSeconds` | não | 30 | Margem de renovação antes da expiração |
+| `tokenCacheMaxEntries` | não | 1000 | Descarte LRU por scope |
+
+¹ Exatamente um entre `tokenEndpoint` e `fhirBase`. ² Exatamente um entre `privateKeyPem` e `signingStrategy`. ³ Obrigatório apenas para mTLS via chave em memória.
+
+<Link id="excecoes" />
+
+## Exceções {#etitle}
+
+| Tipo | Uso |
+| --- | --- |
+| `SmartTokenError` | Configuração criptográfica inválida, resposta HTTP/JSON inválida, algoritmo não suportado, ou rejeição confirmada do certificado de cliente |
+| `SigningError` | Falha da estratégia criptográfica ao assinar o client\_assertion |
+
+## Repositório e especificação {#ltitle}
+
+- [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-ts)
+- [Especificação normativa (compartilhada pelos 4 SDKs)](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

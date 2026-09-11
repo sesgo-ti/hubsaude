@@ -1,0 +1,27 @@
+---
+id: index
+title: "Fluxos de integração"
+slug: /fluxos/
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ptitle" />
+
+# Fluxos de integração
+
+Integrar-se ao HubSaúde se resume a duas conversas com o servidor: primeiro seu sistema se identifica e recebe permissão para agir, depois envia os dados de saúde propriamente ditos. As páginas abaixo percorrem cada uma dessas conversas na ordem em que elas acontecem, com exemplos prontos em quatro linguagens.
+
+## Autenticação
+
+Como seu sistema descobre os endereços do serviço, comprova sua identidade com um certificado digital e recebe o token que autoriza as chamadas seguintes.
+
+- [Ver fluxo](autenticacao.mdx)
+
+## Envio de recurso
+
+Como enviar um registro de saúde já autenticado. O HubSaúde aceita o envio na hora, mas processa depois, então há um segundo passo para acompanhar o resultado.
+
+- [Ver fluxo](envio-recurso.mdx)

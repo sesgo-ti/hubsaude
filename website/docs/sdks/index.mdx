@@ -1,0 +1,45 @@
+---
+id: index
+title: "Bibliotecas cliente"
+slug: /sdks/
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ptitle" />
+
+# Bibliotecas cliente
+
+As bibliotecas oficiais são organizadas por domínio, de acordo com a finalidade de cada família de SDKs. Atualmente, existe apenas o domínio de autenticação. Novos domínios que venham a surgir, como o de envio de recurso, serão apresentados em seções próprias, sem mesclar conteúdos distintos.
+
+<Link id="autenticacao" />
+
+## Autenticação {#atitle}
+
+Quatro implementações da mesma biblioteca, uma por linguagem, com comportamento idêntico: assinam as credenciais, solicitam o token via SMART Backend Services e o renovam antes da expiração. Para o detalhamento do funcionamento interno, consulte a página de [Autenticação](../fluxos/autenticacao.mdx).
+
+### Python
+
+Ainda não está no PyPI. Por enquanto você instala a partir do código-fonte, com suporte opcional a HSM.
+
+- [Ver SDK](autenticacao/python.mdx)
+
+### Java
+
+Disponível como dependência Maven. A versão 0.4.0 está publicada enquanto o pacote não chega ao Maven Central.
+
+- [Ver SDK](autenticacao/java.mdx)
+
+### TypeScript
+
+Ainda não está no npm público. Instale a partir de um tarball do repositório ou apontando direto para o Git.
+
+- [Ver SDK](autenticacao/typescript.mdx)
+
+### C#
+
+Distribuído como pacote NuGet, publicado junto de cada versão lançada no GitHub.
+
+- [Ver SDK](autenticacao/csharp.mdx)

@@ -1,0 +1,144 @@
+---
+id: csharp
+title: "SDK C#"
+slug: /sdks/autenticacao/csharp/
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ptitle" />
+
+# SDK C#
+
+Biblioteca cliente C#/.NET (pacote NuGet `HubSaude.Cliente`).
+
+- [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
+
+<Link id="instalacao" />
+
+## Instalação {#ititle}
+
+O nupkg (e o SBOM CycloneDX) saem da GitHub Release da tag; a publicação no nuget.org ainda não faz parte do repositório. Baixe o `.nupkg` da release e registre-o como fonte local antes de referenciar o pacote.
+
+```bash
+dotnet nuget add source ./caminho/para/pasta-com-o-nupkg --name hubsaude-local
+dotnet add package HubSaude.Cliente --version 0.4.0 --source hubsaude-local
+```
+
+Isso adiciona ao seu projeto:
+
+```xml
+<PackageReference Include="HubSaude.Cliente" Version="0.4.0" />
+```
+
+<Link id="uso-basico" />
+
+## Uso básico {#utitle}
+
+`SmartTokenClient.CreateBuilder()` é a única forma de construção, já que a classe não expõe construtores públicos. Implementa `IDisposable`/`IAsyncDisposable`.
+
+```csharp
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .CertificatePem("certificado.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.rs");
+```
+
+<Link id="fontes-de-chave" />
+
+## Fontes de chave suportadas {#ftitle}
+
+Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com a interface `ISigningStrategy` (um único método que assina bytes), e `SigningStrategyFactory` já traz pronta a construção para as fontes mais comuns.
+
+### PEM com senha
+
+```csharp
+var senha = "segredo".ToCharArray();
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .PrivateKeyPassword(senha)
+    .Build();
+```
+
+### PKCS#12 direto (recomendado para produção)
+
+Um único arquivo (`.pfx`/`.p12`) já reúne a chave e o certificado, protegido por senha.
+
+```csharp
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .ClientPkcs12("certificado.pfx", "alias-da-chave", "senha-pfx".ToCharArray())
+    .Build();
+```
+
+### HSM via PKCS#11
+
+Um HSM (Hardware Security Module) é um dispositivo dedicado que guarda a chave e nunca a expõe: toda assinatura acontece dentro dele, acessado aqui pelo padrão PKCS#11.
+
+```csharp
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .SigningStrategy(SigningStrategyFactory.FromPkcs11(new Pkcs11Options
+    {
+        Library = "/usr/lib/softhsm/libsofthsm2.so",
+        Pin = pinDoToken,
+        TokenLabel = "hubsaude",
+        KeyLabel = "jwt-key",
+        JwtAlgorithm = "RS384",
+    }))
+    .ClientPkcs12("cliente-mtls.pfx", "alias-do-cert", senhaPfx)
+    .Build();
+```
+
+<Link id="configuracao" />
+
+## Configuração completa {#ctitle}
+
+| Método do builder | Obrigatório | Padrão | Observações |
+| --- | --- | --- | --- |
+| `.TokenEndpoint(url)` | sim¹ | — | URL completa do endpoint de token |
+| `.FhirBase(url)` | sim¹ | — | Base FHIR para descoberta automática |
+| `.ClientId(id)` | sim | — | Emitido pelo Ganesha |
+| `.PrivateKeyPem(path)` | sim² | — | Caminho do PEM da chave privada |
+| `.PrivateKeyPassword(char[])` | não | — | Senha do PEM criptografado |
+| `.SigningStrategy(strategy)` | sim² | — | Estratégia pronta (HSM, cofre etc.) |
+| `.CertificatePem(path)` | não³ | — | Certificado do cliente (PEM) |
+| `.ClientPkcs12(path, alias, senha)` | não | — | mTLS via bundle PKCS#12 |
+| `.ServerTrustAnchor(path)` | não | trust store do sistema | PEM ou certificado |
+| `.TlsProtocol(protocolo)` | não | TLSv1.3 | Ex.: TLSv1.2 |
+| `.JwtAlgorithm(alg)` | não | RS384 | HubSaúde aceita RS384/ES384 |
+| `.KeyId(kid)` | não | — | Inclui kid no header do JWT |
+| `.HubContext(ig, versao)` | não | — | Inclui o claim hub\_ctx |
+| `.ConnectTimeout(TimeSpan)` | não | 10s | Conexão TCP |
+| `.RequestTimeout(TimeSpan)` | não | 30s | Requisição HTTP completa |
+| `.AssertionTtlSeconds(n)` | não | 60 | Deveria ser ≤300 |
+| `.MaxRetries(n)` | não | 3 | Tentativas totais |
+| `.EnableTokenCache(bool)` | não | true | Ativa ou desativa o cache de tokens |
+| `.TokenCacheMarginSeconds(n)` | não | 30 | Margem de renovação antes da expiração |
+| `.TokenCacheMaxEntries(n)` | não | 1000 | Descarte LRU por scope |
+
+¹ Exatamente um entre `TokenEndpoint` e `FhirBase`. ² Exatamente um entre `PrivateKeyPem` e `SigningStrategy`. ³ Obrigatório apenas para mTLS via chave em memória.
+
+<Link id="excecoes" />
+
+## Exceções {#etitle}
+
+| Tipo | Uso |
+| --- | --- |
+| `SmartTokenException` | Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado |
+| `SigningException` | Falha da estratégia criptográfica ao assinar o client\_assertion |
+
+## Repositório e especificação {#ltitle}
+
+- [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-csharp)
+- [Especificação normativa (compartilhada pelos 4 SDKs)](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

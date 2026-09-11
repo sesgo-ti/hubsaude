@@ -1,0 +1,221 @@
+[
+  {
+    "legacy": "ferramentas/cli.html",
+    "route": "ferramentas/cli/",
+    "sha256": "72b3237d0ca914d3a547442437e825439d3ea66018842842a2994182879bc5f8",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>hubsaude auth verify \\\n    --client-id hs-12345678 \\\n    --key minha-chave.pem \\\n    --cert meu-certificado.pem \\\n    --ig hemograma --ig-versao 0.0.1</code></pre>"
+      }
+    ]
+  },
+  {
+    "legacy": "ferramentas/simulador.html",
+    "route": "ferramentas/simulador/",
+    "sha256": "3175ae08df1bced295c37293b322ecdabd5b1e8be649e8b8b221b3dc68e04ca6",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>hubsaude sim start\nhubsaude sim status\nhubsaude sim stop</code></pre>"
+      }
+    ]
+  },
+  {
+    "legacy": "ferramentas/validador.html",
+    "route": "ferramentas/validador/",
+    "sha256": "51670173f8ec64f0ff4764bb55b96bdd74ff7548cd4896eb759ab345f9586a72",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code># um arquivo\nhubsaude validate paciente.json\n\n# todos os recursos de um diretório\nhubsaude validate --dir ./recursos/\n\n# lendo da entrada padrão\ncat paciente.json | hubsaude validate -</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>hubsaude validate server status\nhubsaude validate server stop</code></pre>"
+      }
+    ]
+  },
+  {
+    "legacy": "fluxos/autenticacao.html",
+    "route": "fluxos/autenticacao/",
+    "sha256": "54e8f366cf1c2d842f0622cfd8b8586d38e3839dee863877ea2b6751c878a464",
+    "snippets": [
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"python\" data-label=\"Python\">\nfrom hubsaude_client.builder import SmartTokenClientBuilder\n\nclient = (\n    SmartTokenClientBuilder()\n    .client_id(\"meu-client-id\")\n    .token_endpoint(\"https://auth.hubsaude.exemplo/token\")\n    .private_key_pem(\"/caminho/para/chave-privada.pem\")\n    .build()\n)\n\nresultado = client.obtain_token(scope=\"system/Patient.rs\")\nprint(resultado)\n\nclient.close()\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"java\" data-label=\"Java\">\nvar client = SmartTokenClient.builder()\n        .tokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n        .clientId(\"meu-sistema\")\n        .privateKeyPem(Path.of(\"chave-privada.pem\"))\n        .certificatePem(Path.of(\"certificado.pem\"))\n        .build();\n\nString token = client.obtainToken(\"system/Patient.rs\");\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"typescript\" data-label=\"TypeScript\">\nimport { createSmartTokenClient } from \"hubsaude-cliente-js\";\n\nconst client = await createSmartTokenClient({\n  tokenEndpoint: \"https://hub.saude.go.gov.br/auth/token\",\n  clientId: \"meu-sistema\",\n  privateKeyPem: \"chave-privada.pem\",\n  certificatePem: \"certificado.pem\",\n});\n\nconst token = await client.obtainToken(\"system/Patient.rs\");\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"csharp\" data-label=\"C#\">\nawait using var client = SmartTokenClient.CreateBuilder()\n    .TokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n    .ClientId(\"meu-sistema\")\n    .PrivateKeyPem(\"chave-privada.pem\")\n    .CertificatePem(\"certificado.pem\")\n    .Build();\n\nstring token = await client.ObtainTokenAsync(\"system/Patient.rs\");\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"python\" data-label=\"Python\">\nclient.invalidate_cache(\"system/Patient.rs\")\ntoken_renovado = client.obtain_token(scope=\"system/Patient.rs\")\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"java\" data-label=\"Java\">\nclient.invalidateCache(\"system/Patient.rs\");\nString renewedToken = client.obtainToken(\"system/Patient.rs\");\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"typescript\" data-label=\"TypeScript\">\nclient.invalidateCache(\"system/Patient.rs\");\nconst renewedToken = await client.obtainToken(\"system/Patient.rs\");\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"csharp\" data-label=\"C#\">\nclient.InvalidateCache(\"system/Patient.rs\");\nstring renewedToken = await client.ObtainTokenAsync(\"system/Patient.rs\");\n</template>"
+      }
+    ]
+  },
+  {
+    "legacy": "fluxos/envio-recurso.html",
+    "route": "fluxos/envio-recurso/",
+    "sha256": "764f19d78c986a678bcf84d67c670400b3ee78515e95b81b559c46cf7eb57fd7",
+    "snippets": [
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"python\" data-label=\"Python\">\nimport httpx\nimport time\nimport uuid\n\npaciente = {\n    \"resourceType\": \"Patient\",\n    \"identifier\": [{\"system\": \"urn:oid:2.16.76.1.3.3\", \"value\": \"123456789\"}],\n    \"name\": [{\"use\": \"official\", \"text\": \"Maria da Silva\"}],\n    \"birthDate\": \"1990-01-01\",\n}\n\nheaders = {\n    \"Authorization\": f\"Bearer {token}\",\n    \"Content-Type\": \"application/fhir+json\",\n    \"Accept\": \"application/fhir+json\",\n    \"Prefer\": \"respond-async\",\n    \"Idempotency-Key\": str(uuid.uuid4()),\n}\n\n# O mesmo certificado de cliente usado para obter o token (RFC 8705)\nwith httpx.Client(cert=(\"certificado.pem\", \"chave-privada.pem\")) as http:\n    resp = http.post(\"https://hub.saude.go.gov.br/fhir/Patient\", json=paciente, headers=headers)\n    if resp.status_code != 202:\n        raise RuntimeError(f\"Envio recusado: {resp.status_code} {resp.text}\")\n    task_url = resp.headers[\"Content-Location\"]\n\n    while True:\n        task = http.get(task_url, headers={\"Authorization\": f\"Bearer {token}\"}).json()\n        if task[\"status\"] not in (\"accepted\", \"in-progress\"):\n            break\n        time.sleep(1)\n\n    if task[\"status\"] != \"completed\":\n        raise RuntimeError(f\"Task não concluída ({task['status']}): {task}\")\n\n    print(task[\"output\"][0][\"valueReference\"])\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"java\" data-label=\"Java\">\nvar paciente = \"\"\"\n    {\n      \"resourceType\": \"Patient\",\n      \"identifier\": [{\"system\": \"urn:oid:2.16.76.1.3.3\", \"value\": \"123456789\"}],\n      \"name\": [{\"use\": \"official\", \"text\": \"Maria da Silva\"}],\n      \"birthDate\": \"1990-01-01\"\n    }\n    \"\"\";\n\n// httpClient deve estar configurado com o mesmo certificado de cliente usado para obter o token (RFC 8705)\nvar request = HttpRequest.newBuilder(URI.create(\"https://hub.saude.go.gov.br/fhir/Patient\"))\n        .header(\"Authorization\", \"Bearer \" + token)\n        .header(\"Content-Type\", \"application/fhir+json\")\n        .header(\"Accept\", \"application/fhir+json\")\n        .header(\"Prefer\", \"respond-async\")\n        .header(\"Idempotency-Key\", UUID.randomUUID().toString())\n        .POST(HttpRequest.BodyPublishers.ofString(paciente))\n        .build();\n\nvar response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());\nif (response.statusCode() != 202) {\n    throw new IllegalStateException(\"Envio recusado: \" + response.statusCode() + \" \" + response.body());\n}\nString taskUrl = response.headers().firstValue(\"Content-Location\").orElseThrow();\n\nJsonNode task;\nString status;\ndo {\n    Thread.sleep(1000);\n    var taskRequest = HttpRequest.newBuilder(URI.create(taskUrl))\n            .header(\"Authorization\", \"Bearer \" + token)\n            .GET()\n            .build();\n    var taskResponse = httpClient.send(taskRequest, HttpResponse.BodyHandlers.ofString());\n    task = objectMapper.readTree(taskResponse.body());\n    status = task.get(\"status\").asText();\n} while (status.equals(\"accepted\") || status.equals(\"in-progress\"));\n\nif (!status.equals(\"completed\")) {\n    throw new IllegalStateException(\"Task não concluída (\" + status + \"): \" + task);\n}\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"typescript\" data-label=\"TypeScript\">\nimport { Agent } from \"undici\";\n\nconst paciente = {\n  resourceType: \"Patient\",\n  identifier: [{ system: \"urn:oid:2.16.76.1.3.3\", value: \"123456789\" }],\n  name: [{ use: \"official\", text: \"Maria da Silva\" }],\n  birthDate: \"1990-01-01\",\n};\n\n// O mesmo certificado de cliente usado para obter o token (RFC 8705)\nconst mtlsAgent = new Agent({ connect: { cert: clientCert, key: clientKey } });\n\nconst response = await fetch(\"https://hub.saude.go.gov.br/fhir/Patient\", {\n  method: \"POST\",\n  headers: {\n    Authorization: `Bearer ${token}`,\n    \"Content-Type\": \"application/fhir+json\",\n    Accept: \"application/fhir+json\",\n    Prefer: \"respond-async\",\n    \"Idempotency-Key\": crypto.randomUUID(),\n  },\n  body: JSON.stringify(paciente),\n  dispatcher: mtlsAgent,\n});\n\nif (response.status !== 202) {\n  throw new Error(`Envio recusado: ${response.status} ${await response.text()}`);\n}\nconst taskUrl = response.headers.get(\"Content-Location\")!;\n\nlet task: any;\ndo {\n  await new Promise((r) => setTimeout(r, 1000));\n  const taskResponse = await fetch(taskUrl, {\n    headers: { Authorization: `Bearer ${token}` },\n    dispatcher: mtlsAgent,\n  });\n  task = await taskResponse.json();\n} while (task.status === \"accepted\" || task.status === \"in-progress\");\n\nif (task.status !== \"completed\") {\n  throw new Error(`Task não concluída (${task.status}): ${JSON.stringify(task)}`);\n}\n</template>"
+      },
+      {
+        "kind": "template",
+        "html": "<template data-lang=\"csharp\" data-label=\"C#\">\nvar paciente = new\n{\n    resourceType = \"Patient\",\n    identifier = new[] { new { system = \"urn:oid:2.16.76.1.3.3\", value = \"123456789\" } },\n    name = new[] { new { use = \"official\", text = \"Maria da Silva\" } },\n    birthDate = \"1990-01-01\",\n};\n\n// httpClient deve estar configurado com o mesmo certificado de cliente usado para obter o token (RFC 8705)\nusing var request = new HttpRequestMessage(HttpMethod.Post, \"https://hub.saude.go.gov.br/fhir/Patient\")\n{\n    Content = JsonContent.Create(paciente, new MediaTypeHeaderValue(\"application/fhir+json\")),\n};\nrequest.Headers.Authorization = new AuthenticationHeaderValue(\"Bearer\", token);\nrequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(\"application/fhir+json\"));\nrequest.Headers.Add(\"Prefer\", \"respond-async\");\nrequest.Headers.Add(\"Idempotency-Key\", Guid.NewGuid().ToString());\n\nvar response = await httpClient.SendAsync(request);\nif ((int)response.StatusCode != 202)\n{\n    var corpo = await response.Content.ReadAsStringAsync();\n    throw new InvalidOperationException($\"Envio recusado: {(int)response.StatusCode} {corpo}\");\n}\nstring taskUrl = response.Content.Headers.ContentLocation!.ToString();\n\nJsonDocument task;\nstring status;\ndo\n{\n    await Task.Delay(1000);\n    using var taskRequest = new HttpRequestMessage(HttpMethod.Get, taskUrl);\n    taskRequest.Headers.Authorization = new AuthenticationHeaderValue(\"Bearer\", token);\n    var taskResponse = await httpClient.SendAsync(taskRequest);\n    task = JsonDocument.Parse(await taskResponse.Content.ReadAsStreamAsync());\n    status = task.RootElement.GetProperty(\"status\").GetString()!;\n} while (status is \"accepted\" or \"in-progress\");\n\nif (status != \"completed\")\n{\n    throw new InvalidOperationException($\"Task não concluída ({status}): {task.RootElement}\");\n}\n</template>"
+      }
+    ]
+  },
+  {
+    "legacy": "sdks/autenticacao/csharp.html",
+    "route": "sdks/autenticacao/csharp/",
+    "sha256": "6c0276f95bfdcf7f8145898df17cf2843bac1baace6a944e8d49b99a15c43947",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>dotnet nuget add source ./caminho/para/pasta-com-o-nupkg --name hubsaude-local\ndotnet add package HubSaude.Cliente --version 0.4.0 --source hubsaude-local</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>&lt;PackageReference Include=\"HubSaude.Cliente\" Version=\"0.4.0\" /&gt;</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>await using var client = SmartTokenClient.CreateBuilder()\n    .TokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n    .ClientId(\"meu-sistema\")\n    .PrivateKeyPem(\"chave-privada.pem\")\n    .CertificatePem(\"certificado.pem\")\n    .Build();\n\nstring token = await client.ObtainTokenAsync(\"system/Patient.rs\");</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>var senha = \"segredo\".ToCharArray();\nawait using var client = SmartTokenClient.CreateBuilder()\n    .TokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n    .ClientId(\"meu-sistema\")\n    .PrivateKeyPem(\"chave-privada.pem\")\n    .PrivateKeyPassword(senha)\n    .Build();</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>await using var client = SmartTokenClient.CreateBuilder()\n    .TokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n    .ClientId(\"meu-sistema\")\n    .ClientPkcs12(\"certificado.pfx\", \"alias-da-chave\", \"senha-pfx\".ToCharArray())\n    .Build();</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>await using var client = SmartTokenClient.CreateBuilder()\n    .TokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n    .ClientId(\"meu-sistema\")\n    .SigningStrategy(SigningStrategyFactory.FromPkcs11(new Pkcs11Options\n    {\n        Library = \"/usr/lib/softhsm/libsofthsm2.so\",\n        Pin = pinDoToken,\n        TokenLabel = \"hubsaude\",\n        KeyLabel = \"jwt-key\",\n        JwtAlgorithm = \"RS384\",\n    }))\n    .ClientPkcs12(\"cliente-mtls.pfx\", \"alias-do-cert\", senhaPfx)\n    .Build();</code></pre>"
+      }
+    ]
+  },
+  {
+    "legacy": "sdks/autenticacao/java.html",
+    "route": "sdks/autenticacao/java/",
+    "sha256": "058b9da1bbb6244c0332d58445c22aec0bad8cdba4cc5050ee394cd56ddfee9a",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>&lt;dependency&gt;\n    &lt;groupId&gt;br.gov.go.saude.hubsaude&lt;/groupId&gt;\n    &lt;artifactId&gt;hubsaude-cliente-java&lt;/artifactId&gt;\n    &lt;version&gt;0.4.0&lt;/version&gt;\n&lt;/dependency&gt;</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>&lt;repositories&gt;\n    &lt;repository&gt;\n        &lt;id&gt;github&lt;/id&gt;\n        &lt;url&gt;https://maven.pkg.github.com/sesgo-ti/hubsaude-cliente-java&lt;/url&gt;\n    &lt;/repository&gt;\n&lt;/repositories&gt;</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>&lt;servers&gt;\n    &lt;server&gt;\n        &lt;id&gt;github&lt;/id&gt;\n        &lt;username&gt;SEU_USUARIO_GITHUB&lt;/username&gt;\n        &lt;password&gt;SEU_TOKEN_COM_READ_PACKAGES&lt;/password&gt;\n    &lt;/server&gt;\n&lt;/servers&gt;</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>var client = SmartTokenClient.builder()\n        .tokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n        .clientId(\"meu-sistema\")\n        .privateKeyPem(Path.of(\"chave-privada.pem\"))\n        .certificatePem(Path.of(\"certificado.pem\"))\n        .build();\n\nString token = client.obtainToken(\"system/Patient.rs\");</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>var client = SmartTokenClient.builder()\n        .tokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n        .clientId(\"meu-sistema\")\n        .privateKeyPem(Path.of(\"chave-encrypted.pem\"))\n        .privateKeyPassword(\"minha-senha\".toCharArray())\n        .build();</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>KeyStore ks = KeyStore.getInstance(\"PKCS12\");\ntry (var fis = new FileInputStream(\"certificado.pfx\")) {\n    ks.load(fis, \"senha-pfx\".toCharArray());\n}\n\nSigningStrategy strategy = SigningStrategyFactory.fromKeyStore(\n        ks, \"alias-da-chave\", \"senha-chave\".toCharArray());\n\nvar client = SmartTokenClient.builder()\n        .tokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n        .clientId(\"meu-sistema\")\n        .signingStrategy(strategy)\n        .clientKeyStore(ks, \"alias-da-chave\", \"senha-chave\".toCharArray())\n        .build();</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>Provider pkcs11 = SigningStrategyFactory.configurePkcs11Provider(\"/etc/pkcs11/hsm.cfg\");\nSigningStrategy strategy = SigningStrategyFactory.fromPkcs11(\n        pkcs11, \"alias-chave-hsm\", \"123456\".toCharArray());\n\nvar client = SmartTokenClient.builder()\n        .tokenEndpoint(\"https://hub.saude.go.gov.br/auth/token\")\n        .clientId(\"meu-sistema\")\n        .signingStrategy(strategy)\n        .build();</code></pre>"
+      }
+    ]
+  },
+  {
+    "legacy": "sdks/autenticacao/python.html",
+    "route": "sdks/autenticacao/python/",
+    "sha256": "34d2941b05830b9d92a69ea139b8ac4bdff7ee4a25f23ddddd2173a671f95898",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>git clone https://github.com/sesgo-ti/hubsaude-cliente-python.git\ncd hubsaude-cliente-python\npip install -e .</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>from hubsaude_client.builder import SmartTokenClientBuilder\n\nclient = (\n    SmartTokenClientBuilder()\n    .client_id(\"meu-client-id\")\n    .token_endpoint(\"https://auth.hubsaude.exemplo/token\")\n    .private_key_pem(\"/caminho/para/chave-privada.pem\")\n    .build()\n)\n\nresultado = client.obtain_token(scope=\"system/Patient.rs\")\nprint(resultado)\n\nclient.close()</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>client = (\n    SmartTokenClientBuilder()\n    .client_id(\"meu-client-id\")\n    .token_endpoint(\"https://auth.hubsaude.exemplo/token\")\n    .private_key_pem(\"/caminho/chave-encrypted.pem\", password=bytearray(b\"minha-senha\"))\n    .build()\n)</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>client = (\n    SmartTokenClientBuilder()\n    .client_id(\"meu-client-id\")\n    .token_endpoint(\"https://auth.hubsaude.exemplo/token\")\n    .client_key_store(\"certificado.pfx\", \"senha-pfx\")\n    .build()\n)</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>from hubsaude_client.strategy_factory import from_pkcs11\n\nstrategy = from_pkcs11(\n    pkcs11_module_path=\"/usr/lib/softhsm/libsofthsm2.so\",\n    token_label=\"meu-token\",\n    key_label=\"minha-chave-hsm\",\n    user_pin=\"123456\",\n)\n\nclient = (\n    SmartTokenClientBuilder()\n    .client_id(\"meu-client-id\")\n    .token_endpoint(\"https://auth.hubsaude.exemplo/token\")\n    .signing_strategy(strategy)\n    .build()\n)</code></pre>"
+      }
+    ]
+  },
+  {
+    "legacy": "sdks/autenticacao/typescript.html",
+    "route": "sdks/autenticacao/typescript/",
+    "sha256": "c4ec5d3fc84f138f82bd138dc29789a3763c57fc81f898745eb5ec23cc9ee166",
+    "snippets": [
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>npm install github:sesgo-ti/hubsaude-cliente-ts</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>import { createSmartTokenClient } from \"hubsaude-cliente-js\";\n\nconst client = await createSmartTokenClient({\n  tokenEndpoint: \"https://hub.saude.go.gov.br/auth/token\",\n  clientId: \"meu-sistema\",\n  privateKeyPem: \"chave-privada.pem\",\n  certificatePem: \"certificado.pem\",\n});\n\nconst token = await client.obtainToken(\"system/Patient.rs\");</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>const client = await createSmartTokenClient({\n  tokenEndpoint: \"https://hub.saude.go.gov.br/auth/token\",\n  clientId: \"meu-sistema\",\n  privateKeyPem: \"chave-encrypted.pem\",\n  privateKeyPassword: Buffer.from(\"minha-senha\"),\n});</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>import { readFile } from \"node:fs/promises\";\nimport { createSmartTokenClient, fromPkcs12 } from \"hubsaude-cliente-js\";\n\nconst pfx = await readFile(\"certificado.pfx\");\n\nconst client = await createSmartTokenClient({\n  tokenEndpoint: \"https://hub.saude.go.gov.br/auth/token\",\n  clientId: \"meu-sistema\",\n  signingStrategy: fromPkcs12(pfx, \"senha-pfx\"),\n  clientPfx: pfx,\n  clientPfxPassphrase: \"senha-pfx\",\n});</code></pre>"
+      },
+      {
+        "kind": "pre",
+        "html": "<pre class=\"hsct-panel\"><code>import { createSmartTokenClient, fromPkcs11 } from \"hubsaude-cliente-js\";\n\nconst signingStrategy = await fromPkcs11({\n  library: \"/usr/lib/softhsm/libsofthsm2.so\",\n  tokenLabel: \"meu-token\",\n  keyLabel: \"minha-chave-hsm\",\n  pin: \"123456\",\n  jwtAlgorithm: \"ES384\",\n});\n\nconst client = await createSmartTokenClient({\n  tokenEndpoint: \"https://hub.saude.go.gov.br/auth/token\",\n  clientId: \"meu-sistema\",\n  signingStrategy,\n});</code></pre>"
+      }
+    ]
+  }
+]

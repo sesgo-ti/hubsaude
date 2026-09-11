@@ -1,0 +1,151 @@
+---
+id: python
+title: "SDK Python"
+slug: /sdks/autenticacao/python/
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ptitle" />
+
+# SDK Python
+
+Biblioteca cliente Python (`hubsaude-client`) para obtenção de access tokens via SMART Backend Services.
+
+- [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
+
+<Link id="instalacao" />
+
+## Instalação {#ititle}
+
+Ainda não publicado no PyPI. Instale a partir do código-fonte (branch `develop`):
+
+```bash
+git clone https://github.com/sesgo-ti/hubsaude-cliente-python.git
+cd hubsaude-cliente-python
+pip install -e .
+```
+
+O extra opcional `hsm` (`pip install "hubsaude-client[hsm]"`) traz a dependência `python-pkcs11`, necessária apenas para assinatura via HSM/smart token.
+
+<Link id="uso-basico" />
+
+## Uso básico {#utitle}
+
+`SmartTokenClientBuilder` monta o cliente passo a passo e valida a configuração antes de criar a instância. Reutilize o mesmo cliente durante todo o ciclo de vida da aplicação e chame `close()` uma única vez ao encerrar, ou use o gerenciador de contexto `with`.
+
+```python
+from hubsaude_client.builder import SmartTokenClientBuilder
+
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .private_key_pem("/caminho/para/chave-privada.pem")
+    .build()
+)
+
+resultado = client.obtain_token(scope="system/Patient.rs")
+print(resultado)
+
+client.close()
+```
+
+<Link id="fontes-de-chave" />
+
+## Fontes de chave suportadas {#ftitle}
+
+Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com um contrato simples, `hubsaude_client.SigningStrategy` (um `Protocol` com um único método, `sign(bytes) -> bytes`), e já traz pronta uma factory para as quatro fontes mais comuns em `hubsaude_client.strategy_factory`.
+
+### PEM com senha
+
+```python
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .private_key_pem("/caminho/chave-encrypted.pem", password=bytearray(b"minha-senha"))
+    .build()
+)
+```
+
+### PKCS#12 direto
+
+Um único arquivo (`.pfx`/`.p12`) já reúne a chave e o certificado, protegido por senha. `.client_key_store(path, password)` resolve os dois de uma vez: a assinatura e o certificado de cliente para mTLS.
+
+```python
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .client_key_store("certificado.pfx", "senha-pfx")
+    .build()
+)
+```
+
+### HSM via PKCS#11
+
+Um HSM (Hardware Security Module) é um dispositivo dedicado que guarda a chave e nunca a expõe: toda assinatura acontece dentro dele. Requer o extra opcional `hsm`; o SDK mantém apenas um handle de sessão PKCS#11.
+
+```python
+from hubsaude_client.strategy_factory import from_pkcs11
+
+strategy = from_pkcs11(
+    pkcs11_module_path="/usr/lib/softhsm/libsofthsm2.so",
+    token_label="meu-token",
+    key_label="minha-chave-hsm",
+    user_pin="123456",
+)
+
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .signing_strategy(strategy)
+    .build()
+)
+```
+
+<Link id="configuracao" />
+
+## Configuração completa {#ctitle}
+
+| Método do builder | Obrigatório | Padrão | Observações |
+| --- | --- | --- | --- |
+| `.token_endpoint(url)` | sim¹ | — | URL completa do endpoint de token |
+| `.fhir_base(url)` | sim¹ | — | Base FHIR para descoberta automática |
+| `.client_id(id)` | sim | — | Emitido pelo Ganesha |
+| `.private_key_pem(path, password=None)` | sim² | — | Caminho do PEM da chave privada |
+| `.signing_strategy(strategy)` | sim² | — | Estratégia pronta (HSM, cofre etc.) |
+| `.certificate_pem(path)` | não³ | — | Certificado do cliente (PEM) |
+| `.client_key_store(path, password)` | não | — | mTLS via bundle PKCS#12 |
+| `.server_trust_anchor(path)` | não | trust store do sistema | PEM ou certificado X.509 |
+| `.tls_protocol(protocolo)` | não | TLSv1.3 | Ex.: TLSv1.2 |
+| `.jwt_algorithm(alg)` | não | RS384 | HubSaúde aceita RS384/ES384 |
+| `.key_id(kid)` | não | — | Inclui kid no header do JWT |
+| `.hub_context(ig, versao)` | não | — | Inclui o claim hub\_ctx |
+| `.connect_timeout(timedelta)` | não | 10s | Conexão TCP |
+| `.request_timeout(timedelta)` | não | 30s | Requisição HTTP completa |
+| `.assertion_ttl_seconds(n)` | não | 60 | Deveria ser ≤300 |
+| `.max_retries(n)` | não | 3 | Tentativas totais |
+| `.enable_token_cache(bool)` | não | true | Ativa ou desativa o cache de tokens |
+| `.token_cache_margin_seconds(n)` | não | 30 | Margem de renovação antes da expiração |
+| `.token_cache_max_entries(n)` | não | 1000 | Descarte LRU por scope |
+
+¹ Exatamente um entre `token_endpoint` e `fhir_base`. ² Exatamente um entre `private_key_pem` e `signing_strategy`. ³ Obrigatório apenas para mTLS via chave em memória.
+
+<Link id="excecoes" />
+
+## Exceções {#etitle}
+
+| Tipo | Uso |
+| --- | --- |
+| `SmartTokenError` | Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado |
+| `SigningError` | Falha da estratégia criptográfica ao assinar o client\_assertion |
+
+## Repositório e especificação {#ltitle}
+
+- [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-python)
+- [Especificação normativa (compartilhada pelos 4 SDKs)](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

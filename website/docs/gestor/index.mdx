@@ -1,0 +1,45 @@
+---
+id: index
+title: "A jornada do gestor (credenciamento)"
+slug: /gestor/
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ganesha" />
+
+<Link id="gtitle" />
+
+# A jornada do gestor (credenciamento)
+
+O **Ganesha** é o Sistema de Credenciamento do HubSaúde. Por ele, o **gestor** da instituição solicita e mantém o credenciamento de estabelecimentos e profissionais de saúde, desde a coleta de documentação até a entrega das credenciais que liberam o acesso aos dados em FHIR R4.
+
+## O que é o Ganesha
+
+É o sistema que **conduz todo o processo de credenciamento**: recebe a documentação, verifica se a instituição é elegível e mantém a situação de cada pedido em dia. Ele conversa com o HubSaúde para definir **quem pode acessar o quê**.
+
+## O papel do gestor
+
+Pessoa física responsável pela relação do SIS com o HubSaúde (ex.: diretor de estabelecimento). É quem faz as **solicitações e atualizações** dos pedidos, sempre pelo Ganesha, que intermedia toda a relação com o HubSaúde.
+
+## Como funciona o credenciamento
+
+Do pedido à entrega das credenciais, em cinco etapas:
+
+1. Solicitação (CNES/CPF/CNPJ + nível)
+2. Aprovação e atribuição de nível
+3. Geração do `client_id` (UUID)
+4. Namespace e cadastro SMART
+5. Entrega das credenciais
+
+## Níveis de credenciamento
+
+O nível atribuído define o grau de acesso aos dados em saúde:
+
+- **N1**: Básico, só com consentimento
+- **N2**: Pleno, inclui emergência
+- **N3**: Regulatório, vigilância e LGPD
+
+- [Documentação](https://fhir.saude.go.gov.br)

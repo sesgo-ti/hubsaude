@@ -1,0 +1,7 @@
+CLAUDE.local.md
+.claude/
+website/node_modules/
+website/build/
+website/.docusaurus/
+website/test-results/
+website/playwright-report/

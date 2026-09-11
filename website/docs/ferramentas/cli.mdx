@@ -1,0 +1,167 @@
+---
+id: cli
+title: "HubSaúde CLI"
+slug: /ferramentas/cli/
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Link from '@docusaurus/Link';
+
+<Link id="main" />
+
+<Link id="ferramentas" />
+
+<Link id="ftitle" />
+
+# HubSaúde CLI
+
+Um único programa instala e comanda tudo o que você precisa para testar a integração antes de ir ao ar: validação de recursos, simulador e servidor FHIR local. Ele não exige Java instalado nem permissão de administrador.
+
+<Link id="term-cli" />
+
+## Demonstração de instalação e validação
+
+Demonstração estática de terminal: instalação via curl com verificação de checksum, consulta de versão e validação de uma instância FHIR em JSON. As versões e saídas abaixo são ilustrativas, não resultados executados nesta página.
+
+```text
+# 1) Instalar o HubSaúde CLI (sem Java · verifica SHA-256)
+$ curl -fsSL raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash
+  ✓ checksum verificado (SHA-256)
+  ✓ hubsaude instalado em ~/.local/bin/hubsaude
+
+# 2) Conferir a versão do CLI e dos componentes
+$ hubsaude version
+  hubsaude 0.3.16 · validador 0.1.43 · simulador 0.1.40
+
+# 3) Validar uma instância FHIR (JSON) contra os IGs
+$ hubsaude validate paciente.json
+  ✓ Patient válido (0 erros · 0 avisos)
+```
+
+<Link id="qi-t" />
+
+<Link id="qi-text" />
+
+<Link id="qi-tab-unix" />
+
+<Link id="qi-tab-win" />
+
+<Link id="qi-copy" />
+
+<Link id="qi-cmd" />
+
+## Instalar com um comando
+
+Baixa o `hubsaude`, confere a integridade por SHA-256 e instala sem exigir administrador nem sudo.
+
+Selecione manualmente o sistema operacional. No Windows, use **PowerShell**; em macOS e Linux, é preciso ter `curl` e `bash`.
+
+<Tabs groupId="ferramentas-cli-instalacao-so" defaultValue="unix">
+
+<TabItem value="unix" label="macOS e Linux">
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash
+```
+
+</TabItem>
+
+<TabItem value="win" label="Windows">
+
+```powershell
+irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
+```
+
+</TabItem>
+
+</Tabs>
+
+[Opções de versão e diretório](https://github.com/sesgo-ti/hubsaude#readme)
+
+<Link id="comandos" />
+
+## Comandos {#cmdtitle}
+
+Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instalado acima.
+
+| Comando | O que faz |
+| --- | --- |
+| `hubsaude validate <arquivo>` | Valida um recurso FHIR R4 a partir de um arquivo |
+| `hubsaude validate --dir <dir>` | Valida todos os recursos de um diretório |
+| `hubsaude validate -` | Lê o recurso da entrada padrão (stdin) |
+| `hubsaude validate --output json\|web` | Saída em JSON ou na interface web interativa |
+| `hubsaude validate --profile <url>` | Valida contra um perfil específico |
+| `hubsaude validate server status\|stop` | Consulta ou encerra o serviço local do Validador |
+| `hubsaude sim start\|status\|stop` | Ciclo de vida do Simulador SMART on FHIR local |
+| `hubsaude server start [--reset]` | Sobe o servidor HAPI FHIR local; `--reset` zera os dados |
+| `hubsaude server stop` | Encerra o servidor HAPI FHIR local |
+| `hubsaude auth verify` | Diagnóstico de credenciamento, detalhado abaixo |
+| `hubsaude status` | Agrega, numa única invocação, o estado dos três componentes com ciclo de vida (validador, simulador e server) |
+| `hubsaude update --check` | Verifica se há versão mais recente disponível |
+| `hubsaude version` | Exibe a versão do CLI e dos componentes provisionados |
+
+O Validador e o Simulador têm páginas próprias, com exemplos de uso de cada um: [Validador](validador.mdx) e [Simulador](simulador.mdx).
+
+<Link id="auth-verify" />
+
+## hubsaude auth verify {#avtitle}
+
+Assim que o credenciamento é aprovado, este comando confirma em segundos que a sua chave e o seu certificado realmente funcionam, sem precisar escrever uma linha de código. Ele existe para conferência: para obter tokens no funcionamento normal da aplicação, use um dos [SDKs](../sdks/index.mdx).
+
+```bash
+hubsaude auth verify \
+    --client-id hs-12345678 \
+    --key minha-chave.pem \
+    --cert meu-certificado.pem \
+    --ig hemograma --ig-versao 0.0.1
+```
+
+| Exit | Significado | Ação recomendada |
+| --- | --- | --- |
+| `0` | Sucesso: token obtido, credencial apta | Nenhuma |
+| `3` | Erro de uso: argumentos, arquivos ou configuração inválidos | Corrigir a invocação |
+| `4` | Falha de rede: teste inconclusivo (descoberta, timeout, 429, 5xx) | Repetir mais tarde (retry/backoff) |
+| `6` | Credencial não apta: rejeição definitiva (HTTP 400/401 `invalid_client` ou handshake mTLS) | Acionar o processo de credenciamento |
+
+Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribuída com certeza à credencial, ela é classificada como `4`, ou seja, inconclusiva. Uma credencial nunca é declarada inapta sem evidência clara. Os mesmos códigos de saída valem para a ferramenta Java autônoma [hubsaude-cliente-cli](https://github.com/sesgo-ti/hubsaude-cliente-cli).
+
+<Link id="ambiente" />
+
+## Variáveis de ambiente {#envtitle}
+
+| Variável | Efeito | Padrão |
+| --- | --- | --- |
+| `HUBSAUDE_VALIDADOR_PORT` | Porta local do Validador | 8090 |
+| `HUBSAUDE_SIMULADOR_PORT` | Porta local do Simulador | 8443 |
+| `HUBSAUDE_IDLE_TIMEOUT` | Tempo de ociosidade antes de encerrar um componente local | 30m |
+| `HUBSAUDE_HTTP_TIMEOUT` | Timeout das requisições HTTP feitas pelo CLI | 120s |
+| `HUBSAUDE_RELEASE_CHANNEL` | Canal de release usado para baixar os componentes | stable |
+
+As variáveis que controlam a instalação, como a versão e a pasta de destino do programa, estão documentadas no [README do repositório de distribuição](https://github.com/sesgo-ti/hubsaude#readme).
+
+<Link id="recursos" />
+
+## Outros recursos {#rectitle}
+
+Materiais que acompanham a integração e não fazem parte do CLI.
+
+### Safira
+
+Assina e valida documentos FHIR conforme a política de assinatura
+
+- [Repositório](https://github.com/sesgo-ti/safira)
+- [Política](https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html)
+
+### Contrato FHIR
+
+CapabilityStatements (normativo) e OpenAPI derivado
+
+- [FHIR NPM (.tgz)](https://hub.saude.go.gov.br/downloads/hubsaude-capabilities)
+- [OpenAPI (.json)](https://hub.saude.go.gov.br/downloads/openapi-hubsaude-fhir)
+
+### Coleção do produtor
+
+Requisições prontas para executar o fluxo de escrita (Bruno e .http)
+
+- [Bruno + .http (.zip)](https://hub.saude.go.gov.br/downloads/hubsaude-colecao-produtor)
