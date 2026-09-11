@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Validador interativo de recursos FHIR R4 (ferramenta local).">
+<title>Validador · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="ferramentas" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">Ferramentas</span>
+      <h1 id="ptitle">Validador</h1>
+      <p>O Validador confere se um registro de saúde está de acordo com as
+         regras dos Guias de Implementação e aponta o que precisa ser
+         corrigido. Ele roda na sua máquina: o
+         <a href="cli.html">HubSaúde CLI</a> baixa e inicia a ferramenta quando
+         você precisa dela, e não existe versão hospedada.</p>
+    </div>
+    <div class="callout">
+      <p><b>Use apenas dados sintéticos.</b> Nunca envie informação real de
+         pacientes ao Validador. Trabalhe sempre com instâncias de teste
+         inventadas. A própria interface da ferramenta mantém esse aviso
+         visível o tempo todo.</p>
+    </div>
+  </section>
+
+  <!-- ── USO ── -->
+  <section id="uso" class="block" aria-labelledby="utitle">
+    <div class="bhead">
+      <span class="eyebrow">1. Uso</span>
+      <h2 id="utitle">Validando recursos</h2>
+      <p>O caso mais simples é validar um arquivo. O mesmo comando também
+         aceita uma pasta inteira, texto vindo da entrada padrão e diferentes
+         formatos de saída.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code># um arquivo
+hubsaude validate paciente.json
+
+# todos os recursos de um diretório
+hubsaude validate --dir ./recursos/
+
+# lendo da entrada padrão
+cat paciente.json | hubsaude validate -</code></pre></div>
+    <div class="bento">
+      <article class="tile s6">
+        <h3>Inspeção no navegador</h3>
+        <p><code>hubsaude validate --output web</code> abre uma tela onde você
+           percorre os problemas encontrados, recurso a recurso.</p>
+      </article>
+      <article class="tile s6">
+        <h3>Uso em automação</h3>
+        <p><code>hubsaude validate --output json</code> devolve o resultado em
+           formato legível por máquina, adequado a pipelines de CI. Para checar
+           contra um perfil específico, acrescente
+           <code>--profile &lt;url&gt;</code>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── SERVIÇO LOCAL ── -->
+  <section id="servico" class="block" aria-labelledby="stitle">
+    <div class="bhead">
+      <span class="eyebrow">2. Serviço local</span>
+      <h2 id="stitle">Ciclo de vida do serviço</h2>
+      <p>Por trás do comando, o Validador fica rodando como um serviço na sua
+         máquina, iniciado automaticamente no primeiro uso. Para consultar o
+         estado ou encerrá-lo, use os comandos abaixo.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>hubsaude validate server status
+hubsaude validate server stop</code></pre></div>
+    <p class="pagenote">A porta usada pode ser alterada com a variável
+       <code>HUBSAUDE_VALIDADOR_PORT</code>. Veja as
+       <a href="cli.html#ambiente">variáveis de ambiente</a>.</p>
+  </section>
+
+  <!-- ── LINKS ── -->
+  <section class="block" aria-labelledby="ltitle">
+    <div class="bhead">
+      <span class="eyebrow">Referências</span>
+      <h2 id="ltitle">Onde obter</h2>
+    </div>
+    <div class="tlinks">
+      <a class="il" href="cli.html">HubSaúde CLI (mesmo binário) →</a>
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude/releases" target="_blank" rel="noopener">Releases ↗</a>
+      <a class="il" href="https://fhir.saude.go.gov.br" target="_blank" rel="noopener">Guias de Implementação ↗</a>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
