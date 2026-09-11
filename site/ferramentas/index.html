@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · CLI, Validador, Simulador e outros recursos para integradores.">
+<title>Ferramentas · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="ferramentas" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">Ferramentas</span>
+      <h1 id="ptitle">Ferramentas para integradores</h1>
+      <p>Estas ferramentas rodam na sua própria máquina e permitem conferir se
+         os dados estão no formato certo e se a autenticação funciona, antes de
+         apontar o sistema para produção.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s2">
+        <h3>HubSaúde CLI</h3>
+        <p>O programa de linha de comando que instala e comanda as ferramentas
+           locais. É por ele que você valida arquivos e sobe os ambientes de
+           teste na sua máquina.</p>
+        <div class="tlinks"><a class="il" href="cli.html">Ver CLI →</a></div>
+      </article>
+      <article class="tile s2">
+        <h3>Validador</h3>
+        <p>Confere se um registro de saúde está de acordo com as regras dos
+           Guias de Implementação e aponta o que precisa ser corrigido.</p>
+        <div class="tlinks"><a class="il" href="validador.html">Ver Validador →</a></div>
+      </article>
+      <article class="tile s2">
+        <h3>Simulador</h3>
+        <p>Uma cópia local do HubSaúde para testar seu cliente de ponta a
+           ponta, com as mesmas exigências de segurança da produção.</p>
+        <div class="tlinks"><a class="il" href="simulador.html">Ver Simulador →</a></div>
+      </article>
+    </div>
+    <div class="tools">
+      <div class="tool">
+        <div class="thead"><div><b>Safira</b><span>Assina e valida documentos FHIR conforme a política de assinatura</span></div></div>
+        <div class="dls">
+          <a class="dl" href="https://github.com/sesgo-ti/safira" target="_blank" rel="noopener">Repositório ↗</a>
+          <a class="dl" href="https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html" target="_blank" rel="noopener">Política</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="thead"><div><b>Contrato FHIR</b><span>Descreve o que o servidor aceita, em CapabilityStatement e OpenAPI</span></div></div>
+        <div class="dls">
+          <a class="dl" href="https://hub.saude.go.gov.br/downloads/hubsaude-capabilities">FHIR NPM (.tgz) ↓</a>
+          <a class="dl" href="https://hub.saude.go.gov.br/downloads/openapi-hubsaude-fhir">OpenAPI (.json) ↓</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="thead"><div><b>Coleção do produtor</b><span>Requisições prontas para executar o fluxo de escrita (Bruno e .http)</span></div></div>
+        <div class="dls">
+          <a class="dl" href="https://hub.saude.go.gov.br/downloads/hubsaude-colecao-produtor">Bruno + .http (.zip) ↓</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
