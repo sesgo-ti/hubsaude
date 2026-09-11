@@ -60,11 +60,11 @@
       </div>
       <div class="qi-tabs" role="tablist" aria-label="Sistema operacional">
         <button class="qi-tab is-on" type="button" role="tab" aria-selected="true"
-                id="qi-tab-unix" aria-controls="qi-cmd" data-os="unix">
+                id="qi-tab-unix" aria-controls="qi-cmd" data-os="unix" tabindex="0">
           macOS e Linux
         </button>
         <button class="qi-tab" type="button" role="tab" aria-selected="false"
-                id="qi-tab-win" aria-controls="qi-cmd" data-os="win">
+                id="qi-tab-win" aria-controls="qi-cmd" data-os="win" tabindex="-1">
           Windows
         </button>
       </div>
@@ -221,7 +221,7 @@
     {h:''},
     {h:'<span class="t-c"># 2) Conferir a versão do CLI e dos componentes</span>'},
     {h:'<span class="t-p">$</span> <span class="t-cmd">hubsaude</span> <span class="t-s">version</span>'},
-    {h:'<span class="t-c">  hubsaude 0.2.2 · validador 1.4.0 · simulador 0.9.1</span>'},
+    {h:'<span class="t-c">  hubsaude 0.3.16 · validador 0.1.43 · simulador 0.1.40</span>'},
     {h:''},
     {h:'<span class="t-c"># 3) Validar uma instância FHIR (JSON) contra os IGs</span>'},
     {h:'<span class="t-p">$</span> <span class="t-cmd">hubsaude</span> <span class="t-s">validate</span> <span class="t-v">paciente.json</span>'},
@@ -254,14 +254,24 @@
     win:{c:'irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex',p:'PS>'}
   };
   var cur='unix';
-  function select(os){
+  function select(os,focus){
     if(!cmds[os])return;
     cur=os;var d=cmds[os];txt.textContent=d.c;prompt.textContent=d.p;
     tabs.forEach(function(t){var on=t.dataset.os===os;
-      t.classList.toggle('is-on',on);t.setAttribute('aria-selected',on?'true':'false');});
+      t.classList.toggle('is-on',on);t.setAttribute('aria-selected',on?'true':'false');
+      t.tabIndex=on?0:-1;if(on&&focus)t.focus();});
     box.setAttribute('aria-labelledby','qi-tab-'+os);
   }
-  tabs.forEach(function(t){t.addEventListener('click',function(){select(t.dataset.os);});});
+  var tabList=Array.prototype.slice.call(tabs);
+  tabList.forEach(function(t,i){
+    t.addEventListener('click',function(){select(t.dataset.os);});
+    t.addEventListener('keydown',function(e){
+      var dir=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
+      if(dir){e.preventDefault();var next=tabList[(i+dir+tabList.length)%tabList.length];select(next.dataset.os,true);}
+      else if(e.key==='Home'){e.preventDefault();select(tabList[0].dataset.os,true);}
+      else if(e.key==='End'){e.preventDefault();select(tabList[tabList.length-1].dataset.os,true);}
+    });
+  });
   var tmr;
   copy.addEventListener('click',function(){
     var cmd=cmds[cur].c;
