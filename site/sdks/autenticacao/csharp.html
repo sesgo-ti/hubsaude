@@ -43,8 +43,13 @@
       <span class="eyebrow">1. Instalação</span>
       <h2 id="ititle">Instalação</h2>
       <p>O nupkg (e o SBOM CycloneDX) saem da GitHub Release da tag; a
-         publicação no nuget.org ainda não faz parte do repositório.</p>
+         publicação no nuget.org ainda não faz parte do repositório. Baixe o
+         <code>.nupkg</code> da release e registre-o como fonte local antes
+         de referenciar o pacote.</p>
     </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>dotnet nuget add source ./caminho/para/pasta-com-o-nupkg --name hubsaude-local
+dotnet add package HubSaude.Cliente --version 0.4.0 --source hubsaude-local</code></pre></div>
+    <p class="subnote">Isso adiciona ao seu projeto:</p>
     <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;PackageReference Include="HubSaude.Cliente" Version="0.4.0" /&gt;</code></pre></div>
   </section>
 
