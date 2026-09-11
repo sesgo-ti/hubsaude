@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Bibliotecas cliente oficiais: Python, Java, TypeScript e C#.">
+<title>SDKs · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="sdks" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">SDKs</span>
+      <h1 id="ptitle">Bibliotecas cliente</h1>
+      <p>As bibliotecas oficiais são organizadas por domínio, de acordo com a
+         finalidade de cada família de SDKs. Atualmente, existe apenas o
+         domínio de autenticação. Novos domínios que venham a surgir, como o
+         de envio de recurso, serão apresentados em seções próprias, sem
+         mesclar conteúdos distintos.</p>
+    </div>
+  </section>
+
+  <!-- ── DOMÍNIO: AUTENTICAÇÃO ── -->
+  <section id="autenticacao" class="block" aria-labelledby="atitle">
+    <div class="bhead">
+      <span class="eyebrow">Domínio</span>
+      <h2 id="atitle">Autenticação</h2>
+      <p>Quatro implementações da mesma biblioteca, uma por linguagem, com
+         comportamento idêntico: assinam as credenciais, solicitam o token via
+         SMART Backend Services e o renovam antes da expiração. Para o
+         detalhamento do funcionamento interno, consulte a página de
+         <a href="../fluxos/autenticacao.html">Autenticação</a>.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s3">
+        <h3>Python</h3>
+        <p>Ainda não está no PyPI. Por enquanto você instala a partir do
+           código-fonte, com suporte opcional a HSM.</p>
+        <div class="tlinks"><a class="il" href="autenticacao/python.html">Ver SDK →</a></div>
+      </article>
+      <article class="tile s3">
+        <h3>Java</h3>
+        <p>Disponível como dependência Maven. A versão 0.4.0 está publicada
+           enquanto o pacote não chega ao Maven Central.</p>
+        <div class="tlinks"><a class="il" href="autenticacao/java.html">Ver SDK →</a></div>
+      </article>
+      <article class="tile s3">
+        <h3>TypeScript</h3>
+        <p>Ainda não está no npm público. Instale a partir de um tarball do
+           repositório ou apontando direto para o Git.</p>
+        <div class="tlinks"><a class="il" href="autenticacao/typescript.html">Ver SDK →</a></div>
+      </article>
+      <article class="tile s3">
+        <h3>C#</h3>
+        <p>Distribuído como pacote NuGet, publicado junto de cada versão
+           lançada no GitHub.</p>
+        <div class="tlinks"><a class="il" href="autenticacao/csharp.html">Ver SDK →</a></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
