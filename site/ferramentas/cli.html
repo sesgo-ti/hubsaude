@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Instalação e uso do HubSaúde CLI.">
+<title>HubSaúde CLI · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="ferramentas" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <!-- ── FERRAMENTAS ── -->
+  <section id="ferramentas" class="block" aria-labelledby="ftitle">
+    <div class="bhead">
+      <span class="eyebrow">Ferramentas</span>
+      <h1 id="ftitle">HubSaúde CLI</h1>
+      <p>Um único programa instala e comanda tudo o que você precisa para testar
+         a integração antes de ir ao ar: validação de recursos, simulador e
+         servidor FHIR local. Ele não exige Java instalado nem permissão de
+         administrador.</p>
+    </div>
+
+    <!-- screencast: instalar e usar o HubSaúde CLI -->
+    <div class="term" role="img" style="margin-bottom:1.6rem"
+         aria-label="Demonstração de terminal: instalação do HubSaúde CLI via curl com verificação de checksum, conferência da versão e validação de uma instância FHIR em JSON.">
+      <div class="term-bar">
+        <span class="tdot tr" aria-hidden="true"></span><span class="tdot ty" aria-hidden="true"></span><span class="tdot tg" aria-hidden="true"></span>
+        <span class="term-title">instalar-hubsaude-cli.sh</span>
+        <span class="term-tag">HubSaúde CLI</span>
+      </div>
+      <div class="term-body" id="term-cli"></div>
+    </div>
+
+    <!-- instalação rápida (one-liner, estilo Deno): macOS/Linux e Windows -->
+    <div class="qi" aria-labelledby="qi-t">
+      <div class="qi-head">
+        <div>
+          <span id="qi-t" class="tt">Instalar com um comando</span>
+          <span class="ds">Baixa o <span class="qi-bin">hubsaude</span>, confere a integridade por SHA-256 e instala sem exigir administrador nem sudo</span>
+        </div>
+      </div>
+      <div class="qi-tabs" role="tablist" aria-label="Sistema operacional">
+        <button class="qi-tab is-on" type="button" role="tab" aria-selected="true"
+                id="qi-tab-unix" aria-controls="qi-cmd" data-os="unix">
+          macOS e Linux
+        </button>
+        <button class="qi-tab" type="button" role="tab" aria-selected="false"
+                id="qi-tab-win" aria-controls="qi-cmd" data-os="win">
+          Windows
+        </button>
+      </div>
+      <div class="qi-cmd" id="qi-cmd" role="tabpanel" aria-labelledby="qi-tab-unix">
+        <code class="qi-code"><span class="qi-prompt" aria-hidden="true">$</span><span class="qi-text" id="qi-text">curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash</span></code>
+        <button class="qi-copy" id="qi-copy" type="button" aria-label="Copiar comando de instalação">
+          <span class="qi-copy-ic" aria-hidden="true">⧉</span><span class="qi-copy-tx">Copiar</span>
+        </button>
+      </div>
+      <div class="qi-foot">
+        <span>No Windows o comando roda no <b>PowerShell</b>. Em macOS e Linux é preciso ter <code>curl</code> e <code>bash</code>.</span>
+        <a class="qi-more" href="https://github.com/sesgo-ti/hubsaude#readme" target="_blank" rel="noopener">Opções de versão e diretório →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── REFERÊNCIA DE COMANDOS ── -->
+  <section id="comandos" class="block" aria-labelledby="cmdtitle">
+    <div class="bhead">
+      <span class="eyebrow">Referência</span>
+      <h2 id="cmdtitle">Comandos</h2>
+      <p>Estes são os comandos do dia a dia. Todos partem do programa
+         <code>hubsaude</code> instalado acima.</p>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Comando</th><th>O que faz</th></tr></thead>
+      <tbody>
+        <tr><td>hubsaude validate &lt;arquivo&gt;</td><td>Valida um recurso FHIR R4 a partir de um arquivo</td></tr>
+        <tr><td>hubsaude validate --dir &lt;dir&gt;</td><td>Valida todos os recursos de um diretório</td></tr>
+        <tr><td>hubsaude validate -</td><td>Lê o recurso da entrada padrão (stdin)</td></tr>
+        <tr><td>hubsaude validate --output json|web</td><td>Saída em JSON ou na interface web interativa</td></tr>
+        <tr><td>hubsaude validate --profile &lt;url&gt;</td><td>Valida contra um perfil específico</td></tr>
+        <tr><td>hubsaude validate server status|stop</td><td>Consulta ou encerra o serviço local do Validador</td></tr>
+        <tr><td>hubsaude sim start|status|stop</td><td>Ciclo de vida do Simulador SMART on FHIR local</td></tr>
+        <tr><td>hubsaude server start [--reset]</td><td>Sobe o servidor HAPI FHIR local; <code>--reset</code> zera os dados</td></tr>
+        <tr><td>hubsaude server stop</td><td>Encerra o servidor HAPI FHIR local</td></tr>
+        <tr><td>hubsaude auth verify</td><td>Diagnóstico de credenciamento, detalhado abaixo</td></tr>
+        <tr><td>hubsaude status</td><td>Agrega, numa única invocação, o estado dos três componentes com ciclo de vida (validador, simulador e server)</td></tr>
+        <tr><td>hubsaude update --check</td><td>Verifica se há versão mais recente disponível</td></tr>
+        <tr><td>hubsaude version</td><td>Exibe a versão do CLI e dos componentes provisionados</td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">O Validador e o Simulador têm páginas próprias, com
+       exemplos de uso de cada um: <a href="validador.html">Validador</a> e
+       <a href="simulador.html">Simulador</a>.</p>
+  </section>
+
+  <!-- ── AUTH VERIFY ── -->
+  <section id="auth-verify" class="block" aria-labelledby="avtitle">
+    <div class="bhead">
+      <span class="eyebrow">Credenciamento</span>
+      <h2 id="avtitle">hubsaude auth verify</h2>
+      <p>Assim que o credenciamento é aprovado, este comando confirma em
+         segundos que a sua chave e o seu certificado realmente funcionam, sem
+         precisar escrever uma linha de código. Ele existe para conferência:
+         para obter tokens no funcionamento normal da aplicação, use um dos
+         <a href="../sdks/index.html">SDKs</a>.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>hubsaude auth verify \
+    --client-id hs-12345678 \
+    --key minha-chave.pem \
+    --cert meu-certificado.pem \
+    --ig hemograma --ig-versao 0.0.1</code></pre></div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Exit</th><th>Significado</th><th>Ação recomendada</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>Sucesso: token obtido, credencial apta</td><td>Nenhuma</td></tr>
+        <tr><td>3</td><td>Erro de uso: argumentos, arquivos ou configuração inválidos</td><td>Corrigir a invocação</td></tr>
+        <tr><td>4</td><td>Falha de rede: teste inconclusivo (descoberta, timeout, 429, 5xx)</td><td>Repetir mais tarde (retry/backoff)</td></tr>
+        <tr><td>6</td><td>Credencial não apta: rejeição definitiva (HTTP 400/401 <code>invalid_client</code> ou handshake mTLS)</td><td>Acionar o processo de credenciamento</td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">Na dúvida, o comando erra para o lado seguro. Se a
+       falha não puder ser atribuída com certeza à credencial, ela é
+       classificada como <code>4</code>, ou seja, inconclusiva. Uma credencial
+       nunca é declarada inapta sem evidência clara. Os mesmos códigos de saída
+       valem para a ferramenta Java autônoma
+       <a href="https://github.com/sesgo-ti/hubsaude-cliente-cli" target="_blank" rel="noopener">hubsaude-cliente-cli ↗</a>.</p>
+  </section>
+
+  <!-- ── VARIÁVEIS DE AMBIENTE ── -->
+  <section id="ambiente" class="block" aria-labelledby="envtitle">
+    <div class="bhead">
+      <span class="eyebrow">Configuração</span>
+      <h2 id="envtitle">Variáveis de ambiente</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Variável</th><th>Efeito</th><th>Padrão</th></tr></thead>
+      <tbody>
+        <tr><td>HUBSAUDE_VALIDADOR_PORT</td><td>Porta local do Validador</td><td>8090</td></tr>
+        <tr><td>HUBSAUDE_SIMULADOR_PORT</td><td>Porta local do Simulador</td><td>8443</td></tr>
+        <tr><td>HUBSAUDE_IDLE_TIMEOUT</td><td>Tempo de ociosidade antes de encerrar um componente local</td><td>30m</td></tr>
+        <tr><td>HUBSAUDE_HTTP_TIMEOUT</td><td>Timeout das requisições HTTP feitas pelo CLI</td><td>120s</td></tr>
+        <tr><td>HUBSAUDE_RELEASE_CHANNEL</td><td>Canal de release usado para baixar os componentes</td><td>stable</td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">As variáveis que controlam a instalação, como a versão
+       e a pasta de destino do programa, estão documentadas no
+       <a href="https://github.com/sesgo-ti/hubsaude#readme" target="_blank" rel="noopener">README do repositório de distribuição ↗</a>.</p>
+  </section>
+  <!-- ── OUTROS RECURSOS ── -->
+  <section id="recursos" class="block" aria-labelledby="rectitle">
+    <div class="bhead">
+      <span class="eyebrow">Downloads</span>
+      <h2 id="rectitle">Outros recursos</h2>
+      <p>Materiais que acompanham a integração e não fazem parte do CLI.</p>
+    </div>
+    <div class="tools">
+
+      <div class="tool">
+        <div class="thead"><div><b>Safira</b><span>Assina e valida documentos FHIR conforme a política de assinatura</span></div></div>
+        <div class="dls">
+          <a class="dl" href="https://github.com/sesgo-ti/safira" target="_blank" rel="noopener">Repositório ↗</a>
+          <a class="dl" href="https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html" target="_blank" rel="noopener">Política</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="thead"><div><b>Contrato FHIR</b><span>CapabilityStatements (normativo) e OpenAPI derivado</span></div></div>
+        <div class="dls">
+          <a class="dl" href="https://hub.saude.go.gov.br/downloads/hubsaude-capabilities">FHIR NPM (.tgz) ↓</a>
+          <a class="dl" href="https://hub.saude.go.gov.br/downloads/openapi-hubsaude-fhir">OpenAPI (.json) ↓</a>
+        </div>
+      </div>
+
+      <div class="tool">
+        <div class="thead"><div><b>Coleção do produtor</b><span>Requisições prontas para executar o fluxo de escrita (Bruno e .http)</span></div></div>
+        <div class="dls">
+          <a class="dl" href="https://hub.saude.go.gov.br/downloads/hubsaude-colecao-produtor">Bruno + .http (.zip) ↓</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+<script>
+/* ── screencast: HubSaúde CLI ── */
+(function(){
+  var el=document.getElementById('term-cli');if(!el)return;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lines=[
+    {h:'<span class="t-c"># 1) Instalar o HubSaúde CLI (sem Java · verifica SHA-256)</span>'},
+    {h:'<span class="t-p">$</span> <span class="t-cmd">curl</span> -fsSL <span class="t-v">raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh</span> | <span class="t-cmd">bash</span>'},
+    {h:'<span class="t-ok">  ✓ checksum verificado (SHA-256)</span>'},
+    {h:'<span class="t-ok">  ✓ hubsaude instalado em ~/.local/bin/hubsaude</span>'},
+    {h:''},
+    {h:'<span class="t-c"># 2) Conferir a versão do CLI e dos componentes</span>'},
+    {h:'<span class="t-p">$</span> <span class="t-cmd">hubsaude</span> <span class="t-s">version</span>'},
+    {h:'<span class="t-c">  hubsaude 0.2.2 · validador 1.4.0 · simulador 0.9.1</span>'},
+    {h:''},
+    {h:'<span class="t-c"># 3) Validar uma instância FHIR (JSON) contra os IGs</span>'},
+    {h:'<span class="t-p">$</span> <span class="t-cmd">hubsaude</span> <span class="t-s">validate</span> <span class="t-v">paciente.json</span>'},
+    {h:'<span class="t-ok">  ✓ Patient válido (0 erros · 0 avisos)</span>'}
+  ];
+  if(reduce){el.innerHTML=lines.map(function(l){return '<div class="tline">'+(l.h||'&nbsp;')+'</div>';}).join('');return;}
+  var i=0;
+  function next(){
+    if(i>=lines.length){setTimeout(function(){el.innerHTML='';i=0;next();},4200);return;}
+    var div=document.createElement('div');div.className='tline';div.innerHTML=lines[i].h||'&nbsp;';
+    var caret=document.createElement('span');caret.className='caret';
+    el.appendChild(div);
+    var prev=el.querySelector('.caret');if(prev)prev.remove();
+    div.appendChild(caret);
+    i++;setTimeout(next, lines[i-1].h===''?160:Math.random()*220+260);
+  }
+  next();
+})();
+
+/* ── instalação rápida: abas (macOS/Linux ⇄ Windows) + copiar ── */
+(function(){
+  var box=document.getElementById('qi-cmd');if(!box)return;
+  var txt=document.getElementById('qi-text'),
+      prompt=box.querySelector('.qi-prompt'),
+      tabs=document.querySelectorAll('.qi-tab'),
+      copy=document.getElementById('qi-copy'),
+      copyTx=copy.querySelector('.qi-copy-tx');
+  var cmds={
+    unix:{c:'curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash',p:'$'},
+    win:{c:'irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex',p:'PS>'}
+  };
+  var cur='unix';
+  function select(os){
+    if(!cmds[os])return;
+    cur=os;var d=cmds[os];txt.textContent=d.c;prompt.textContent=d.p;
+    tabs.forEach(function(t){var on=t.dataset.os===os;
+      t.classList.toggle('is-on',on);t.setAttribute('aria-selected',on?'true':'false');});
+    box.setAttribute('aria-labelledby','qi-tab-'+os);
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){select(t.dataset.os);});});
+  var tmr;
+  copy.addEventListener('click',function(){
+    var cmd=cmds[cur].c;
+    function done(){copy.classList.add('is-done');copyTx.textContent='Copiado!';
+      clearTimeout(tmr);tmr=setTimeout(function(){copy.classList.remove('is-done');copyTx.textContent='Copiar';},1800);}
+    function fallback(){var ta=document.createElement('textarea');ta.value=cmd;
+      ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');done();}catch(e){}document.body.removeChild(ta);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(cmd).then(done).catch(fallback);
+    }else{fallback();}
+  });
+  /* pré-seleciona a plataforma do visitante (estilo Deno) */
+  if(/Windows/i.test(navigator.userAgent||''))select('win');
+})();
+</script>
+</body>
+</html>
