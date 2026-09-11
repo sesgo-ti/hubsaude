@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Biblioteca cliente C#/.NET para obtenção de access tokens via SMART Backend Services.">
+<title>SDK C# · HubSaúde</title>
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<script src="../../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="sdks" base="../../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../../index.html">Início</a>
+    <a href="../../fluxos/index.html">Fluxos</a>
+    <a href="../../sdks/index.html">SDKs</a>
+    <a href="../../ferramentas/index.html">Ferramentas</a>
+    <a href="../../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">SDKs</span>
+      <h1 id="ptitle">SDK C#</h1>
+      <p>Biblioteca cliente C#/.NET (pacote NuGet <code>HubSaude.Cliente</code>).</p>
+      <div class="tlinks"><a class="il" href="../../fluxos/autenticacao.html">Ver o fluxo de Autenticação →</a></div>
+    </div>
+  </section>
+
+  <!-- ── INSTALAÇÃO ── -->
+  <section id="instalacao" class="block" aria-labelledby="ititle">
+    <div class="bhead">
+      <span class="eyebrow">1. Instalação</span>
+      <h2 id="ititle">Instalação</h2>
+      <p>O nupkg (e o SBOM CycloneDX) saem da GitHub Release da tag; a
+         publicação no nuget.org ainda não faz parte do repositório.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;PackageReference Include="HubSaude.Cliente" Version="0.4.0" /&gt;</code></pre></div>
+  </section>
+
+  <!-- ── USO BÁSICO ── -->
+  <section id="uso-basico" class="block" aria-labelledby="utitle">
+    <div class="bhead">
+      <span class="eyebrow">2. Uso básico</span>
+      <h2 id="utitle">Uso básico</h2>
+      <p><code>SmartTokenClient.CreateBuilder()</code> é a única forma de
+         construção, já que a classe não expõe construtores públicos. Implementa
+         <code>IDisposable</code>/<code>IAsyncDisposable</code>.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .CertificatePem("certificado.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.rs");</code></pre></div>
+  </section>
+
+  <!-- ── FONTES DE CHAVE ── -->
+  <section id="fontes-de-chave" class="block" aria-labelledby="ftitle">
+    <div class="bhead">
+      <span class="eyebrow">3. Fontes de chave</span>
+      <h2 id="ftitle">Fontes de chave suportadas</h2>
+      <p>Sua chave privada pode estar em diferentes lugares: um arquivo, um
+         cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso
+         com a interface <code>ISigningStrategy</code> (um único método que
+         assina bytes), e <code>SigningStrategyFactory</code> já traz pronta
+         a construção para as fontes mais comuns.</p>
+    </div>
+    <h3 class="subhead subhead-first">PEM com senha</h3>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>var senha = "segredo".ToCharArray();
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .PrivateKeyPassword(senha)
+    .Build();</code></pre></div>
+    <h3 class="subhead">PKCS#12 direto (recomendado para produção)</h3>
+    <p class="subnote">Um único arquivo (<code>.pfx</code>/<code>.p12</code>)
+       já reúne a chave e o certificado, protegido por senha.</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .ClientPkcs12("certificado.pfx", "alias-da-chave", "senha-pfx".ToCharArray())
+    .Build();</code></pre></div>
+    <h3 class="subhead">HSM via PKCS#11</h3>
+    <p class="subnote">Um HSM (Hardware Security Module) é um dispositivo
+       dedicado que guarda a chave e nunca a expõe: toda assinatura acontece
+       dentro dele, acessado aqui pelo padrão PKCS#11.</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .SigningStrategy(SigningStrategyFactory.FromPkcs11(new Pkcs11Options
+    {
+        Library = "/usr/lib/softhsm/libsofthsm2.so",
+        Pin = pinDoToken,
+        TokenLabel = "hubsaude",
+        KeyLabel = "jwt-key",
+        JwtAlgorithm = "RS384",
+    }))
+    .ClientPkcs12("cliente-mtls.pfx", "alias-do-cert", senhaPfx)
+    .Build();</code></pre></div>
+  </section>
+
+  <!-- ── CONFIGURAÇÃO COMPLETA ── -->
+  <section id="configuracao" class="block" aria-labelledby="ctitle">
+    <div class="bhead">
+      <span class="eyebrow">4. Configuração</span>
+      <h2 id="ctitle">Configuração completa</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Método do builder</th><th>Obrigatório</th><th>Padrão</th><th>Observações</th></tr></thead>
+      <tbody>
+        <tr><td>.TokenEndpoint(url)</td><td>sim¹</td><td>—</td><td>URL completa do endpoint de token</td></tr>
+        <tr><td>.FhirBase(url)</td><td>sim¹</td><td>—</td><td>Base FHIR para descoberta automática</td></tr>
+        <tr><td>.ClientId(id)</td><td>sim</td><td>—</td><td>Emitido pelo Ganesha</td></tr>
+        <tr><td>.PrivateKeyPem(path)</td><td>sim²</td><td>—</td><td>Caminho do PEM da chave privada</td></tr>
+        <tr><td>.PrivateKeyPassword(char[])</td><td>não</td><td>—</td><td>Senha do PEM criptografado</td></tr>
+        <tr><td>.SigningStrategy(strategy)</td><td>sim²</td><td>—</td><td>Estratégia pronta (HSM, cofre etc.)</td></tr>
+        <tr><td>.CertificatePem(path)</td><td>não³</td><td>—</td><td>Certificado do cliente (PEM)</td></tr>
+        <tr><td>.ClientPkcs12(path, alias, senha)</td><td>não</td><td>—</td><td>mTLS via bundle PKCS#12</td></tr>
+        <tr><td>.ServerTrustAnchor(path)</td><td>não</td><td>trust store do sistema</td><td>PEM ou certificado</td></tr>
+        <tr><td>.TlsProtocol(protocolo)</td><td>não</td><td>TLSv1.3</td><td>Ex.: TLSv1.2</td></tr>
+        <tr><td>.JwtAlgorithm(alg)</td><td>não</td><td>RS384</td><td>HubSaúde aceita RS384/ES384</td></tr>
+        <tr><td>.KeyId(kid)</td><td>não</td><td>—</td><td>Inclui kid no header do JWT</td></tr>
+        <tr><td>.HubContext(ig, versao)</td><td>não</td><td>—</td><td>Inclui o claim hub_ctx</td></tr>
+        <tr><td>.ConnectTimeout(TimeSpan)</td><td>não</td><td>10s</td><td>Conexão TCP</td></tr>
+        <tr><td>.RequestTimeout(TimeSpan)</td><td>não</td><td>30s</td><td>Requisição HTTP completa</td></tr>
+        <tr><td>.AssertionTtlSeconds(n)</td><td>não</td><td>60</td><td>Deveria ser ≤300</td></tr>
+        <tr><td>.MaxRetries(n)</td><td>não</td><td>3</td><td>Tentativas totais</td></tr>
+        <tr><td>.EnableTokenCache(bool)</td><td>não</td><td>true</td><td>Ativa ou desativa o cache de tokens</td></tr>
+        <tr><td>.TokenCacheMarginSeconds(n)</td><td>não</td><td>30</td><td>Margem de renovação antes da expiração</td></tr>
+        <tr><td>.TokenCacheMaxEntries(n)</td><td>não</td><td>1000</td><td>Descarte LRU por scope</td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">¹ Exatamente um entre <code>TokenEndpoint</code> e
+       <code>FhirBase</code>. ² Exatamente um entre <code>PrivateKeyPem</code>
+       e <code>SigningStrategy</code>. ³ Obrigatório apenas para mTLS via
+       chave em memória.</p>
+  </section>
+
+  <!-- ── ERROS ── -->
+  <section id="excecoes" class="block" aria-labelledby="etitle">
+    <div class="bhead">
+      <span class="eyebrow">5. Exceções</span>
+      <h2 id="etitle">Exceções</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Tipo</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td>SmartTokenException</td><td>Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado</td></tr>
+        <tr><td>SigningException</td><td>Falha da estratégia criptográfica ao assinar o client_assertion</td></tr>
+      </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── LINKS ── -->
+  <section class="block" aria-labelledby="ltitle">
+    <div class="bhead">
+      <span class="eyebrow">Referências</span>
+      <h2 id="ltitle">Repositório e especificação</h2>
+    </div>
+    <div class="tlinks">
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude-cliente-csharp" target="_blank" rel="noopener">Repositório ↗</a>
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md" target="_blank" rel="noopener">Especificação normativa (compartilhada pelos 4 SDKs) ↗</a>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
