@@ -94,9 +94,10 @@
          carrega o campo <code>cnf</code> e fica atrelado a esse certificado
          (veja <a href="autenticacao.html#cache-mtls">Cache e mTLS</a>). Isso
          quer dizer que o cabeçalho <code>Authorization: Bearer</code> sozinho
-         não basta: a chamada a <code>/fhir/*</code> precisa acontecer na mesma
-         conexão mTLS, apresentando o mesmo certificado usado para obter o
-         token. Caso contrário a resposta é <code>401</code>, acompanhada de
+         não basta: a chamada a <code>/fhir/*</code> também precisa ser mTLS,
+         apresentando o mesmo certificado de cliente usado para obter o
+         token — não precisa ser a mesma conexão TCP, só o mesmo certificado.
+         Caso contrário a resposta é <code>401</code>, acompanhada de
          <code>WWW-Authenticate: Bearer error="invalid_token"</code> e de um
          <code>OperationOutcome</code> explicando a recusa.</p>
     </div>
@@ -136,6 +137,8 @@ headers = {
 # O mesmo certificado de cliente usado para obter o token (RFC 8705)
 with httpx.Client(cert=("certificado.pem", "chave-privada.pem")) as http:
     resp = http.post("https://hub.saude.go.gov.br/fhir/Patient", json=paciente, headers=headers)
+    if resp.status_code != 202:
+        raise RuntimeError(f"Envio recusado: {resp.status_code} {resp.text}")
     task_url = resp.headers["Content-Location"]
 
     while True:
@@ -144,8 +147,8 @@ with httpx.Client(cert=("certificado.pem", "chave-privada.pem")) as http:
             break
         time.sleep(1)
 
-    if task["status"] == "rejected":
-        raise RuntimeError(f"Task rejeitada: {task}")
+    if task["status"] != "completed":
+        raise RuntimeError(f"Task não concluída ({task['status']}): {task}")
 
     print(task["output"][0]["valueReference"])
 </template>
@@ -170,6 +173,9 @@ var request = HttpRequest.newBuilder(URI.create("https://hub.saude.go.gov.br/fhi
         .build();
 
 var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+if (response.statusCode() != 202) {
+    throw new IllegalStateException("Envio recusado: " + response.statusCode() + " " + response.body());
+}
 String taskUrl = response.headers().firstValue("Content-Location").orElseThrow();
 
 JsonNode task;
@@ -185,8 +191,8 @@ do {
     status = task.get("status").asText();
 } while (status.equals("accepted") || status.equals("in-progress"));
 
-if (status.equals("rejected")) {
-    throw new IllegalStateException("Task rejeitada: " + task);
+if (!status.equals("completed")) {
+    throw new IllegalStateException("Task não concluída (" + status + "): " + task);
 }
 </template>
 <template data-lang="typescript" data-label="TypeScript">
@@ -215,6 +221,9 @@ const response = await fetch("https://hub.saude.go.gov.br/fhir/Patient", {
   dispatcher: mtlsAgent,
 });
 
+if (response.status !== 202) {
+  throw new Error(`Envio recusado: ${response.status} ${await response.text()}`);
+}
 const taskUrl = response.headers.get("Content-Location")!;
 
 let task: any;
@@ -227,8 +236,8 @@ do {
   task = await taskResponse.json();
 } while (task.status === "accepted" || task.status === "in-progress");
 
-if (task.status === "rejected") {
-  throw new Error(`Task rejeitada: ${JSON.stringify(task)}`);
+if (task.status !== "completed") {
+  throw new Error(`Task não concluída (${task.status}): ${JSON.stringify(task)}`);
 }
 </template>
 <template data-lang="csharp" data-label="C#">
@@ -251,6 +260,11 @@ request.Headers.Add("Prefer", "respond-async");
 request.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
 
 var response = await httpClient.SendAsync(request);
+if ((int)response.StatusCode != 202)
+{
+    var corpo = await response.Content.ReadAsStringAsync();
+    throw new InvalidOperationException($"Envio recusado: {(int)response.StatusCode} {corpo}");
+}
 string taskUrl = response.Content.Headers.ContentLocation!.ToString();
 
 JsonDocument task;
@@ -265,9 +279,9 @@ do
     status = task.RootElement.GetProperty("status").GetString()!;
 } while (status is "accepted" or "in-progress");
 
-if (status == "rejected")
+if (status != "completed")
 {
-    throw new InvalidOperationException($"Task rejeitada: {task.RootElement}");
+    throw new InvalidOperationException($"Task não concluída ({status}): {task.RootElement}");
 }
 </template>
 </hs-code-tabs>
