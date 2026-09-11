@@ -1,0 +1,13 @@
+:root{
+  --bg:#eaf6ef;--bg-2:#dcefe3;--bg-elev:#ffffff;
+  --tx:#10301f;--tx-2:#3a5446;--tx-3:#566e61;
+  --card:#ffffff;--card-2:#ffffff;
+  --card-hover:#eef9f3;
+  --bd:rgba(15,51,34,.12);--bd-2:rgba(15,51,34,.18);--bd-hover:rgba(16,185,129,.55);
+  --acc:#34d399;--acc-br:#7eecc0;--acc-dim:#10b981;--acc-deep:#059669;--acc-deepest:#036a4c;
+  --cyan:#5eead4;--lime:#a3e635;
+  --r-s:10px;--r-m:14px;--r-l:20px;--r-x:28px;
+  --fs:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --fm:'JetBrains Mono','SF Mono','Fira Code',monospace;
+  --mx:1160px;
+}
