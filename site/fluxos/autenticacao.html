@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Autenticação SMART on FHIR / OAuth2 para integradores.">
+<title>Autenticação · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+<script src="../assets/js/code-tabs.js" defer></script>
+</head>
+<body>
+<hs-header active="fluxos" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">Fluxos</span>
+      <h1 id="ptitle">Autenticação SMART on FHIR</h1>
+      <p>O HubSaúde não usa senha nem chave de API. Nesta etapa acontecem duas
+         coisas: seu sistema <strong>prova quem é</strong>, apresentando um
+         certificado digital, e <strong>recebe permissão</strong> na forma de um
+         token temporário, limitado ao que a sua instituição foi autorizada a
+         acessar. Quem conduz a troca do outro lado é o
+         <strong>servidor de autorização</strong> do HubSaúde, seguindo o padrão
+         <a href="https://hl7.org/fhir/smart-app-launch/backend-services.html" target="_blank" rel="noopener">SMART Backend Services</a>,
+         construído sobre OAuth 2.0 e adotado internacionalmente para integração
+         entre sistemas de saúde.</p>
+      <p>Na prática os <a href="../sdks/index.html">SDKs oficiais</a> fazem todo
+         esse trabalho por você, e uma chamada de método basta. As seções abaixo
+         servem para quando você precisar entender o que acontece por dentro,
+         seja para investigar um erro, seja para implementar o fluxo sem eles.</p>
+    </div>
+  </section>
+
+  <!-- ── DESCOBERTA (console) ── -->
+  <section id="descoberta" class="block" aria-labelledby="dtitle">
+    <div class="bhead">
+      <span class="eyebrow">1. Descoberta</span>
+      <h2 id="dtitle">Descoberta da API</h2>
+      <p>Em vez de fixar endereços no seu código, pergunte ao próprio servidor
+         onde ficam as coisas e como a segurança está configurada. Os três
+         endereços abaixo são públicos e você pode abri-los agora mesmo.</p>
+    </div>
+    <div class="console">
+      <div class="console-bar">● hubsaude · api discovery</div>
+      <a class="endpoint" href="https://hub.saude.go.gov.br/metadata" target="_blank" rel="noopener">
+        <span class="verb">GET</span>
+        <span class="epath">/metadata</span>
+        <span class="edesc">Capability Statement FHIR R4 do HubSaúde</span>
+        <span class="estatus"><span class="d" aria-hidden="true"></span>online</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a>
+      <a class="endpoint" href="https://hub.saude.go.gov.br/.well-known/smart-configuration" target="_blank" rel="noopener">
+        <span class="verb">GET</span>
+        <span class="epath">/.well-known/smart-configuration</span>
+        <span class="edesc">Descoberta OAuth2 / SMART</span>
+        <span class="estatus"><span class="d" aria-hidden="true"></span>online</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a>
+      <a class="endpoint" href="https://hub.saude.go.gov.br/cds-services" target="_blank" rel="noopener">
+        <span class="verb">GET</span>
+        <span class="epath">/cds-services</span>
+        <span class="edesc">Descoberta de serviços CDS Hooks</span>
+        <span class="estatus"><span class="d" aria-hidden="true"></span>online</span>
+        <span class="go" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── MONTANDO O CLIENT_ASSERTION ── -->
+  <section id="assertion" class="block" aria-labelledby="atitle">
+    <div class="bhead">
+      <span class="eyebrow">2. client_assertion</span>
+      <h2 id="atitle">Provando a identidade do seu sistema</h2>
+      <p>Esta é a parte de autenticação do fluxo: aqui seu sistema apenas
+         demonstra quem é. A permissão de acesso vem depois, no passo
+         seguinte.</p>
+      <p>Para provar que é quem diz ser, seu sistema monta um pequeno documento
+         assinado, o <code>client_assertion</code>. Tecnicamente é um JWT
+         (JSON Web Token): um texto dividido em três partes separadas por
+         ponto (cabeçalho, conteúdo e assinatura). A assinatura é gerada com a
+         chave privada do seu certificado; o HubSaúde a confere com a chave
+         pública já cadastrada no credenciamento, e só quem possui a chave
+         privada correspondente consegue produzi-la corretamente. É essa
+         assinatura que prova que o pedido veio do seu sistema, e o documento
+         vale por poucos segundos.</p>
+      <p>Os SDKs oficiais montam e assinam esse documento sozinhos, então você
+         não precisa construí-lo à mão. Conhecer o que ele contém ajuda a
+         investigar falhas de autenticação e atende a exigências de
+         auditoria. As duas primeiras partes (cabeçalho e conteúdo) não são
+         criptografadas, apenas codificadas: qualquer um consegue lê-las. É
+         nelas que ficam as seguintes informações:</p>
+    </div>
+    <div class="bento">
+      <article class="tile s6">
+        <h3>Cabeçalho</h3>
+        <p>Diz qual algoritmo assinou o documento. O padrão é <code>RS384</code>,
+           e o HubSaúde aceita apenas <code>RS384</code> ou <code>ES384</code>.
+           Vem acompanhado de <code>typ: "JWT"</code>. Informe também o
+           <code>kid</code> sempre que puder: ele identifica qual das suas
+           chaves foi usada e passa a ser obrigatório quando há mais de uma
+           chave registrada. Sem ele, o servidor responde
+           <code>401 invalid_client</code>.</p>
+      </article>
+      <article class="tile s6">
+        <h3>Conteúdo</h3>
+        <p>Identifica quem pede e a quem se destina: <code>iss</code> e
+           <code>sub</code> trazem o <code>client_id</code>, enquanto
+           <code>aud</code> aponta o endereço do token. <code>iat</code> e
+           <code>exp</code> delimitam a validade, por padrão 60 segundos e no
+           máximo 300. O <code>jti</code> é um número de série que nunca se
+           repete entre pedidos. Já <code>hub_ctx</code> é opcional e declara o
+           Guia de Implementação pretendido, no formato
+           <code>{ig, versao}</code>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── TROCANDO POR UM ACCESS TOKEN ── -->
+  <section id="token" class="block" aria-labelledby="ttitle">
+    <div class="bhead">
+      <span class="eyebrow">3. Access token</span>
+      <h2 id="ttitle">Trocando por um access token</h2>
+      <p>Aqui vem a parte de autorização. Com o documento assinado em mãos, o
+         SDK o envia ao servidor de autorização e recebe o token de acesso de
+         volta. É um <code>POST</code> em formato de
+         formulário (<code>application/x-www-form-urlencoded</code>) com os
+         campos <code>grant_type=client_credentials</code>,
+         <code>client_id</code>, <code>client_assertion_type</code>,
+         <code>client_assertion</code> e <code>scope</code>, este último
+         omitido quando vazio.</p>
+      <p>O campo <code>scope</code> declara o que você pretende acessar, mas
+         quem decide é o servidor: ele concede no máximo o que já estava
+         pré-autorizado para o seu cadastro no credenciamento.</p>
+      <p>Apenas o código <code>HTTP 200</code> significa sucesso. Se vier
+         <code>429</code>, o servidor está pedindo que você espere, e os SDKs
+         não repetem a tentativa sozinhos nesse caso.</p>
+    </div>
+    <hs-code-tabs>
+<template data-lang="python" data-label="Python">
+from hubsaude_client.builder import SmartTokenClientBuilder
+
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .private_key_pem("/caminho/para/chave-privada.pem")
+    .build()
+)
+
+resultado = client.obtain_token(scope="system/Patient.rs")
+print(resultado)
+
+client.close()
+</template>
+<template data-lang="java" data-label="Java">
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .privateKeyPem(Path.of("chave-privada.pem"))
+        .certificatePem(Path.of("certificado.pem"))
+        .build();
+
+String token = client.obtainToken("system/Patient.rs");
+</template>
+<template data-lang="typescript" data-label="TypeScript">
+import { createSmartTokenClient } from "hubsaude-cliente-js";
+
+const client = await createSmartTokenClient({
+  tokenEndpoint: "https://hub.saude.go.gov.br/auth/token",
+  clientId: "meu-sistema",
+  privateKeyPem: "chave-privada.pem",
+  certificatePem: "certificado.pem",
+});
+
+const token = await client.obtainToken("system/Patient.rs");
+</template>
+<template data-lang="csharp" data-label="C#">
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .CertificatePem("certificado.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.rs");
+</template>
+    </hs-code-tabs>
+  </section>
+
+  <!-- ── CACHE, RENOVAÇÃO E MTLS ── -->
+  <section id="cache-mtls" class="block" aria-labelledby="ctitle">
+    <div class="bhead">
+      <span class="eyebrow">4. Cache e mTLS</span>
+      <h2 id="ctitle">Cache, renovação e mTLS</h2>
+      <p>Pedir um token novo a cada chamada seria lento e desnecessário, então o
+         SDK guarda o token e o reaproveita enquanto ele valer. O cache é
+         separado por scope, e o token é considerado válido enquanto
+         <code>agora + margem &lt; expiração</code>, com margem padrão de 30
+         segundos. Nesse intervalo, chamadas repetidas não geram tráfego de
+         rede.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s6">
+        <h3>Token preso ao certificado</h3>
+        <p>Numa conexão HTTPS comum, só o servidor comprova sua identidade com
+           um certificado. No mTLS (TLS mútuo), o cliente, ou seja, o seu
+           sistema, também apresenta um certificado ao se conectar. Quando
+           isso acontece, o token emitido pelo HubSaúde fica atrelado a esse
+           certificado (campo <code>cnf.x5t#S256</code>, definido pela
+           <a href="https://www.rfc-editor.org/rfc/rfc8705.html#section-3.1" target="_blank" rel="noopener">RFC 8705</a>).
+           Na prática, um token interceptado não serve a mais ninguém: só quem
+           apresentar o mesmo certificado consegue usá-lo. Veja como isso
+           aparece no <a href="envio-recurso.html#certificado">Envio de Recurso</a>.</p>
+      </article>
+      <article class="tile s6">
+        <h3>Quando o token deixa de valer</h3>
+        <p>Um <code>401</code> numa chamada FHIR normalmente significa que o
+           token guardado não vale mais. Descarte o cache daquele scope e peça
+           um novo. Se o <code>401</code> se repetir com o token recém-obtido,
+           pare de tentar: o problema está na credencial, não no cache.</p>
+      </article>
+    </div>
+    <h3 class="subhead">Descartando o token guardado</h3>
+    <p>Os exemplos abaixo fazem os dois passos em sequência: primeiro descartam
+       o token que está no cache para aquele scope, depois pedem um novo ao
+       servidor. O primeiro passo é indispensável, porque enquanto o horário de
+       expiração não chega o SDK considera o token válido e devolveria de novo
+       exatamente o mesmo que acabou de ser recusado.</p>
+    <hs-code-tabs>
+<template data-lang="python" data-label="Python">
+client.invalidate_cache("system/Patient.rs")
+token_renovado = client.obtain_token(scope="system/Patient.rs")
+</template>
+<template data-lang="java" data-label="Java">
+client.invalidateCache("system/Patient.rs");
+String renewedToken = client.obtainToken("system/Patient.rs");
+</template>
+<template data-lang="typescript" data-label="TypeScript">
+client.invalidateCache("system/Patient.rs");
+const renewedToken = await client.obtainToken("system/Patient.rs");
+</template>
+<template data-lang="csharp" data-label="C#">
+client.InvalidateCache("system/Patient.rs");
+string renewedToken = await client.ObtainTokenAsync("system/Patient.rs");
+</template>
+    </hs-code-tabs>
+  </section>
+
+  <!-- ── ERROS COMUNS ── -->
+  <section id="erros" class="block" aria-labelledby="etitle">
+    <div class="bhead">
+      <span class="eyebrow">5. Erros comuns</span>
+      <h2 id="etitle">Erros comuns</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead>
+        <tr><th>Situação</th><th>Causa</th><th>O que fazer</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>401 invalid_client</td>
+          <td>Cliente tem múltiplas chaves registradas e o assertion não informa qual</td>
+          <td>Configurar <code>keyId</code> no SDK</td>
+        </tr>
+        <tr>
+          <td>401</td>
+          <td>Certificado mTLS ausente ou divergente do cadastrado</td>
+          <td>Conferir o par chave/certificado usado pelo SDK</td>
+        </tr>
+        <tr>
+          <td>429</td>
+          <td>Limite de requisições atingido</td>
+          <td>Não há repetição automática: aguarde o <code>Retry-After</code> e tente de novo</td>
+        </tr>
+        <tr>
+          <td>Erro de assinatura (<code>SigningException</code>/<code>SigningError</code>)</td>
+          <td>Falha criptográfica na estratégia de assinatura configurada</td>
+          <td>Verificar formato/senha da chave PEM ou a configuração do HSM</td>
+        </tr>
+      </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
