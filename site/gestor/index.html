@@ -181,6 +181,78 @@
       </div>
     </div>
   </section>
+
+  <!-- ── DEPOIS DE ENVIAR ── -->
+  <section id="depois" class="block" aria-labelledby="dtitle">
+    <div class="bhead">
+      <span class="eyebrow">Bastidores</span>
+      <h2 id="dtitle">O que acontece depois de enviar o pedido</h2>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <span class="step-num">1</span>
+        <div>
+          <p class="step-title">Validação</p>
+          <p class="step-desc">A SES-GO analisa o pedido, confirma que o solicitante é quem diz ser e atribui o <a href="#niveis">nível de credenciamento</a> (N1, N2 ou N3).</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">2</span>
+        <div>
+          <p class="step-title">Cadastro</p>
+          <p class="step-desc">Aprovado, o Ganesha cadastra a chave pública do certificado no servidor de autorização, já com os acessos definidos para o serviço solicitado.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">3</span>
+        <div>
+          <p class="step-title">Credencial</p>
+          <p class="step-desc">O Ganesha devolve um <code>client_id</code>, que passa a valer como credencial do estabelecimento para aquele serviço.</p>
+        </div>
+      </li>
+      <li class="step">
+        <span class="step-num">4</span>
+        <div>
+          <p class="step-title">Pronto para autenticar</p>
+          <p class="step-desc">Com o <code>client_id</code>, o cadastro feito pelo Ganesha e a chave privada do certificado (que só a instituição possui), o sistema já consegue solicitar e receber o token de acesso.</p>
+        </div>
+      </li>
+    </ol>
+    <p class="pagenote">O <code>client_id</code> e o certificado são o material
+       de entrada da autenticação técnica. Veja como um sistema os usa na
+       prática no fluxo de <a href="../fluxos/autenticacao.html">Autenticação</a>
+       e na referência dos <a href="../sdks/index.html">SDKs oficiais</a>.</p>
+  </section>
+
+  <!-- ── ACOMPANHAMENTO ── -->
+  <section id="acompanhamento" class="block" aria-labelledby="atitle">
+    <div class="bhead">
+      <span class="eyebrow">Depois de solicitar</span>
+      <h2 id="atitle">Acompanhando a solicitação</h2>
+      <p>No menu lateral do Ganesha, "Acompanhar Solicitações" mostra o
+         andamento de cada pedido feito pelo estabelecimento, com o status
+         atual (por exemplo, "Aguardando Análise"). Assim que um pedido é
+         aprovado, novas ações relacionadas a ele passam a ficar disponíveis
+         ali mesmo, sem precisar refazer o cadastro. Já em "Credenciais"
+         ficam listadas as credenciais já emitidas para o estabelecimento,
+         por serviço, útil para conferir mais tarde o que está ativo.</p>
+    </div>
+  </section>
+
+  <!-- ── COMO SOLICITAR ── -->
+  <section id="solicitar" class="block" aria-labelledby="stitle">
+    <div class="bhead">
+      <span class="eyebrow">Próximo passo</span>
+      <h2 id="stitle">Como solicitar o credenciamento</h2>
+      <p>O Ganesha é um sistema externo, operado pela SES-GO, que não faz
+         parte do código nem da infraestrutura do HubSaúde. Reunidos os
+         dados e documentos descritos acima, o primeiro contato para abrir a
+         solicitação é o canal institucional da Secretaria.</p>
+    </div>
+    <div class="tlinks">
+      <a class="il" href="mailto:suporte@saude.go.gov.br">Solicitar credenciamento ↗</a>
+    </div>
+  </section>
 </main>
 
 <hs-footer></hs-footer>
