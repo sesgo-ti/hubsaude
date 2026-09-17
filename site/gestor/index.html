@@ -55,28 +55,65 @@
       </article>
 
       <article class="tile s6">
-        <h3>Como funciona o credenciamento</h3>
-        <p>Do pedido à entrega das credenciais, em cinco etapas:</p>
-        <div class="levels">
-          <div class="lv"><b>1</b><span>Solicitação (CNES/CPF/CNPJ + nível)</span></div>
-          <div class="lv"><b>2</b><span>Aprovação e atribuição de nível</span></div>
-          <div class="lv"><b>3</b><span>Geração do <code>client_id</code> (UUID)</span></div>
-          <div class="lv"><b>4</b><span>Namespace e cadastro SMART</span></div>
-          <div class="lv"><b>5</b><span>Entrega das credenciais</span></div>
-        </div>
+        <h3>Passo a passo da solicitação</h3>
+        <p>Na Home do Ganesha, escolha a categoria e depois o serviço
+           desejado (ex.: "Envio de Exames de Laboratório"). A página do
+           serviço mostra contexto e requisitos antes de você seguir para o
+           botão de solicitar acesso, que abre o formulário dividido em
+           cinco abas preenchidas em sequência:</p>
+        <ol class="steps">
+          <li class="step">
+            <span class="step-num">1</span>
+            <div>
+              <p class="step-title">Solicitante</p>
+              <p class="step-desc">Seus dados como responsável: CPF, nome completo, data de nascimento, e-mail, nome da mãe e telefone.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">2</span>
+            <div>
+              <p class="step-title">Estabelecimento</p>
+              <p class="step-desc">Informe o CNES e clique em "Consultar". A razão social, o CNPJ e o endereço são preenchidos automaticamente.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">3</span>
+            <div>
+              <p class="step-title">Sistema</p>
+              <p class="step-desc">Anexe o certificado digital e o documento de identificação institucional (veja o alerta a seguir).</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">4</span>
+            <div>
+              <p class="step-title">Acessos do Serviço</p>
+              <p class="step-desc">Tela só de conferência: mostra os recursos FHIR já definidos para o serviço solicitado.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step-num">5</span>
+            <div>
+              <p class="step-title">Resumo</p>
+              <p class="step-desc">Revise tudo, declare que é o responsável legal pela instituição e confirme.</p>
+            </div>
+          </li>
+        </ol>
       </article>
 
       <article class="tile s6">
-        <h3>Níveis de credenciamento</h3>
-        <p>O nível atribuído define o grau de acesso aos dados em saúde:</p>
-        <div class="levels">
-          <div class="lv"><b>N1</b><span>Básico, só com consentimento</span></div>
-          <div class="lv"><b>N2</b><span>Pleno, inclui emergência</span></div>
-          <div class="lv"><b>N3</b><span>Regulatório, vigilância e LGPD</span></div>
-        </div>
-        <!-- TODO: adicionar link para o sistema Ganesha assim que a URL real for definida -->
-        <div class="tlinks" style="margin-top:1rem">
-          <a class="il" href="https://fhir.saude.go.gov.br" target="_blank" rel="noopener">Documentação ↗</a>
+        <h3>Certificado: só a parte pública, nunca a chave privada</h3>
+        <p>Na aba "Sistema" você anexa o <strong>certificado digital
+           ICP-Brasil da instituição</strong>, em arquivo <code>.cer</code>
+           (até 10 MB), mais um documento de identificação institucional
+           (PNG, JPG ou PDF, até 10 MB).</p>
+        <div class="callout">
+          <p><b>O arquivo <code>.cer</code> contém só a chave pública do
+             certificado.</b> A chave privada nunca deve ser enviada a
+             ninguém, nem ao Ganesha, nem ao HubSaúde: ela fica só com quem
+             administra o certificado na instituição. É justamente por
+             ninguém além do dono ter acesso a ela que o certificado serve
+             como prova de identidade depois, no momento de autenticar o
+             sistema.</p>
         </div>
       </article>
     </div>
