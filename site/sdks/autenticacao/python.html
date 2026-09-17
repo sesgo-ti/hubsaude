@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Biblioteca cliente Python para obtenção de access tokens via SMART Backend Services.">
+<title>SDK Python · HubSaúde</title>
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<script src="../../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="sdks" base="../../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../../index.html">Início</a>
+    <a href="../../fluxos/index.html">Fluxos</a>
+    <a href="../../sdks/index.html">SDKs</a>
+    <a href="../../ferramentas/index.html">Ferramentas</a>
+    <a href="../../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">SDKs</span>
+      <h1 id="ptitle">SDK Python</h1>
+      <p>Biblioteca cliente Python (<code>hubsaude-client</code>) para obtenção
+         de access tokens via SMART Backend Services.</p>
+      <div class="tlinks"><a class="il" href="../../fluxos/autenticacao.html">Ver o fluxo de Autenticação →</a></div>
+    </div>
+  </section>
+
+  <!-- ── INSTALAÇÃO ── -->
+  <section id="instalacao" class="block" aria-labelledby="ititle">
+    <div class="bhead">
+      <span class="eyebrow">1. Instalação</span>
+      <h2 id="ititle">Instalação</h2>
+      <p>Ainda não publicado no PyPI. Instale a partir do código-fonte
+         (branch <code>develop</code>):</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>git clone https://github.com/sesgo-ti/hubsaude-cliente-python.git
+cd hubsaude-cliente-python
+pip install -e .</code></pre></div>
+    <p class="subnote">O extra opcional
+       <code>hsm</code> (<code>pip install "hubsaude-client[hsm]"</code>)
+       traz a dependência <code>python-pkcs11</code>, necessária apenas
+       para assinatura via HSM/smart token.</p>
+  </section>
+
+  <!-- ── USO BÁSICO ── -->
+  <section id="uso-basico" class="block" aria-labelledby="utitle">
+    <div class="bhead">
+      <span class="eyebrow">2. Uso básico</span>
+      <h2 id="utitle">Uso básico</h2>
+      <p><code>SmartTokenClientBuilder</code> monta o cliente passo a passo e
+         valida a configuração antes de criar a instância. Reutilize o mesmo
+         cliente durante todo o ciclo de vida da aplicação e chame
+         <code>close()</code> uma única vez ao encerrar, ou use o gerenciador
+         de contexto <code>with</code>.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>from hubsaude_client.builder import SmartTokenClientBuilder
+
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .private_key_pem("/caminho/para/chave-privada.pem")
+    .build()
+)
+
+resultado = client.obtain_token(scope="system/Patient.rs")
+print(resultado)
+
+client.close()</code></pre></div>
+  </section>
+
+  <!-- ── FONTES DE CHAVE ── -->
+  <section id="fontes-de-chave" class="block" aria-labelledby="ftitle">
+    <div class="bhead">
+      <span class="eyebrow">3. Fontes de chave</span>
+      <h2 id="ftitle">Fontes de chave suportadas</h2>
+      <p>Sua chave privada pode estar em diferentes lugares: um arquivo, um
+         cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso
+         com um contrato simples, <code>hubsaude_client.SigningStrategy</code>
+         (um <code>Protocol</code> com um único método,
+         <code>sign(bytes) -&gt; bytes</code>), e já traz pronta uma factory
+         para as quatro fontes mais comuns em
+         <code>hubsaude_client.strategy_factory</code>.</p>
+    </div>
+    <h3 class="subhead subhead-first">PEM com senha</h3>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .private_key_pem("/caminho/chave-encrypted.pem", password=bytearray(b"minha-senha"))
+    .build()
+)</code></pre></div>
+    <h3 class="subhead">PKCS#12 direto</h3>
+    <p class="subnote">
+       Um único arquivo (<code>.pfx</code>/<code>.p12</code>) já reúne a
+       chave e o certificado, protegido por senha.
+       <code>.client_key_store(path, password)</code> resolve os dois de uma
+       vez: a assinatura e o certificado de cliente para mTLS.</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .client_key_store("certificado.pfx", "senha-pfx")
+    .build()
+)</code></pre></div>
+    <h3 class="subhead">HSM via PKCS#11</h3>
+    <p class="subnote">
+       Um HSM (Hardware Security Module) é um dispositivo dedicado que guarda
+       a chave e nunca a expõe: toda assinatura acontece dentro dele. Requer
+       o extra opcional <code>hsm</code>; o SDK mantém apenas um handle de
+       sessão PKCS#11.</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>from hubsaude_client.strategy_factory import from_pkcs11
+
+strategy = from_pkcs11(
+    pkcs11_module_path="/usr/lib/softhsm/libsofthsm2.so",
+    token_label="meu-token",
+    key_label="minha-chave-hsm",
+    user_pin="123456",
+)
+
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .signing_strategy(strategy)
+    .build()
+)</code></pre></div>
+  </section>
+
+  <!-- ── CONFIGURAÇÃO COMPLETA ── -->
+  <section id="configuracao" class="block" aria-labelledby="ctitle">
+    <div class="bhead">
+      <span class="eyebrow">4. Configuração</span>
+      <h2 id="ctitle">Configuração completa</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Método do builder</th><th>Obrigatório</th><th>Padrão</th><th>Observações</th></tr></thead>
+      <tbody>
+        <tr><td>.token_endpoint(url)</td><td>sim¹</td><td>—</td><td>URL completa do endpoint de token</td></tr>
+        <tr><td>.fhir_base(url)</td><td>sim¹</td><td>—</td><td>Base FHIR para descoberta automática</td></tr>
+        <tr><td>.client_id(id)</td><td>sim</td><td>—</td><td>Emitido pelo Ganesha</td></tr>
+        <tr><td>.private_key_pem(path, password=None)</td><td>sim²</td><td>—</td><td>Caminho do PEM da chave privada</td></tr>
+        <tr><td>.signing_strategy(strategy)</td><td>sim²</td><td>—</td><td>Estratégia pronta (HSM, cofre etc.)</td></tr>
+        <tr><td>.certificate_pem(path)</td><td>não³</td><td>—</td><td>Certificado do cliente (PEM)</td></tr>
+        <tr><td>.client_key_store(path, password)</td><td>não</td><td>—</td><td>mTLS via bundle PKCS#12</td></tr>
+        <tr><td>.server_trust_anchor(path)</td><td>não</td><td>trust store do sistema</td><td>PEM ou certificado X.509</td></tr>
+        <tr><td>.tls_protocol(protocolo)</td><td>não</td><td>TLSv1.3</td><td>Ex.: TLSv1.2</td></tr>
+        <tr><td>.jwt_algorithm(alg)</td><td>não</td><td>RS384</td><td>HubSaúde aceita RS384/ES384</td></tr>
+        <tr><td>.key_id(kid)</td><td>não</td><td>—</td><td>Inclui kid no header do JWT</td></tr>
+        <tr><td>.hub_context(ig, versao)</td><td>não</td><td>—</td><td>Inclui o claim hub_ctx</td></tr>
+        <tr><td>.connect_timeout(timedelta)</td><td>não</td><td>10s</td><td>Conexão TCP</td></tr>
+        <tr><td>.request_timeout(timedelta)</td><td>não</td><td>30s</td><td>Requisição HTTP completa</td></tr>
+        <tr><td>.assertion_ttl_seconds(n)</td><td>não</td><td>60</td><td>Deveria ser ≤300</td></tr>
+        <tr><td>.max_retries(n)</td><td>não</td><td>3</td><td>Tentativas totais</td></tr>
+        <tr><td>.enable_token_cache(bool)</td><td>não</td><td>true</td><td>Ativa ou desativa o cache de tokens</td></tr>
+        <tr><td>.token_cache_margin_seconds(n)</td><td>não</td><td>30</td><td>Margem de renovação antes da expiração</td></tr>
+        <tr><td>.token_cache_max_entries(n)</td><td>não</td><td>1000</td><td>Descarte LRU por scope</td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">¹ Exatamente um entre <code>token_endpoint</code> e
+       <code>fhir_base</code>. ² Exatamente um entre <code>private_key_pem</code>
+       e <code>signing_strategy</code>. ³ Obrigatório apenas para mTLS via
+       chave em memória.</p>
+  </section>
+
+  <!-- ── ERROS ── -->
+  <section id="excecoes" class="block" aria-labelledby="etitle">
+    <div class="bhead">
+      <span class="eyebrow">5. Exceções</span>
+      <h2 id="etitle">Exceções</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Tipo</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td>SmartTokenError</td><td>Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado</td></tr>
+        <tr><td>SigningError</td><td>Falha da estratégia criptográfica ao assinar o client_assertion</td></tr>
+      </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── LINKS ── -->
+  <section class="block" aria-labelledby="ltitle">
+    <div class="bhead">
+      <span class="eyebrow">Referências</span>
+      <h2 id="ltitle">Repositório e especificação</h2>
+    </div>
+    <div class="tlinks">
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude-cliente-python" target="_blank" rel="noopener">Repositório ↗</a>
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md" target="_blank" rel="noopener">Especificação normativa (compartilhada pelos 4 SDKs) ↗</a>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>

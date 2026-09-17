@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Biblioteca cliente Java para obtenção de access tokens via SMART Backend Services.">
+<title>SDK Java · HubSaúde</title>
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/base.css">
+<link rel="stylesheet" href="../../assets/css/components.css">
+<script src="../../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="sdks" base="../../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../../index.html">Início</a>
+    <a href="../../fluxos/index.html">Fluxos</a>
+    <a href="../../sdks/index.html">SDKs</a>
+    <a href="../../ferramentas/index.html">Ferramentas</a>
+    <a href="../../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">SDKs</span>
+      <h1 id="ptitle">SDK Java</h1>
+      <p>Biblioteca cliente Java (<code>hubsaude-cliente-java</code>), a
+         <strong>implementação de referência</strong> do contrato
+         normativo compartilhado pelos 4 SDKs.</p>
+      <div class="tlinks"><a class="il" href="../../fluxos/autenticacao.html">Ver o fluxo de Autenticação →</a></div>
+    </div>
+  </section>
+
+  <!-- ── INSTALAÇÃO ── -->
+  <section id="instalacao" class="block" aria-labelledby="ititle">
+    <div class="bhead">
+      <span class="eyebrow">1. Instalação</span>
+      <h2 id="ititle">Instalação</h2>
+      <p>A release <code>0.4.0</code> está disponível, somente leitura, no
+         GitHub Packages legado. Novas versões serão promovidas pelo
+         repositório atual, até a publicação no Maven Central. O GitHub
+         Packages exige repositório e credenciais configurados mesmo para
+         leitura pública — a dependência sozinha não resolve.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;dependency&gt;
+    &lt;groupId&gt;br.gov.go.saude.hubsaude&lt;/groupId&gt;
+    &lt;artifactId&gt;hubsaude-cliente-java&lt;/artifactId&gt;
+    &lt;version&gt;0.4.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+    <p class="subnote">Adicione o repositório no <code>pom.xml</code>:</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;github&lt;/id&gt;
+        &lt;url&gt;https://maven.pkg.github.com/sesgo-ti/hubsaude-cliente-java&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;</code></pre></div>
+    <p class="subnote">E as credenciais no <code>~/.m2/settings.xml</code>
+       (um token pessoal com escopo <code>read:packages</code>):</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>&lt;servers&gt;
+    &lt;server&gt;
+        &lt;id&gt;github&lt;/id&gt;
+        &lt;username&gt;SEU_USUARIO_GITHUB&lt;/username&gt;
+        &lt;password&gt;SEU_TOKEN_COM_READ_PACKAGES&lt;/password&gt;
+    &lt;/server&gt;
+&lt;/servers&gt;</code></pre></div>
+  </section>
+
+  <!-- ── USO BÁSICO ── -->
+  <section id="uso-basico" class="block" aria-labelledby="utitle">
+    <div class="bhead">
+      <span class="eyebrow">2. Uso básico</span>
+      <h2 id="utitle">Uso básico</h2>
+      <p><code>SmartTokenClient</code> não expõe construtores públicos, então
+         <code>builder()</code> é a única entrada. A instância é
+         thread-safe; reutilize-a pelo ciclo de vida da aplicação e invoque
+         <code>close()</code> uma única vez no encerramento.</p>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .privateKeyPem(Path.of("chave-privada.pem"))
+        .certificatePem(Path.of("certificado.pem"))
+        .build();
+
+String token = client.obtainToken("system/Patient.rs");</code></pre></div>
+  </section>
+
+  <!-- ── FONTES DE CHAVE ── -->
+  <section id="fontes-de-chave" class="block" aria-labelledby="ftitle">
+    <div class="bhead">
+      <span class="eyebrow">3. Fontes de chave</span>
+      <h2 id="ftitle">Fontes de chave suportadas</h2>
+      <p>Sua chave privada pode estar em diferentes lugares: um arquivo, um
+         cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso
+         com a interface funcional <code>SigningStrategy</code> (um único
+         método, <code>sign(bytes) -&gt; bytes</code>), e
+         <code>SigningStrategyFactory</code> já traz pronta a construção para
+         as fontes mais comuns.</p>
+    </div>
+    <h3 class="subhead subhead-first">PEM com senha</h3>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .privateKeyPem(Path.of("chave-encrypted.pem"))
+        .privateKeyPassword("minha-senha".toCharArray())
+        .build();</code></pre></div>
+    <h3 class="subhead">PKCS#12 direto (recomendado para produção)</h3>
+    <p class="subnote">Um único arquivo (<code>.pfx</code>/<code>.p12</code>)
+       já reúne a chave e o certificado, protegido por senha.</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>KeyStore ks = KeyStore.getInstance("PKCS12");
+try (var fis = new FileInputStream("certificado.pfx")) {
+    ks.load(fis, "senha-pfx".toCharArray());
+}
+
+SigningStrategy strategy = SigningStrategyFactory.fromKeyStore(
+        ks, "alias-da-chave", "senha-chave".toCharArray());
+
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .signingStrategy(strategy)
+        .clientKeyStore(ks, "alias-da-chave", "senha-chave".toCharArray())
+        .build();</code></pre></div>
+    <h3 class="subhead">HSM via PKCS#11</h3>
+    <p class="subnote">Um HSM (Hardware Security Module) é um dispositivo
+       dedicado que guarda a chave e nunca a expõe: toda assinatura acontece
+       dentro dele, acessado aqui pelo padrão PKCS#11.</p>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>Provider pkcs11 = SigningStrategyFactory.configurePkcs11Provider("/etc/pkcs11/hsm.cfg");
+SigningStrategy strategy = SigningStrategyFactory.fromPkcs11(
+        pkcs11, "alias-chave-hsm", "123456".toCharArray());
+
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .signingStrategy(strategy)
+        .build();</code></pre></div>
+  </section>
+
+  <!-- ── CONFIGURAÇÃO COMPLETA ── -->
+  <section id="configuracao" class="block" aria-labelledby="ctitle">
+    <div class="bhead">
+      <span class="eyebrow">4. Configuração</span>
+      <h2 id="ctitle">Configuração completa</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Método do builder</th><th>Obrigatório</th><th>Padrão</th><th>Observações</th></tr></thead>
+      <tbody>
+        <tr><td>.tokenEndpoint(url)</td><td>sim¹</td><td>—</td><td>URL completa do endpoint de token</td></tr>
+        <tr><td>.fhirBase(url)</td><td>sim¹</td><td>—</td><td>Base FHIR para descoberta automática</td></tr>
+        <tr><td>.clientId(id)</td><td>sim</td><td>—</td><td>Emitido pelo Ganesha</td></tr>
+        <tr><td>.privateKeyPem(path)</td><td>sim²</td><td>—</td><td>Caminho do PEM da chave privada</td></tr>
+        <tr><td>.privateKeyPassword(char[])</td><td>não</td><td>—</td><td>Senha do PEM criptografado</td></tr>
+        <tr><td>.signingStrategy(strategy)</td><td>sim²</td><td>—</td><td>Estratégia pronta (HSM, cofre etc.)</td></tr>
+        <tr><td>.certificatePem(path)</td><td>não³</td><td>—</td><td>Certificado do cliente (PEM)</td></tr>
+        <tr><td>.clientKeyStore(ks, alias, senha)</td><td>não</td><td>—</td><td>mTLS via KeyStore (PKCS#11/12, JKS)</td></tr>
+        <tr><td>.serverTrustAnchor(path)</td><td>não</td><td>trust store da plataforma</td><td>PEM ou objeto X.509</td></tr>
+        <tr><td>.tlsProtocol(protocolo)</td><td>não</td><td>TLSv1.3</td><td>Ex.: TLSv1.2</td></tr>
+        <tr><td>.jwtAlgorithm(alg)</td><td>não</td><td>RS384</td><td>HubSaúde aceita RS384/ES384</td></tr>
+        <tr><td>.keyId(kid)</td><td>não</td><td>—</td><td>Inclui kid no header do JWT</td></tr>
+        <tr><td>.hubContext(ig, versao)</td><td>não</td><td>—</td><td>Inclui o claim hub_ctx</td></tr>
+        <tr><td>.connectTimeout(Duration)</td><td>não</td><td>10s</td><td>Conexão TCP</td></tr>
+        <tr><td>.requestTimeout(Duration)</td><td>não</td><td>30s</td><td>Requisição HTTP completa</td></tr>
+        <tr><td>.assertionTtlSeconds(n)</td><td>não</td><td>60</td><td>Deveria ser ≤300</td></tr>
+        <tr><td>.maxRetries(n)</td><td>não</td><td>3</td><td>Tentativas totais</td></tr>
+        <tr><td>.enableTokenCache(bool)</td><td>não</td><td>true</td><td>Ativa ou desativa o cache de tokens</td></tr>
+        <tr><td>.tokenCacheMarginSeconds(n)</td><td>não</td><td>30</td><td>Margem de renovação antes da expiração</td></tr>
+        <tr><td>.tokenCacheMaxEntries(n)</td><td>não</td><td>1000</td><td>Descarte LRU por scope</td></tr>
+      </tbody>
+      </table>
+    </div>
+    <p class="pagenote">¹ Exatamente um entre <code>tokenEndpoint</code> e
+       <code>fhirBase</code>. ² Exatamente um entre <code>privateKeyPem</code>
+       e <code>signingStrategy</code>. ³ Obrigatório apenas para mTLS via
+       chave em memória.</p>
+  </section>
+
+  <!-- ── ERROS ── -->
+  <section id="excecoes" class="block" aria-labelledby="etitle">
+    <div class="bhead">
+      <span class="eyebrow">5. Exceções</span>
+      <h2 id="etitle">Exceções</h2>
+    </div>
+    <div class="tscroll">
+      <table class="errtable">
+      <thead><tr><th>Tipo</th><th>Uso</th></tr></thead>
+      <tbody>
+        <tr><td>SmartTokenException</td><td>Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado</td></tr>
+        <tr><td>SigningException</td><td>Falha da estratégia criptográfica ao assinar o client_assertion</td></tr>
+      </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── LINKS ── -->
+  <section class="block" aria-labelledby="ltitle">
+    <div class="bhead">
+      <span class="eyebrow">Referências</span>
+      <h2 id="ltitle">Repositório e especificação</h2>
+    </div>
+    <div class="tlinks">
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude-cliente-java" target="_blank" rel="noopener">Repositório ↗</a>
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md" target="_blank" rel="noopener">Especificação normativa ↗</a>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>

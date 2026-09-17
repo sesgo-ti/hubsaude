@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Fluxos de integração: autenticação, token e envio de recursos FHIR.">
+<title>Fluxos · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="fluxos" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">Fluxos</span>
+      <h1 id="ptitle">Fluxos de integração</h1>
+      <p>Integrar-se ao HubSaúde se resume a duas conversas com o servidor:
+         primeiro seu sistema se identifica e recebe permissão para agir,
+         depois envia os dados de saúde propriamente ditos. As páginas abaixo
+         percorrem cada uma dessas conversas na ordem em que elas acontecem,
+         com exemplos prontos em quatro linguagens.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s6">
+        <h3>Autenticação</h3>
+        <p>Como seu sistema descobre os endereços do serviço, comprova sua
+           identidade com um certificado digital e recebe o token que autoriza
+           as chamadas seguintes.</p>
+        <div class="tlinks"><a class="il" href="autenticacao.html">Ver fluxo →</a></div>
+      </article>
+      <article class="tile s6">
+        <h3>Envio de recurso</h3>
+        <p>Como enviar um registro de saúde já autenticado. O HubSaúde aceita o
+           envio na hora, mas processa depois, então há um segundo passo para
+           acompanhar o resultado.</p>
+        <div class="tlinks"><a class="il" href="envio-recurso.html">Ver fluxo →</a></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>

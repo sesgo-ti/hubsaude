@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="HubSaúde · Simulador SMART on FHIR para testar clientes do HubSaúde (ferramenta local).">
+<title>Simulador · HubSaúde</title>
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/js/layout.js" defer></script>
+</head>
+<body>
+<hs-header active="ferramentas" base="../">
+  <a href="#main" class="skip">Pular para o conteúdo</a>
+  <nav aria-label="Navegação principal">
+    <a href="../index.html">Início</a>
+    <a href="../fluxos/index.html">Fluxos</a>
+    <a href="../sdks/index.html">SDKs</a>
+    <a href="../ferramentas/index.html">Ferramentas</a>
+    <a href="../gestor/index.html">Gestor</a>
+  </nav>
+</hs-header>
+
+<main id="main" class="wrap">
+  <section class="block" aria-labelledby="ptitle">
+    <div class="bhead">
+      <span class="eyebrow">Ferramentas</span>
+      <h1 id="ptitle">Simulador</h1>
+      <p>O Simulador é uma cópia reduzida do HubSaúde que roda na sua máquina.
+         Ele responde como o ambiente real, inclusive nas exigências de
+         segurança, o que permite testar autenticação e envio de ponta a ponta
+         sem depender de credenciais de produção. Quem instala e controla é o
+         <a href="cli.html">HubSaúde CLI</a>.</p>
+    </div>
+    <div class="callout">
+      <p><b>Os dados não sobrevivem ao reinício.</b> O Simulador guarda tudo
+         apenas em memória, então parar e subir de novo devolve o ambiente
+         limpo. Ele escuta em HTTPS na porta <code>8443</code>.</p>
+    </div>
+  </section>
+
+  <!-- ── USO ── -->
+  <section id="uso" class="block" aria-labelledby="utitle">
+    <div class="bhead">
+      <span class="eyebrow">1. Uso</span>
+      <h2 id="utitle">Ciclo de vida</h2>
+    </div>
+    <div class="hsct-panel-wrap"><pre class="hsct-panel"><code>hubsaude sim start
+hubsaude sim status
+hubsaude sim stop</code></pre></div>
+    <p class="pagenote">A porta pode ser alterada com a variável
+       <code>HUBSAUDE_SIMULADOR_PORT</code>. Veja as
+       <a href="cli.html#ambiente">variáveis de ambiente</a>.</p>
+  </section>
+
+  <!-- ── O QUE ELE SIMULA ── -->
+  <section id="o-que-simula" class="block" aria-labelledby="qtitle">
+    <div class="bhead">
+      <span class="eyebrow">2. Cobertura</span>
+      <h2 id="qtitle">O que o Simulador reproduz</h2>
+      <p>Não se trata de uma versão simplificada: o Simulador reproduz a mesma
+         mecânica descrita nas páginas de fluxo.</p>
+    </div>
+    <div class="bento">
+      <article class="tile s2">
+        <h3>Descoberta</h3>
+        <p>Os mesmos endereços de descoberta que os SDKs consultam para
+           localizar o servidor de autorização.</p>
+      </article>
+      <article class="tile s2">
+        <h3>Emissão de token</h3>
+        <p>Exige certificado de cliente e prende o token emitido a ele,
+           exatamente como a produção faz. Veja
+           <a href="../fluxos/autenticacao.html#cache-mtls">Cache e mTLS</a>.</p>
+      </article>
+      <article class="tile s2">
+        <h3>Envio de recursos</h3>
+        <p>Os endereços <code>/fhir/*</code> respondendo no mesmo modelo de
+           envio em duas etapas.
+           <a href="../fluxos/envio-recurso.html#assincrono">Veja como funciona o envio</a>.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── LINKS ── -->
+  <section class="block" aria-labelledby="ltitle">
+    <div class="bhead">
+      <span class="eyebrow">Referências</span>
+      <h2 id="ltitle">Próximos passos</h2>
+    </div>
+    <div class="tlinks">
+      <a class="il" href="../fluxos/envio-recurso.html#teste-local">Testando localmente →</a>
+      <a class="il" href="cli.html">HubSaúde CLI →</a>
+      <a class="il" href="https://github.com/sesgo-ti/hubsaude/releases" target="_blank" rel="noopener">Releases ↗</a>
+    </div>
+  </section>
+</main>
+
+<hs-footer></hs-footer>
+</body>
+</html>
