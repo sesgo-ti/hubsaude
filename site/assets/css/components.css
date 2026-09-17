@@ -308,6 +308,32 @@ hs-code-tabs{display:block}
   color:#04120a;font-family:var(--fm);font-weight:700;font-size:.85rem}
 .step-title{font-weight:700;color:var(--tx);font-size:.92rem}
 .step-desc{margin-top:.2rem;color:var(--tx-2);font-size:.86rem;line-height:1.55}
+/* carrossel de capturas de tela (jornada do gestor) */
+.gcarousel{border:1px solid var(--bd);border-radius:var(--r-l);background:var(--card);
+  box-shadow:0 20px 50px rgba(0,0,0,.08);padding:1.1rem}
+.gcarousel-frame{position:relative;border-radius:var(--r-m);overflow:hidden;background:var(--bg-2)}
+.gcarousel-track{display:flex;aspect-ratio:1295/614;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.gcarousel-slide{flex:0 0 100%;min-width:0;margin:0}
+.gcarousel-slide img{display:block;width:100%;height:100%;object-fit:contain;background:#fff}
+.gcarousel-nav{flex:0 0 auto;width:2.5rem;height:2.5rem;border-radius:50%;
+  border:1px solid var(--bd-2);background:var(--bg-2);color:var(--tx);font-size:1.3rem;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.gcarousel-nav:hover{background:#fff;border-color:var(--bd-hover)}
+.gcarousel-info{margin-top:1.3rem;min-height:6.4em}
+.gcarousel-step{display:flex;align-items:center;gap:.8rem}
+.gcarousel-num{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:2.1rem;height:2.1rem;
+  border-radius:50%;background:linear-gradient(135deg,var(--acc),var(--acc-deep));color:#04120a;
+  font-family:var(--fm);font-weight:700;font-size:.95rem}
+.gcarousel-eyebrow{font-family:var(--fm);font-size:.72rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--acc-deepest)}
+.gcarousel-caption{margin-top:.15rem;font-size:1.05rem;font-weight:700;color:var(--tx)}
+.gcarousel-desc{margin-top:.55rem;color:var(--tx-2);font-size:.92rem;line-height:1.6}
+.gcarousel-controls{display:flex;align-items:center;gap:.9rem;margin-top:1rem}
+.gcarousel-dots{display:flex;gap:.5rem;flex:1;justify-content:center;flex-wrap:wrap}
+.gcarousel-dots button{width:.65rem;height:.65rem;border-radius:50%;border:0;background:var(--bd-2);padding:0;cursor:pointer;transition:.15s}
+.gcarousel-dots button:hover{background:var(--bd-hover)}
+.gcarousel-dots button.is-on{background:var(--acc-deep)}
+@media(prefers-reduced-motion:reduce){.gcarousel-track{transition:none}}
 /* codigo inline: nao havia regra alguma, entao as 133 ocorrencias caiam no
    monospace padrao do navegador, com tamanho variando conforme o contexto
    (13px, 13.76px, 14.4px). Em "em" o tamanho acompanha o texto ao redor,

@@ -151,8 +151,121 @@
        das obrigações do nível e histórico de incidentes. Rebaixamento ou
        suspensão têm efeito imediato sobre o acesso.</p>
   </section>
+
+  <!-- ── CARROSSEL DO FORMULÁRIO ── -->
+  <section id="formulario" class="block" aria-labelledby="ftitle">
+    <div class="bhead">
+      <span class="eyebrow">Na prática</span>
+      <h2 id="ftitle">Conheça as telas do Ganesha</h2>
+      <p>Capturas de tela reais do Ganesha, com os campos em branco, para
+         você reconhecer cada tela antes de preencher de verdade.</p>
+    </div>
+    <div class="gcarousel">
+      <div class="gcarousel-frame">
+        <div class="gcarousel-track" id="gc-track"></div>
+      </div>
+      <div class="gcarousel-info">
+        <div class="gcarousel-step">
+          <span class="gcarousel-num" id="gc-num">1</span>
+          <div class="gcarousel-heading">
+            <p class="gcarousel-eyebrow" id="gc-eyebrow"></p>
+            <p class="gcarousel-caption" id="gc-caption" aria-live="polite"></p>
+          </div>
+        </div>
+        <p class="gcarousel-desc" id="gc-desc"></p>
+      </div>
+      <div class="gcarousel-controls">
+        <button class="gcarousel-nav gcarousel-prev" type="button" aria-label="Etapa anterior">‹</button>
+        <div class="gcarousel-dots" id="gc-dots" role="tablist" aria-label="Ir para etapa"></div>
+        <button class="gcarousel-nav gcarousel-next" type="button" aria-label="Próxima etapa">›</button>
+      </div>
+    </div>
+  </section>
 </main>
 
 <hs-footer></hs-footer>
+
+<script>
+/* ── carrossel: capturas do formulário do Ganesha ── */
+(function(){
+  var slides=[
+    {src:'../assets/img/gestor/ganesha-01-categoria.png', title:'Escolha o serviço',
+     alt:'Tela Serviços por Categoria, listando o serviço "Envio de Exames de Laboratório" dentro da categoria Exame de Laboratório',
+     desc:'Na Home do Ganesha, escolha a categoria (por exemplo, Exame de Laboratório) e depois o serviço específico para o qual sua instituição vai solicitar acesso.'},
+    {src:'../assets/img/gestor/ganesha-02-servico.png', title:'Confira o serviço',
+     alt:'Página do serviço Envio de Exames de Laboratório, com as abas Sobre, Ajuda, Perguntas Frequentes e Informações Técnicas, e o botão para solicitar acesso',
+     desc:'A página do serviço reúne contexto, objetivo e requisitos nas abas Sobre, Ajuda, Perguntas Frequentes e Informações Técnicas. Depois de conferir tudo, clique no botão de solicitar acesso para abrir o formulário.'},
+    {src:'../assets/img/gestor/ganesha-03-solicitante.png', title:'Solicitante',
+     alt:'Aba Solicitante do formulário, com os campos de CPF, nome completo, data de nascimento, e-mail, nome da mãe e telefone em branco',
+     desc:'Preencha seus dados como responsável pela solicitação: CPF, nome completo, data de nascimento, e-mail, nome da mãe e telefone. É esse conjunto de dados que identifica você perante a SES-GO.'},
+    {src:'../assets/img/gestor/ganesha-04-estabelecimento.png', title:'Estabelecimento',
+     alt:'Aba Estabelecimento, com o campo CNES em branco. Razão social, CNPJ, nome fantasia e endereço são preenchidos automaticamente após a consulta',
+     desc:'Informe apenas o CNES e clique em "Consultar". A razão social, o CNPJ, o nome fantasia e o endereço são preenchidos automaticamente a partir do cadastro nacional de estabelecimentos.'},
+    {src:'../assets/img/gestor/ganesha-05-sistema.png', title:'Sistema',
+     alt:'Aba Sistema, com as áreas para anexar o certificado digital da instituição e o documento de identificação institucional',
+     desc:'Anexe o certificado digital da instituição (só a parte pública, em arquivo .cer de até 10 MB) e um documento de identificação institucional (PNG, JPG ou PDF, também até 10 MB). A chave privada nunca deve ser enviada.'},
+    {src:'../assets/img/gestor/ganesha-06-acessos.png', title:'Acessos do Serviço',
+     alt:'Aba Acessos do Serviço, mostrando os recursos FHIR já definidos para o serviço solicitado, só para conferência',
+     desc:'Esta tela é só de conferência: mostra os recursos FHIR e o tipo de acesso já definidos para o serviço escolhido, sem nada para você preencher.'},
+    {src:'../assets/img/gestor/ganesha-07-resumo-1.png', title:'Resumo (parte 1 de 2)',
+     alt:'Início da aba Resumo, com os dados do solicitante e do estabelecimento em branco e o serviço solicitado preenchido como exemplo',
+     desc:'Revise os dados do solicitante e do estabelecimento e confira o serviço solicitado antes de seguir para a próxima parte do resumo.'},
+    {src:'../assets/img/gestor/ganesha-08-resumo-2.png', title:'Resumo (parte 2 de 2)',
+     alt:'Continuação da aba Resumo, com os recursos FHIR, a lista de anexos e a declaração de responsabilidade antes de cadastrar a solicitação',
+     desc:'Confira os recursos FHIR e os anexos enviados, declare que é o responsável legal pela instituição e clique em "Cadastrar Solicitação" para concluir.'},
+    {src:'../assets/img/gestor/ganesha-09-acompanhar.png', title:'Acompanhar Solicitações',
+     alt:'Tela Acompanhar Solicitações, com estabelecimento e solicitante em branco e as colunas de data, tipo de solicitação e status preenchidas como exemplo',
+     desc:'Depois de enviado, acompanhe por aqui o status do pedido. Assim que ele for aprovado, novas ações relacionadas a ele passam a aparecer nesta mesma tela.'}
+  ];
+  var track=document.getElementById('gc-track'),
+      num=document.getElementById('gc-num'),
+      eyebrow=document.getElementById('gc-eyebrow'),
+      cap=document.getElementById('gc-caption'),
+      desc=document.getElementById('gc-desc'),
+      dotsWrap=document.getElementById('gc-dots'),
+      carousel=document.querySelector('.gcarousel');
+  if(!track||!carousel) return;
+  var cur=0;
+  slides.forEach(function(s,i){
+    var fig=document.createElement('figure');
+    fig.className='gcarousel-slide';
+    var im=document.createElement('img');
+    im.src=s.src; im.alt=s.alt;
+    im.loading=i===0?'eager':'lazy';
+    fig.appendChild(im);
+    track.appendChild(fig);
+  });
+  var dots=slides.map(function(s,i){
+    var b=document.createElement('button');
+    b.type='button';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-label','Ir para etapa '+(i+1)+': '+s.title);
+    b.addEventListener('click',function(){show(i);});
+    dotsWrap.appendChild(b);
+    return b;
+  });
+  function show(i){
+    cur=(i+slides.length)%slides.length;
+    var s=slides[cur];
+    track.style.transform='translateX(-'+(cur*100)+'%)';
+    num.textContent=(cur+1);
+    eyebrow.textContent='Etapa '+(cur+1)+' de '+slides.length;
+    cap.textContent=s.title;
+    desc.textContent=s.desc;
+    dots.forEach(function(b,idx){
+      var on=idx===cur;
+      b.classList.toggle('is-on',on);
+      b.setAttribute('aria-selected',on?'true':'false');
+    });
+  }
+  carousel.querySelector('.gcarousel-prev').addEventListener('click',function(){show(cur-1);});
+  carousel.querySelector('.gcarousel-next').addEventListener('click',function(){show(cur+1);});
+  carousel.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'){e.preventDefault();show(cur-1);}
+    else if(e.key==='ArrowRight'){e.preventDefault();show(cur+1);}
+  });
+  show(0);
+})();
+</script>
 </body>
 </html>
