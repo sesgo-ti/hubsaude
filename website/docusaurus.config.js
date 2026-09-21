@@ -27,6 +27,19 @@ export default {
       sitemap: {changefreq: null, priority: null},
     }],
   ],
+  themes: [
+    ['@easyops-cn/docusaurus-search-local', {
+      hashed: 'filename',
+      language: ['pt', 'en'],
+      docsRouteBasePath: '/',
+      indexBlog: false,
+      indexPages: false,
+      explicitSearchResultPath: true,
+      searchResultContextMaxLength: 100,
+      searchBarShortcut: false,
+      searchBarShortcutHint: false,
+    }],
+  ],
   plugins: [
     ['@docusaurus/plugin-client-redirects', {
       redirects: [
@@ -55,29 +68,15 @@ export default {
       title: 'HubSaúde',
       logo: {alt: 'Brasão do Estado de Goiás', src: 'img/brasao-goias.svg', width: 36, height: 48},
       items: [
-        {to: '/', label: 'Início', position: 'left', activeBaseRegex: '^/hubsaude/$'},
-        {type: 'docSidebar', sidebarId: 'integrador', label: 'Desenvolvedores', position: 'left'},
         {type: 'docSidebar', sidebarId: 'gestor', label: 'Gestores', position: 'left'},
-        {to: '/sdks/', label: 'SDKs', position: 'right'},
-        {to: '/ferramentas/', label: 'Ferramentas', position: 'right'},
+        {type: 'docSidebar', sidebarId: 'integrador', label: 'Desenvolvedores', position: 'left'},
+        {type: 'search', position: 'right'},
       ],
     },
     footer: {
       style: 'dark',
       links: [
-        {title: 'Desenvolvedores', items: [
-          {label: 'Fluxos de integração', to: '/fluxos/'},
-          {label: 'SDKs de autenticação', to: '/sdks/'},
-          {label: 'Ferramentas locais', to: '/ferramentas/'},
-        ]},
-        {title: 'Gestores', items: [
-          {label: 'Credenciamento e níveis de acesso', to: '/gestor/'},
-          {label: 'Suporte técnico', href: 'mailto:suporte@saude.go.gov.br'},
-        ]},
-        {title: 'Referências', items: [
-          {label: 'Guias de Implementação FHIR', href: 'https://fhir.saude.go.gov.br'},
-          {label: 'Repositório e downloads', href: 'https://github.com/sesgo-ti/hubsaude'},
-        ]},
+        {label: 'Suporte', href: 'mailto:suporte@saude.go.gov.br'},
       ],
       copyright: 'Secretaria de Estado da Saúde de Goiás · HubSaúde',
     },

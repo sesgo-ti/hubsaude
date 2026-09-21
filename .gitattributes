@@ -1,0 +1,2 @@
+# Upstream context and removed lines must remain byte-exact in dependency patches.
+website/patches/*.patch whitespace=-blank-at-eol

@@ -31,6 +31,7 @@
   --ifm-footer-link-color: #dcefe3;
   --ifm-footer-title-color: #ffffff;
   --docusaurus-highlighted-code-line-bg: #204e39;
+  --search-local-muted-color: #4c6356;
 }
 
 .navbar {padding-inline: max(1rem, calc((100vw - 1360px) / 2));}
@@ -38,6 +39,8 @@
 .navbar__logo {height: 3rem;}
 .navbar__title {font-size: 1.35rem; letter-spacing: -0.04em;}
 .navbar__link {font-size: 0.9rem;}
+.navbar__search-input {width: 15rem; color: #10301f;}
+.navbar__search-input::placeholder {color: #3a5446; opacity: 1;}
 .footer {padding-block: 3rem;}
 .footer--dark {--ifm-footer-background-color: #10301f;}
 .footer__copyright {margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #42614f; font-size: 0.85rem;}
@@ -56,6 +59,7 @@
 .tabs__item {padding: 0.75rem 1rem;}
 .tabs__item--active {background: #eaf6ef;}
 .pagination-nav__link:hover {background: #f5faf7;}
+.theme-doc-markdown details {--ifm-alert-background-color: #f5faf7; --ifm-alert-border-color: #cddfd3; --ifm-alert-foreground-color: #10301f;}
 :focus-visible {outline: 3px solid #036a4c; outline-offset: 3px;}
 pre :focus-visible, .theme-code-block button:focus-visible, .footer :focus-visible {outline-color: #7eecc0;}
 
@@ -63,6 +67,7 @@ pre :focus-visible, .theme-code-block button:focus-visible, .footer :focus-visib
   :root {--ifm-navbar-height: 4.5rem;}
   .navbar {padding-inline: 1rem;}
   .navbar-sidebar .navbar__brand {margin-right: 0;}
+  .navbar__search-input {width: 9rem; font-size: 0.75rem;}
   .theme-doc-markdown h1 {overflow-wrap: anywhere;}
 }
 

@@ -1,0 +1,70 @@
+---
+title: "Visão geral da integração"
+slug: /fluxos/visao-geral/
+pagination_prev: null
+pagination_next: null
+---
+
+import Link from '@docusaurus/Link';
+
+<Link id="term" />
+
+## Da descoberta ao dado {#sequence-title}
+
+SMART Backend Services. Visão esquemática de uma integração autenticada.
+
+1. **Descobrir os endereços**: `GET /.well-known/smart-configuration`. Consulte o endpoint de token e os escopos suportados.
+2. **Comprovar a identidade**: `client_credentials + client_assertion`. Solicite um token com uma asserção JWT assinada e os escopos autorizados.
+3. **Fazer a requisição FHIR**: `Authorization: Bearer <access_token>`. Use o recurso e a operação previstos no Guia de Implementação.
+
+Ilustração estática, não executável. Nenhuma requisição é enviada. O acesso depende do credenciamento e das permissões concedidas.
+
+<Link id="jornada" />
+
+## Referência da integração {#jtitle}
+
+Os sete assuntos abaixo explicam os componentes da integração e reúnem suas referências. Não são uma sequência de execução nem um tutorial completo. Para a leitura guiada, comece em [Fluxos de integração](index.mdx).
+
+### Credenciamento
+
+Ao aprovar o pedido, a SES-GO atribui um nível de credenciamento (N1, N2 ou N3), que define até onde vai o acesso do estabelecimento aos dados de saúde. Não é você quem escolhe o nível na solicitação: ele é definido pela SES-GO com base no perfil da instituição e no serviço pedido.
+
+Na aba "Sistema" você anexa o **certificado digital ICP-Brasil da instituição**, em arquivo `.cer` (até 10 MB), mais um documento de identificação institucional (PNG, JPG ou PDF, até 10 MB).
+
+O Ganesha devolve um `client_id`, que passa a valer como credencial do estabelecimento para aquele serviço.
+
+Os requisitos de cada nível e o cuidado com a chave privada estão na [jornada do gestor](../gestor/index.mdx).
+
+### Autenticação SMART / OAuth2
+
+Com SMART Backend Services, seu sistema se identifica com uma asserção assinada (`client_assertion`). O servidor de autorização emite um `access_token` com as permissões do seu credenciamento. Os SDKs oficiais cuidam dessa autenticação.
+
+O [fluxo de autenticação](autenticacao.mdx) detalha essa troca. A [configuração SMART](https://hub.saude.go.gov.br/.well-known/smart-configuration) publica os endereços e escopos suportados.
+
+### Conformidade FHIR
+
+Consulte as capacidades do servidor e os Guias de Implementação: quais recursos, perfis e operações estão disponíveis e quais requisitos sua integração deve cumprir.
+
+- [Capacidades do servidor: `/metadata`](https://hub.saude.go.gov.br/metadata)
+- [Guias de Implementação FHIR](https://fhir.saude.go.gov.br)
+
+### Assinatura digital
+
+Alguns documentos de saúde exigem assinatura. Nesses casos, siga a **Política de Assinatura Digital Avançada** do HubSaúde (ICP-Brasil, JWS/JAdES-B). O **Safira** assina e valida documentos FHIR conforme essa política.
+
+- [Safira](https://github.com/sesgo-ti/safira)
+- [Política de Assinatura](https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html)
+- [Criar uma assinatura](https://fhir.saude.go.gov.br/r4/seguranca/caso-de-uso-criar-assinatura.html)
+- [Validar uma assinatura](https://fhir.saude.go.gov.br/r4/seguranca/caso-de-uso-validar-assinatura.html)
+
+### Validação de recursos
+
+Execute seus recursos no [Validador](../ferramentas/validador.mdx), pelo navegador ou pela linha de comando. Confira a conformidade com os perfis homologados antes de enviar dados para produção.
+
+### Ferramentas e SDKs
+
+Os [SDKs oficiais](../sdks/index.mdx) cuidam da autenticação, com uma biblioteca por linguagem suportada. O HubSaúde CLI reúne o Validador, o Simulador e um servidor FHIR local para testar a integração antes de chegar à produção. O catálogo de [ferramentas](../ferramentas/index.mdx) descreve cada produto.
+
+### Envio de recursos FHIR
+
+Com um token, o envio de um recurso FHIR deve seguir o guia e as permissões concedidas. O [fluxo de envio](envio-recurso.mdx) apresenta os exemplos e o acompanhamento do processamento do recurso. O esquema no início desta página é apenas uma visão resumida da integração autenticada.

@@ -1,0 +1,30 @@
+---
+title: "Preparar o ambiente"
+slug: /fluxos/preparar/
+pagination_prev: fluxos/index
+pagination_next: fluxos/autenticacao
+---
+
+Antes de ler os exemplos de autenticação e envio, distinga o ambiente local do acesso à produção. Esta preparação reúne os pré-requisitos documentados; não é uma configuração completa de um cliente para executar os exemplos.
+
+## Testes locais
+
+O Simulador é uma cópia reduzida do HubSaúde que roda na sua máquina. Ele responde como o ambiente real, inclusive nas exigências de segurança, o que permite testar autenticação e envio de ponta a ponta sem depender de credenciais de produção.
+
+**Os dados não sobrevivem ao reinício.** O Simulador guarda tudo apenas em memória, então parar e subir de novo devolve o ambiente limpo. Ele escuta em HTTPS na porta `8443`.
+
+O HubSaúde CLI instala e controla o simulador. Ele não exige Java instalado nem permissão de administrador. Siga a seção [Instalar com um comando](../ferramentas/cli.mdx#instalar-com-um-comando), selecionando o sistema operacional: no Windows, use **PowerShell**; em macOS e Linux, é preciso ter `curl` e `bash`.
+
+## Acesso à produção
+
+O credenciamento da instituição é tratado na [jornada do gestor](../gestor/index.mdx). Na aba "Sistema" você anexa o **certificado digital ICP-Brasil da instituição**, em arquivo `.cer` (até 10 MB), mais um documento de identificação institucional (PNG, JPG ou PDF, até 10 MB).
+
+:::warning
+
+**O arquivo `.cer` contém só a chave pública do certificado.** A chave privada nunca deve ser enviada a ninguém, nem ao Ganesha, nem ao HubSaúde: ela fica só com quem administra o certificado na instituição.
+
+:::
+
+O Ganesha devolve um `client_id`, que passa a valer como credencial do estabelecimento para aquele serviço.
+
+Com o `client_id`, o cadastro feito pelo Ganesha e a chave privada do certificado (que só a instituição possui), o sistema já consegue solicitar e receber o token de acesso.
