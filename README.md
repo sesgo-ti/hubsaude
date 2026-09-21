@@ -1,7 +1,7 @@
 # HubSaúde — distribuição e página do integrador
 
-Implementação da página principal do HubSaúde,
-dedicada a gestores e, em especial, integradores.
+Canal de distribuição das ferramentas HubSaúde e portal de documentação
+para gestores e desenvolvedores, construído com Docusaurus.
 
 > A página encontra-se disponível em **<https://sesgo-ti.github.io/hubsaude/>**.
 
@@ -20,8 +20,8 @@ curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh |
 irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
 ```
 
-Os scripts baixam a release mais recente deste
-repositório, verificam o `checksums.txt` (SHA-256) e instalam sem exigir
+Os scripts selecionam a maior versão do CLI entre as releases consultadas
+neste repositório, verificam o `checksums.txt` (SHA-256) e instalam sem exigir
 privilégios de administrador.
 
 
@@ -31,7 +31,7 @@ privilégios de administrador.
 |---|---|---|
 | `HUBSAUDE_CLI_REPO` | repositório `owner/repo` de onde baixar | `sesgo-ti/hubsaude` |
 | `HUBSAUDE_CLI_VERSION` | versão específica (ex.: `0.2.2`) | mais recente |
-| `HUBSAUDE_CLI_BIN_DIR` | diretório de instalação | `~/.local/bin` |
+| `HUBSAUDE_CLI_BIN_DIR` | diretório de instalação | Linux/macOS: `~/.local/bin`; Windows: `%LOCALAPPDATA%\Programs\hubsaude` |
 
 ## Canal institucional de distribuição
 
@@ -54,7 +54,12 @@ alcancem esta versão; ele não recebe versões posteriores.
 `release.json` é sincronizado a partir da fonte canônica no monorepo do
 HubSaúde. `release.json.sig` contém a assinatura **Ed25519 destacada**
 (64 bytes, base64) sobre os bytes exatos do manifesto. As URLs dos
-componentes apontam exclusivamente para as releases deste repositório.
+componentes HubSaúde apontam para as releases deste repositório; os downloads
+de Java apontam para a Adoptium.
+
+O manifesto assinado pertence à distribuição das ferramentas, não ao GitHub Pages.
+Os instaladores acima verificam `checksums.txt`, não `release.json.sig`.
+Não altere os bytes do manifesto sem atualizar sua assinatura pela fonte canônica.
 
 Verificação da assinatura com a chave pública institucional
 (a mesma pinada no binário do CLI —
