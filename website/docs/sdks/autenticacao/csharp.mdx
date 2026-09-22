@@ -4,21 +4,13 @@ title: "SDK C#"
 slug: /sdks/autenticacao/csharp/
 ---
 
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
-
 # SDK C#
 
 Biblioteca cliente C#/.NET (pacote NuGet `HubSaude.Cliente`).
 
 - [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
 
-<Link id="instalacao" />
-
-## Instalação {#ititle}
+## Instalação
 
 O nupkg (e o SBOM CycloneDX) saem da GitHub Release da tag; a publicação no nuget.org ainda não faz parte do repositório. Baixe o `.nupkg` da release e registre-o como fonte local antes de referenciar o pacote.
 
@@ -33,9 +25,7 @@ Isso adiciona ao seu projeto:
 <PackageReference Include="HubSaude.Cliente" Version="0.4.0" />
 ```
 
-<Link id="uso-basico" />
-
-## Uso básico {#utitle}
+## Uso básico
 
 `SmartTokenClient.CreateBuilder()` é a única forma de construção, já que a classe não expõe construtores públicos. Implementa `IDisposable`/`IAsyncDisposable`.
 
@@ -50,9 +40,7 @@ await using var client = SmartTokenClient.CreateBuilder()
 string token = await client.ObtainTokenAsync("system/Patient.rs");
 ```
 
-<Link id="fontes-de-chave" />
-
-## Fontes de chave suportadas {#ftitle}
+## Fontes de chave suportadas
 
 Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com a interface `ISigningStrategy` (um único método que assina bytes), e `SigningStrategyFactory` já traz pronta a construção para as fontes mais comuns.
 
@@ -100,9 +88,7 @@ await using var client = SmartTokenClient.CreateBuilder()
     .Build();
 ```
 
-<Link id="configuracao" />
-
-## Configuração completa {#ctitle}
+## Configuração completa
 
 | Método do builder | Obrigatório | Padrão | Observações |
 | --- | --- | --- | --- |
@@ -129,16 +115,14 @@ await using var client = SmartTokenClient.CreateBuilder()
 
 ¹ Exatamente um entre `TokenEndpoint` e `FhirBase`. ² Exatamente um entre `PrivateKeyPem` e `SigningStrategy`. ³ Obrigatório apenas para mTLS via chave em memória.
 
-<Link id="excecoes" />
-
-## Exceções {#etitle}
+## Exceções
 
 | Tipo | Uso |
 | --- | --- |
 | `SmartTokenException` | Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado |
 | `SigningException` | Falha da estratégia criptográfica ao assinar o client\_assertion |
 
-## Repositório e especificação {#ltitle}
+## Repositório e especificação
 
 - [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-csharp)
 - [Especificação normativa (compartilhada pelos 4 SDKs)](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

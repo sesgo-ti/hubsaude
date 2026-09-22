@@ -1,40 +1,21 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-import {useHistory, useLocation} from '@docusaurus/router';
-import useBrokenLinks from '@docusaurus/useBrokenLinks';
-import movedSections from '../data/home-sections.json';
 import styles from './index.module.css';
 
 export default function Home() {
-  const history = useHistory();
-  const {hash, search} = useLocation();
-  const baseUrl = useBaseUrl('/');
-  const {collectAnchor} = useBrokenLinks();
-  ['main', 'htitle', 'comece-aqui', 'ptitle', ...Object.keys(movedSections)].forEach(collectAnchor);
-
-  useEffect(() => {
-    const id = hash.slice(1);
-    if (Object.hasOwn(movedSections, id)) {
-      const destination = movedSections[id];
-      const [path, fragment] = destination.split('#');
-      history.replace(`${baseUrl}${path}${search}#${fragment}`);
-    }
-  }, [baseUrl, hash, history, search]);
-
   return (
     <Layout title="Documentação" description="Orientações para credenciar instituições e integrar sistemas de saúde ao HubSaúde de Goiás.">
-      <main id="main" className={styles.home}>
+      <main className={styles.home}>
         <div className={styles.content}>
           <header className={styles.introduction}>
             <p className={styles.eyebrow}>Saúde conectada · Estado de Goiás</p>
-            <h1 id="htitle">Documentação do <span>HubSaúde</span></h1>
+            <h1>Documentação do <span>HubSaúde</span></h1>
             <p>Orientações para credenciar sua instituição e integrar sistemas de saúde à plataforma do Estado de Goiás.</p>
           </header>
 
-          <section id="comece-aqui" aria-labelledby="ptitle">
-            <h2 id="ptitle" className={styles.prompt}>O que você precisa fazer?</h2>
+          <section aria-labelledby="choose-path">
+            <h2 id="choose-path" className={styles.prompt}>O que você precisa fazer?</h2>
             <div className={styles.paths}>
               <article className={styles.path}>
                 <p className={styles.audience}>Gestores de saúde</p>
@@ -50,13 +31,6 @@ export default function Home() {
               </article>
             </div>
           </section>
-
-          {/* Fragment-only links cannot be redirected by the static host. */}
-          {Object.entries(movedSections).map(([id, destination]) => (
-            <aside key={id} id={id} className={styles.movedSection}>
-              Esta seção agora está na documentação. <Link to={`/${destination}`}>Continuar a leitura no novo endereço</Link>.
-            </aside>
-          ))}
         </div>
       </main>
     </Layout>

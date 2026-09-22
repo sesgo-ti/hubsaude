@@ -4,12 +4,6 @@ title: "Simulador"
 slug: /ferramentas/simulador/
 ---
 
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
-
 # Simulador
 
 O Simulador é uma cópia reduzida do HubSaúde que roda na sua máquina. Ele responde como o ambiente real, inclusive nas exigências de segurança, o que permite testar autenticação e envio de ponta a ponta sem depender de credenciais de produção. Quem instala e controla é o [HubSaúde CLI](cli.mdx).
@@ -20,9 +14,7 @@ O Simulador é uma cópia reduzida do HubSaúde que roda na sua máquina. Ele re
 
 :::
 
-<Link id="uso" />
-
-## Ciclo de vida {#utitle}
+## Ciclo de vida
 
 ```bash
 hubsaude sim start
@@ -30,11 +22,9 @@ hubsaude sim status
 hubsaude sim stop
 ```
 
-A porta pode ser alterada com a variável `HUBSAUDE_SIMULADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#ambiente).
+A porta pode ser alterada com a variável `HUBSAUDE_SIMULADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
 
-<Link id="o-que-simula" />
-
-## O que o Simulador reproduz {#qtitle}
+## O que o Simulador reproduz
 
 Não se trata de uma versão simplificada: o Simulador reproduz a mesma mecânica descrita nas páginas de fluxo.
 
@@ -44,14 +34,14 @@ Os mesmos endereços de descoberta que os SDKs consultam para localizar o servid
 
 ### Emissão de token
 
-Exige certificado de cliente e prende o token emitido a ele, exatamente como a produção faz. Veja [Cache e mTLS](../fluxos/autenticacao.mdx#cache-mtls).
+Exige certificado de cliente e prende o token emitido a ele, exatamente como a produção faz. Veja [Cache e mTLS](../fluxos/autenticacao.mdx#cache-renovação-e-mtls).
 
 ### Envio de recursos
 
-Os endereços `/fhir/*` respondendo no mesmo modelo de envio em duas etapas. [Veja como funciona o envio](../fluxos/envio-recurso.mdx#assincrono).
+Os endereços `/fhir/*` respondendo no mesmo modelo de envio em duas etapas. [Veja como funciona o envio](../fluxos/envio-recurso.mdx#como-funciona-o-envio-em-duas-etapas).
 
-## Próximos passos {#ltitle}
+## Próximos passos
 
-- [Testando localmente](../fluxos/envio-recurso.mdx#teste-local)
+- [Testando localmente](../fluxos/envio-recurso.mdx#testando-localmente-antes-de-produção)
 - [HubSaúde CLI](cli.mdx)
 - [Releases](https://github.com/sesgo-ti/hubsaude/releases)

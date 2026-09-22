@@ -8,11 +8,6 @@ pagination_next: fluxos/envio-recurso
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
 
 # Autenticação SMART on FHIR
 
@@ -20,9 +15,7 @@ O HubSaúde não usa senha nem chave de API. Nesta etapa acontecem duas coisas: 
 
 Na prática os [SDKs oficiais](../sdks/index.mdx) fazem todo esse trabalho por você, e uma chamada de método basta. As seções abaixo servem para quando você precisar entender o que acontece por dentro, seja para investigar um erro, seja para implementar o fluxo sem eles.
 
-<Link id="descoberta" />
-
-## Descoberta da API {#dtitle}
+## Descoberta da API
 
 Em vez de fixar endereços no seu código, pergunte ao próprio servidor onde ficam as coisas e como a segurança está configurada. Os três endereços abaixo são públicos e você pode abri-los agora mesmo.
 
@@ -34,9 +27,7 @@ Em vez de fixar endereços no seu código, pergunte ao próprio servidor onde fi
 
 Esta documentação não monitora a disponibilidade dos serviços em tempo real.
 
-<Link id="assertion" />
-
-## Provando a identidade do seu sistema {#atitle}
+## Provando a identidade do seu sistema
 
 Esta é a parte de autenticação do fluxo: aqui seu sistema apenas demonstra quem é. A permissão de acesso vem depois, no passo seguinte.
 
@@ -52,9 +43,7 @@ Diz qual algoritmo assinou o documento. O padrão é `RS384`, e o HubSaúde acei
 
 Identifica quem pede e a quem se destina: `iss` e `sub` trazem o `client_id`, enquanto `aud` aponta o endereço do token. `iat` e `exp` delimitam a validade, por padrão 60 segundos e no máximo 300. O `jti` é um número de série que nunca se repete entre pedidos. Já `hub_ctx` é opcional e declara o Guia de Implementação pretendido, no formato `{ig, versao}`.
 
-<Link id="token" />
-
-## Trocando por um access token {#ttitle}
+## Trocando por um access token
 
 Aqui vem a parte de autorização. Com o documento assinado em mãos, o SDK o envia ao servidor de autorização e recebe o token de acesso de volta. É um `POST` em formato de formulário (`application/x-www-form-urlencoded`) com os campos `grant_type=client_credentials`, `client_id`, `client_assertion_type`, `client_assertion` e `scope`, este último omitido quando vazio.
 
@@ -134,15 +123,13 @@ string token = await client.ObtainTokenAsync("system/Patient.rs");
 
 </Tabs>
 
-<Link id="cache-mtls" />
-
-## Cache, renovação e mTLS {#ctitle}
+## Cache, renovação e mTLS
 
 Pedir um token novo a cada chamada seria lento e desnecessário, então o SDK guarda o token e o reaproveita enquanto ele valer. O cache é separado por scope, e o token é considerado válido enquanto `agora + margem < expiração`, com margem padrão de 30 segundos. Nesse intervalo, chamadas repetidas não geram tráfego de rede.
 
 ### Token preso ao certificado
 
-Numa conexão HTTPS comum, só o servidor comprova sua identidade com um certificado. No mTLS (TLS mútuo), o cliente, ou seja, o seu sistema, também apresenta um certificado ao se conectar. Quando isso acontece, o token emitido pelo HubSaúde fica atrelado a esse certificado (campo `cnf.x5t#S256`, definido pela [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html#section-3.1)). Na prática, um token interceptado não serve a mais ninguém: só quem apresentar o mesmo certificado consegue usá-lo. Veja como isso aparece no [Envio de Recurso](envio-recurso.mdx#certificado).
+Numa conexão HTTPS comum, só o servidor comprova sua identidade com um certificado. No mTLS (TLS mútuo), o cliente, ou seja, o seu sistema, também apresenta um certificado ao se conectar. Quando isso acontece, o token emitido pelo HubSaúde fica atrelado a esse certificado (campo `cnf.x5t#S256`, definido pela [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html#section-3.1)). Na prática, um token interceptado não serve a mais ninguém: só quem apresentar o mesmo certificado consegue usá-lo. Veja como isso aparece no [Envio de Recurso](envio-recurso.mdx#autenticação-vinculada-a-certificado).
 
 ### Quando o token deixa de valer
 
@@ -192,9 +179,7 @@ string renewedToken = await client.ObtainTokenAsync("system/Patient.rs");
 
 </Tabs>
 
-<Link id="erros" />
-
-## Erros comuns {#etitle}
+## Erros comuns
 
 | Situação | Causa | O que fazer |
 | --- | --- | --- |

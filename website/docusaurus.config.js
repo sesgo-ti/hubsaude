@@ -14,7 +14,6 @@ export default {
   favicon: 'img/favicon.svg',
   onBrokenLinks: 'throw',
   onBrokenAnchors: 'throw',
-  clientModules: ['./src/normalize-index.js'],
   i18n: {defaultLocale: 'pt-BR', locales: ['pt-BR']},
   headTags: [
     {tagName: 'link', attributes: {rel: 'apple-touch-icon', href: '/hubsaude/img/favicon-180.png'}},
@@ -24,7 +23,7 @@ export default {
       docs: {routeBasePath: '/', sidebarPath: './sidebars.js'},
       blog: false,
       theme: {customCss: './src/css/custom.css'},
-      sitemap: {changefreq: null, priority: null},
+      sitemap: {changefreq: null, priority: null, ignorePatterns: ['/hubsaude/search/**']},
     }],
   ],
   themes: [
@@ -38,21 +37,6 @@ export default {
       searchResultContextMaxLength: 100,
       searchBarShortcut: false,
       searchBarShortcutHint: false,
-    }],
-  ],
-  plugins: [
-    ['@docusaurus/plugin-client-redirects', {
-      redirects: [
-        'fluxos/autenticacao',
-        'fluxos/envio-recurso',
-        'sdks/autenticacao/python',
-        'sdks/autenticacao/java',
-        'sdks/autenticacao/typescript',
-        'sdks/autenticacao/csharp',
-        'ferramentas/cli',
-        'ferramentas/validador',
-        'ferramentas/simulador',
-      ].map((path) => ({from: `/${path}.html`, to: `/${path}/`})),
     }],
   ],
   themeConfig: {

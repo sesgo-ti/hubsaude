@@ -4,21 +4,13 @@ title: "SDK TypeScript"
 slug: /sdks/autenticacao/typescript/
 ---
 
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
-
 # SDK TypeScript
 
 Biblioteca cliente TypeScript/Node.js (`hubsaude-cliente-js`, consumível também por JavaScript puro). O uso é exclusivamente em servidor, nunca em navegador ou app móvel.
 
 - [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
 
-<Link id="instalacao" />
-
-## Instalação {#ititle}
+## Instalação
 
 Ainda não publicado no registro npm público. Até a primeira publicação, instale a partir de um tarball gerado por `npm pack` no repositório, ou aponte para o Git diretamente.
 
@@ -26,9 +18,7 @@ Ainda não publicado no registro npm público. Até a primeira publicação, ins
 npm install github:sesgo-ti/hubsaude-cliente-ts
 ```
 
-<Link id="uso-basico" />
-
-## Uso básico {#utitle}
+## Uso básico
 
 `createSmartTokenClient` é a única forma de construção (a classe não tem construtor público). Chame `close()` uma vez no encerramento, ou use `await using client = await createSmartTokenClient(...)`.
 
@@ -45,9 +35,7 @@ const client = await createSmartTokenClient({
 const token = await client.obtainToken("system/Patient.rs");
 ```
 
-<Link id="fontes-de-chave" />
-
-## Fontes de chave suportadas {#ftitle}
+## Fontes de chave suportadas
 
 Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com o tipo `SigningStrategy`, uma função que recebe os bytes a assinar e devolve a assinatura, e já traz pronta a construção para as fontes mais comuns.
 
@@ -103,9 +91,7 @@ const client = await createSmartTokenClient({
 });
 ```
 
-<Link id="configuracao" />
-
-## Configuração completa {#ctitle}
+## Configuração completa
 
 Todas as opções abaixo são propriedades do objeto passado a `createSmartTokenClient(options)`.
 
@@ -134,16 +120,14 @@ Todas as opções abaixo são propriedades do objeto passado a `createSmartToken
 
 ¹ Exatamente um entre `tokenEndpoint` e `fhirBase`. ² Exatamente um entre `privateKeyPem` e `signingStrategy`. ³ Obrigatório apenas para mTLS via chave em memória.
 
-<Link id="excecoes" />
-
-## Exceções {#etitle}
+## Exceções
 
 | Tipo | Uso |
 | --- | --- |
 | `SmartTokenError` | Configuração criptográfica inválida, resposta HTTP/JSON inválida, algoritmo não suportado, ou rejeição confirmada do certificado de cliente |
 | `SigningError` | Falha da estratégia criptográfica ao assinar o client\_assertion |
 
-## Repositório e especificação {#ltitle}
+## Repositório e especificação
 
 - [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-ts)
 - [Especificação normativa (compartilhada pelos 4 SDKs)](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

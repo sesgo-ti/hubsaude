@@ -18,19 +18,15 @@ npm start
 lockfile versionado ao atualizar dependências. `npm start` inicia o servidor de
 desenvolvimento com recarga automática.
 
-Para gerar o site e executar os testes de navegador:
+Para validar as alterações:
 
 ```bash
-npm run build
 npx playwright install --with-deps chromium
-npm test
+npm run check
 ```
 
-O build gera `build/`. Os testes usam Playwright com Chromium; a configuração de
-`webServer` inicia o servidor necessário, sem exigir `npm start` em outro terminal.
-A instalação do navegador e das dependências de sistema é necessária na primeira
-execução e quando a versão do Playwright mudar. Os testes validam o portal, não a
-execução dos SDKs ou a disponibilidade de serviços externos.
+Instale o Chromium na primeira execução ou quando sua versão mudar. `check` gera
+um build limpo e executa os testes. Use `npm run serve` para visualizar o resultado.
 
 Instale também as dependências de desenvolvimento no ambiente de build (`npm ci`,
 sem `--omit=dev`): o patch da busca e os testes fazem parte da geração validada.
@@ -45,15 +41,14 @@ sem reproduzir a complexidade desses projetos:
 
 | Caminho | Responsabilidade |
 |---|---|
-| `docusaurus.config.*` | URL/base do portal, tema, navegação, Prism e redirecionamentos |
+| `docusaurus.config.*` | URL/base do portal, tema, navegação, Prism e busca |
 | `sidebars.*` | organização da documentação |
 | `docs/` | conteúdo técnico em Markdown/MDX |
 | `src/pages/` | páginas React, como a página inicial |
-| `src/normalize-index.js` | normalização dos índices legados antes da hidratação do roteador |
 | `src/css/` | ajustes visuais sobre o tema oficial |
 | `static/` | logos, imagens e outros arquivos servidos sem transformação |
 | `package.json` / `package-lock.json` | scripts e dependências npm reproduzíveis |
-| `tests/` | paridade de exemplos, gestores, URLs/âncoras e testes de navegador |
+| `tests/` | sintaxe, páginas descobertas automaticamente, links e interações essenciais |
 | `i18n/pt-BR/code.json` | traduções da interface de busca |
 | `patches/` | correções pontuais e reproduzíveis do plugin de busca |
 
@@ -82,8 +77,7 @@ contexto institucional em `/sobre/`, sem paginação para uma etapa técnica.
 
 **Gestores** leva ao guia único `/gestor/`, com níveis de acesso, solicitação,
 certificado, contato, aprovação e acompanhamento; as capturas opcionais vêm ao final.
-Não há uma lista manual de atalhos repetindo o sumário. Manter essa rota evita
-quebrar links profundos da documentação já compartilhada. O sumário à direita
+Não há uma lista manual de atalhos repetindo o sumário. O sumário à direita
 (ou "Nesta página" no celular) identifica as seções do documento atual; a barra
 lateral organiza as tarefas da trilha. Não são dois menus globais concorrentes.
 
@@ -131,9 +125,8 @@ execute `npx docusaurus clear`, reconstrua e teste acentos, teclado e leitores d
 
 O guia e as nove capturas foram incorporados de `origin/feat/portal-integrador`,
 commit `c36e65f18feabd52f0489dffed7332afe7bbfaee`, sem merge da estrutura HTML antiga.
-Parágrafos, critérios, limites, títulos, legendas e textos alternativos são
-conferidos por `tests/fixtures/gestor-upstream.json`; os PNGs mantêm os hashes da
-origem. Mudaram a ordem das seções e a apresentação, não as instruções.
+O histórico Git mantém a conferência da migração; atualizações posteriores passam
+por revisão técnica e editorial, sem cópias congeladas nos testes.
 
 As duas afirmações divergentes da antiga home não foram transferidas para os novos
 documentos: o guia atualizado é a fonte para atribuição do nível pela SES-GO e
@@ -147,6 +140,14 @@ de avatar; a preservação dos arquivos não certifica anonimização. O respons
 pelo conteúdo deve confirmar a adequação das capturas antes de publicação externa.
 
 ## Autoria
+
+1. Crie ou edite o documento na pasta correspondente em `docs/`.
+2. Adicione ao `sidebars.js` se precisar aparecer no menu. A home permanece com
+   duas entradas, não um catálogo de todos os documentos.
+3. Confira o conteúdo com `npm start` e valide com `npm run check`.
+4. Revise o diff e o resultado visual antes de pedir aprovação para publicação.
+
+Novas páginas são verificadas automaticamente; só altere testes ao mudar um comportamento.
 
 Escreva a documentação em Markdown; use MDX quando precisar de componentes como
 `Tabs` e `TabItem`, importados de `@theme/Tabs` e `@theme/TabItem`. Prefira os
@@ -175,38 +176,29 @@ incluem `java`, `csharp` e `powershell` em `prism.additionalLanguages` na
 configuração do Docusaurus. Use esses nomes nas cercas de código correspondentes.
 Não acrescente execução de código ou integração com SDKs aos exemplos.
 
-Use links relativos para arquivos `.mdx` dentro da documentação. Preserve os IDs
-dos títulos com `## Título {#id}`. Âncoras adicionais usam `<Link id="id" />`,
-importado de `@docusaurus/Link`, para participar da validação de âncoras do build.
-O plugin extrai o H1 como título da página; seu ID legado fica em um `Link`
-imediatamente anterior. Páginas React registram âncoras não pertencentes a títulos
-com a API oficial `useBrokenLinks`. Não desative os erros de links/âncoras no build.
+Use links relativos para arquivos `.mdx` dentro da documentação. Escreva títulos
+comuns, como `## Comandos`: o Docusaurus gera o ID `comandos` e a entrada no sumário.
+Um link direto usa `cli.mdx#comandos`. Ao renomear um título, atualize os links
+internos que apontam para ele e rode o build, que rejeita âncoras inexistentes.
+
+Não adicione aliases vazios nem IDs de títulos da versão HTML anterior. A sintaxe
+`{#id}` é legada e causa erros em analisadores MDX de IDEs. Se surgir uma necessidade
+concreta de ID explícito, use a sintaxe MDX válida `## Título {/* #id */}`, sem
+duplicar a âncora com um elemento `Link`. No conteúdo atual, IDs automáticos bastam.
+Os testes também compilam cada documento como MDX, além de verificar o build.
 
 Inter e JetBrains Mono são distribuídas localmente por pacotes Fontsource: o portal
 não depende do Google Fonts nem envia requisições para serviços externos ao abrir
 uma página. O brasão SVG foi extraído sem redesenho do cabeçalho anterior; o favicon
 e o ícone para dispositivos Apple também foram preservados.
 
-## Compatibilidade
+## Endereços
 
-Fragmentos antigos da home, como `#jornada` e `#term`, têm destinos explícitos em
-`src/data/home-sections.json`. A home usa substituição de histórico para encaminhar
-à seção movida, preservando a query. Sem JavaScript, apenas o aviso correspondente
-ao fragmento acessado aparece, com um link real de continuidade. A visita normal
-continua mostrando somente as duas entradas; não há uma lista visível de redirects.
-
-As URLs internas antigas terminadas em `.html` são preservadas por
-redirecionamentos do plugin oficial `@docusaurus/plugin-client-redirects` para
-as rotas atuais, exceto os caminhos `index.html`, que são arquivos reais do build.
-Um módulo cliente normaliza esses índices para o diretório equivalente antes da
-hidratação, preservando query string e fragmento e evitando conteúdo duplicado.
-As seções também têm páginas de índice reais, com conteúdo e
-navegação, em vez de depender somente de categorias da barra lateral.
-
-Os redirecionamentos são executados no cliente e **dependem de JavaScript**;
-não são respostas HTTP 301/302 do GitHub Pages. Sem JavaScript, a navegação
-automática a partir dessas URLs antigas não é garantida. Em conteúdo novo,
-prefira links para as rotas canônicas e preserve a base `/hubsaude/`.
+Use as rotas atuais com barra final, como `/hubsaude/ferramentas/cli/`, e as âncoras
+geradas pelos títulos. Como a documentação anterior ainda não era utilizada,
+não mantemos redirects `.html`, aliases de seções ou normalização cliente de
+`index.html`. Os arquivos `index.html` do build são apenas a saída do gerador;
+os links do portal usam as rotas canônicas de diretório.
 
 ## Simplificações
 
@@ -226,31 +218,21 @@ passou a ser persistida, sem detecção automática. Não houve migração das p
 armazenadas pelo componente antigo. Abas e cópia continuam exigindo JavaScript;
 com ele desativado, o conteúdo principal e a aba inicial permanecem legíveis.
 
-## Verificação visual
+## Validação
 
-`npm test` verifica o HTML gerado antes de executar o Chromium em 1440 × 1000 e
-390 × 844. As capturas completas de home, autenticação, gestor e CLI ficam em
-`test-results/`, ignorado pelo Git. Abra os PNGs depois de mudanças visuais; a
-ausência de overflow não substitui a inspeção de legibilidade e hierarquia.
-Os testes não representam certificação WCAG nem cobertura de Safari/Firefox.
-
-As fixtures congelam os 12 exemplos multilíngues, 27 blocos estáticos e as URLs/IDs
-da base anterior. Ao alterar intencionalmente um exemplo, revise a fixture junto
-com o conteúdo, com aprovação técnica. Não atualize expectativas apenas para
-esconder diferenças. Referência histórica: commit `b14f5d9`.
+`npm run check` verifica sintaxe, páginas, links internos e interações essenciais
+em desktop/mobile. Capturas ficam em `test-results/`. A revisão humana continua
+necessária: os testes não executam SDKs, verificam sites externos nem certificam acessibilidade.
 
 ## Dependências
 
 Docusaurus é MIT; fontes e dependências conservam suas próprias licenças. O uso
 da ferramenta não altera os direitos do brasão ou do conteúdo institucional.
 
-A revisão de preparação para produção atualizou `image-size` para 2.0.4 e `qs`
-para 6.16.0 por resolução compatível do lockfile. `npm audit` ainda reportou
-22 alertas transitivos (1 alto e 21 moderados), pelas cadeias de
-`serialize-javascript` e `uuid`. A correção automática restante propõe mudar
-incompativelmente a versão do Docusaurus; não foram usados `--force` ou overrides
-para mascarar essa pendência. Consulte o relatório atual: as contagens variam com
-a base de advisories e não constituem uma certificação de segurança.
+Execute `npm audit` ao revisar dependências e avalie o relatório atual: contagens
+e advisories mudam ao longo do tempo. Não use `--force` ou overrides apenas para
+ocultar alertas; uma alteração incompatível precisa de revisão e testes. Um build
+aprovado não constitui certificação de segurança.
 
 O artefato publicado é estático: não hospeda `webpack-dev-server`, Express nem os
 parsers de imagens usados no build. Isso limita a exposição em produção, mas não
@@ -262,8 +244,8 @@ Os responsáveis devem avaliar esses alertas antes da publicação institucional
 
 ## Publicação
 
-O workflow [pages.yml](../.github/workflows/pages.yml) executa `npm ci`, build,
-instalação do Chromium e `npm test`. Pull requests que alteram `website/` ou o
+O workflow [pages.yml](../.github/workflows/pages.yml) executa `npm ci`, instalação
+do Chromium e `npm run check` (build e testes). Pull requests que alteram `website/` ou o
 workflow são validados, inclusive quando a base é uma branch de funcionalidade,
 mas não publicam no Pages.
 

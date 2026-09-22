@@ -4,21 +4,13 @@ title: "SDK Java"
 slug: /sdks/autenticacao/java/
 ---
 
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
-
 # SDK Java
 
 Biblioteca cliente Java (`hubsaude-cliente-java`), a **implementação de referência** do contrato normativo compartilhado pelos 4 SDKs.
 
 - [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
 
-<Link id="instalacao" />
-
-## Instalação {#ititle}
+## Instalação
 
 A release `0.4.0` está disponível, somente leitura, no GitHub Packages legado. Novas versões serão promovidas pelo repositório atual, até a publicação no Maven Central. O GitHub Packages exige repositório e credenciais configurados mesmo para leitura pública — a dependência sozinha não resolve.
 
@@ -53,9 +45,7 @@ E as credenciais no `~/.m2/settings.xml` (um token pessoal com escopo `read:pack
 </servers>
 ```
 
-<Link id="uso-basico" />
-
-## Uso básico {#utitle}
+## Uso básico
 
 `SmartTokenClient` não expõe construtores públicos, então `builder()` é a única entrada. A instância é thread-safe; reutilize-a pelo ciclo de vida da aplicação e invoque `close()` uma única vez no encerramento.
 
@@ -70,9 +60,7 @@ var client = SmartTokenClient.builder()
 String token = client.obtainToken("system/Patient.rs");
 ```
 
-<Link id="fontes-de-chave" />
-
-## Fontes de chave suportadas {#ftitle}
+## Fontes de chave suportadas
 
 Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com a interface funcional `SigningStrategy` (um único método, `sign(bytes) -> bytes`), e `SigningStrategyFactory` já traz pronta a construção para as fontes mais comuns.
 
@@ -124,9 +112,7 @@ var client = SmartTokenClient.builder()
         .build();
 ```
 
-<Link id="configuracao" />
-
-## Configuração completa {#ctitle}
+## Configuração completa
 
 | Método do builder | Obrigatório | Padrão | Observações |
 | --- | --- | --- | --- |
@@ -153,16 +139,14 @@ var client = SmartTokenClient.builder()
 
 ¹ Exatamente um entre `tokenEndpoint` e `fhirBase`. ² Exatamente um entre `privateKeyPem` e `signingStrategy`. ³ Obrigatório apenas para mTLS via chave em memória.
 
-<Link id="excecoes" />
-
-## Exceções {#etitle}
+## Exceções
 
 | Tipo | Uso |
 | --- | --- |
 | `SmartTokenException` | Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado |
 | `SigningException` | Falha da estratégia criptográfica ao assinar o client\_assertion |
 
-## Repositório e especificação {#ltitle}
+## Repositório e especificação
 
 - [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-java)
 - [Especificação normativa](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

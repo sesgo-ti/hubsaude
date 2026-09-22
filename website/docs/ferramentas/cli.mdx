@@ -6,19 +6,10 @@ slug: /ferramentas/cli/
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ferramentas" />
-
-<Link id="ftitle" />
 
 # HubSaúde CLI
 
 Um único programa instala e comanda tudo o que você precisa para testar a integração antes de ir ao ar: validação de recursos, simulador e servidor FHIR local. Ele não exige Java instalado nem permissão de administrador.
-
-<Link id="term-cli" />
 
 ## Demonstração de instalação e validação
 
@@ -38,18 +29,6 @@ $ hubsaude version
 $ hubsaude validate paciente.json
   ✓ Patient válido (0 erros · 0 avisos)
 ```
-
-<Link id="qi-t" />
-
-<Link id="qi-text" />
-
-<Link id="qi-tab-unix" />
-
-<Link id="qi-tab-win" />
-
-<Link id="qi-copy" />
-
-<Link id="qi-cmd" />
 
 ## Instalar com um comando
 
@@ -79,9 +58,7 @@ irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
 
 [Opções de versão e diretório](https://github.com/sesgo-ti/hubsaude#readme)
 
-<Link id="comandos" />
-
-## Comandos {#cmdtitle}
+## Comandos
 
 Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instalado acima.
 
@@ -103,9 +80,7 @@ Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instala
 
 O Validador e o Simulador têm páginas próprias, com exemplos de uso de cada um: [Validador](validador.mdx) e [Simulador](simulador.mdx).
 
-<Link id="auth-verify" />
-
-## hubsaude auth verify {#avtitle}
+## hubsaude auth verify
 
 Assim que o credenciamento é aprovado, este comando confirma em segundos que a sua chave e o seu certificado realmente funcionam, sem precisar escrever uma linha de código. Ele existe para conferência: para obter tokens no funcionamento normal da aplicação, use um dos [SDKs](../sdks/index.mdx).
 
@@ -126,9 +101,7 @@ hubsaude auth verify \
 
 Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribuída com certeza à credencial, ela é classificada como `4`, ou seja, inconclusiva. Uma credencial nunca é declarada inapta sem evidência clara. Os mesmos códigos de saída valem para a ferramenta Java autônoma [hubsaude-cliente-cli](https://github.com/sesgo-ti/hubsaude-cliente-cli).
 
-<Link id="ambiente" />
-
-## Variáveis de ambiente {#envtitle}
+## Variáveis de ambiente
 
 | Variável | Efeito | Padrão |
 | --- | --- | --- |
@@ -140,9 +113,7 @@ Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribu�
 
 As variáveis que controlam a instalação, como a versão e a pasta de destino do programa, estão documentadas no [README do repositório de distribuição](https://github.com/sesgo-ti/hubsaude#readme).
 
-<Link id="recursos" />
-
-## Outros recursos {#rectitle}
+## Outros recursos
 
 Materiais que acompanham a integração e não fazem parte do CLI.
 

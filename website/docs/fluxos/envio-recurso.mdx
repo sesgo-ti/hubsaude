@@ -8,19 +8,12 @@ pagination_next: null
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
 
 # Enviando um recurso FHIR
 
 Com o token de acesso em mãos (veja [Autenticação](autenticacao.mdx)), o próximo passo é enviar o registro de saúde. Aqui há uma diferença importante em relação a APIs comuns: o HubSaúde confirma o recebimento na hora, mas processa o conteúdo depois. Seu sistema envia, recebe um comprovante e consulta esse comprovante até o processamento terminar.
 
-<Link id="assincrono" />
-
-## Como funciona o envio em duas etapas {#atitle}
+## Como funciona o envio em duas etapas
 
 O envio é um `POST /fhir/{tipo}`, ou `PUT`, `PATCH` e `DELETE` em `/fhir/{tipo}/{id}` para alterar e remover. Quatro cabeçalhos são obrigatórios: `Content-Type: application/fhir+json`, `Accept`, `Prefer: respond-async` e `Idempotency-Key`. Faltando qualquer um deles, a requisição volta com `400`.
 
@@ -36,15 +29,11 @@ Consulte com `GET` o endereço recebido em `Content-Location` (`/Task/{id}`) at�
 
 Quando você não souber se o envio chegou, reenvie com a mesma `Idempotency-Key`. O HubSaúde reconhece a repetição, não duplica nada e devolve o mesmo `202`, acrescentando `Idempotency-Replayed: true` quando a operação já terminou.
 
-<Link id="certificado" />
+## Autenticação vinculada a certificado
 
-## Autenticação vinculada a certificado {#ctitle}
+Se o token foi emitido numa conexão com certificado de cliente, ele carrega o campo `cnf` e fica atrelado a esse certificado (veja [Cache e mTLS](autenticacao.mdx#cache-renovação-e-mtls)). Isso quer dizer que o cabeçalho `Authorization: Bearer` sozinho não basta: a chamada a `/fhir/*` também precisa ser mTLS, apresentando o mesmo certificado de cliente usado para obter o token — não precisa ser a mesma conexão TCP, só o mesmo certificado. Caso contrário a resposta é `401`, acompanhada de `WWW-Authenticate: Bearer error="invalid_token"` e de um `OperationOutcome` explicando a recusa.
 
-Se o token foi emitido numa conexão com certificado de cliente, ele carrega o campo `cnf` e fica atrelado a esse certificado (veja [Cache e mTLS](autenticacao.mdx#cache-mtls)). Isso quer dizer que o cabeçalho `Authorization: Bearer` sozinho não basta: a chamada a `/fhir/*` também precisa ser mTLS, apresentando o mesmo certificado de cliente usado para obter o token — não precisa ser a mesma conexão TCP, só o mesmo certificado. Caso contrário a resposta é `401`, acompanhada de `WWW-Authenticate: Bearer error="invalid_token"` e de um `OperationOutcome` explicando a recusa.
-
-<Link id="exemplo" />
-
-## Criando um Patient {#xtitle}
+## Criando um Patient
 
 O exemplo abaixo monta um paciente com o mínimo de informação, envia e consulta o resultado. Repare que são chamadas HTTP diretas: os SDKs oficiais cuidam apenas da autenticação, e o envio dos dados fica por sua conta.
 
@@ -242,9 +231,7 @@ if (status != "completed")
 
 </Tabs>
 
-<Link id="teste-local" />
-
-## Testando localmente antes de produção {#ltitle}
+## Testando localmente antes de produção
 
 Vale exercitar tudo isso na sua máquina antes de apontar para o ambiente real. O [HubSaúde CLI](../ferramentas/cli.mdx) sobe dois ambientes locais, cada um resolvendo um problema diferente.
 
@@ -256,9 +243,7 @@ Vale exercitar tudo isso na sua máquina antes de apontar para o ambiente real. 
 
 `hubsaude server start` sobe um servidor HAPI FHIR local, sem autenticação, útil para conferir se o recurso está bem formado antes de enviá-lo para produção. Use `hubsaude server start --reset` para começar do zero.
 
-<Link id="erros" />
-
-## Erros comuns {#ertitle2}
+## Erros comuns
 
 | Status | Causa |
 | --- | --- |

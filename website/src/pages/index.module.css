@@ -20,8 +20,6 @@
 .path > p:not(.audience) {color: #3a5446; margin-bottom: 1.75rem;}
 .path a {margin-top: auto; color: #036a4c; font-weight: 600; text-decoration: underline; text-underline-offset: 0.25em;}
 .path a:focus-visible {outline: 3px solid #036a4c; outline-offset: 5px;}
-.movedSection {display: none; margin-top: 1.5rem; padding: 1rem; background: #fff; border: 1px solid #cddfd3; scroll-margin-top: 6rem;}
-.movedSection:target {display: block;}
 
 @media (max-width: 600px) {
   .home {align-items: flex-start; padding: 2rem 1rem;}

@@ -4,15 +4,8 @@ title: "A jornada do gestor (credenciamento)"
 slug: /gestor/
 ---
 
-import Link from '@docusaurus/Link';
 import Details from '@theme/Details';
 import categoriaImage from '@site/static/img/gestor/ganesha-01-categoria.png';
-
-<Link id="main" />
-
-<Link id="ganesha" />
-
-<Link id="gtitle" />
 
 Para o gestor de saúde
 
@@ -27,11 +20,6 @@ O **Ganesha** é o Sistema de Credenciamento do HubSaúde. Por ele, o **gestor**
 ## O papel do gestor
 
 Pessoa física responsável pela relação do SIS com o HubSaúde (ex.: diretor de estabelecimento). É quem faz as **solicitações e atualizações** dos pedidos, sempre pelo Ganesha, que intermedia toda a relação com o HubSaúde.
-
-<Link id="niveis" />
-<Link id="níveis-de-credenciamento" />
-
-<Link id="ntitle" />
 
 Antes de solicitar
 
@@ -52,9 +40,6 @@ Cada nível também tem requisitos próprios para ser concedido e mantido:
 | N3 | Tudo do N2, mais designação formal da SES-GO para atividade regulatória e fundamentação legal explícita (LGPD art. 7º, II/III, e Lei 8.080/1990) | Trimestral |
 
 A revisão confere validade do certificado, cumprimento das obrigações do nível e histórico de incidentes. Rebaixamento ou suspensão têm efeito imediato sobre o acesso.
-
-<Link id="passo-a-passo" />
-<Link id="como-funciona-o-credenciamento" />
 
 ## Passo a passo da solicitação
 
@@ -80,8 +65,6 @@ Na Home do Ganesha, escolha a categoria e depois o serviço desejado (ex.: "Envi
 
    Revise tudo, declare que é o responsável legal pela instituição e confirme.
 
-<Link id="certificado" />
-
 ## Certificado: só a parte pública, nunca a chave privada
 
 Na aba "Sistema" você anexa o **certificado digital ICP-Brasil da instituição**, em arquivo `.cer` (até 10 MB), mais um documento de identificação institucional (PNG, JPG ou PDF, até 10 MB).
@@ -92,10 +75,6 @@ Na aba "Sistema" você anexa o **certificado digital ICP-Brasil da instituição
 
 :::
 
-<Link id="solicitar" />
-
-<Link id="stitle" />
-
 Próximo passo
 
 ## Como solicitar o credenciamento
@@ -104,17 +83,13 @@ O Ganesha é um sistema externo, operado pela SES-GO, que não faz parte do cód
 
 [Enviar e-mail para solicitar credenciamento](mailto:suporte@saude.go.gov.br)
 
-<Link id="depois" />
-
-<Link id="dtitle" />
-
 Bastidores
 
 ## O que acontece depois de enviar o pedido
 
 1. **Validação**
 
-   A SES-GO analisa o pedido, confirma que o solicitante é quem diz ser e atribui o [nível de credenciamento](#niveis) (N1, N2 ou N3).
+   A SES-GO analisa o pedido, confirma que o solicitante é quem diz ser e atribui o [nível de credenciamento](#entenda-os-níveis-de-credenciamento) (N1, N2 ou N3).
 
 2. **Cadastro**
 
@@ -130,39 +105,17 @@ Bastidores
 
 O `client_id` e o certificado são o material de entrada da autenticação técnica. Veja como um sistema os usa na prática no fluxo de [Autenticação](../fluxos/autenticacao.mdx) e na referência dos [SDKs oficiais](../sdks/index.mdx).
 
-<Link id="acompanhamento" />
-
-<Link id="atitle" />
-
 Depois de solicitar
 
 ## Acompanhando a solicitação
 
 No menu lateral do Ganesha, "Acompanhar Solicitações" mostra o andamento de cada pedido feito pelo estabelecimento, com o status atual (por exemplo, "Aguardando Análise"). Assim que um pedido é aprovado, novas ações relacionadas a ele passam a ficar disponíveis ali mesmo, sem precisar refazer o cadastro. Já em "Credenciais" ficam listadas as credenciais já emitidas para o estabelecimento, por serviço, útil para conferir mais tarde o que está ativo.
 
-<Link id="formulario" />
-
-<Link id="ftitle" />
-
-<Link id="gc-track" />
-
-<Link id="gc-num" />
-
-<Link id="gc-eyebrow" />
-
-<Link id="gc-caption" />
-
-<Link id="gc-desc" />
-
-<Link id="gc-dots" />
-
 Na prática
 
 ## Conheça as telas do Ganesha
 
 Capturas de tela reais do Ganesha, com os campos em branco, para você reconhecer cada tela antes de preencher de verdade.
-
-<Link id="ganesha-01-categoria" />
 
 <Details summary={<summary>Escolha o serviço</summary>}>
 
@@ -175,8 +128,6 @@ Na Home do Ganesha, escolha a categoria (por exemplo, Exame de Laboratório) e d
 </figure>
 </Details>
 
-<Link id="ganesha-02-servico" />
-
 <Details summary={<summary>Confira o serviço</summary>}>
 
 A página do serviço reúne contexto, objetivo e requisitos nas abas Sobre, Ajuda, Perguntas Frequentes e Informações Técnicas. Depois de conferir tudo, clique no botão de solicitar acesso para abrir o formulário.
@@ -187,8 +138,6 @@ A página do serviço reúne contexto, objetivo e requisitos nas abas Sobre, Aju
 
 </figure>
 </Details>
-
-<Link id="ganesha-03-solicitante" />
 
 <Details summary={<summary>Solicitante</summary>}>
 
@@ -201,8 +150,6 @@ Preencha seus dados como responsável pela solicitação: CPF, nome completo, da
 </figure>
 </Details>
 
-<Link id="ganesha-04-estabelecimento" />
-
 <Details summary={<summary>Estabelecimento</summary>}>
 
 Informe apenas o CNES e clique em "Consultar". A razão social, o CNPJ, o nome fantasia e o endereço são preenchidos automaticamente a partir do cadastro nacional de estabelecimentos.
@@ -213,8 +160,6 @@ Informe apenas o CNES e clique em "Consultar". A razão social, o CNPJ, o nome f
 
 </figure>
 </Details>
-
-<Link id="ganesha-05-sistema" />
 
 <Details summary={<summary>Sistema</summary>}>
 
@@ -227,8 +172,6 @@ Anexe o certificado digital da instituição (só a parte pública, em arquivo .
 </figure>
 </Details>
 
-<Link id="ganesha-06-acessos" />
-
 <Details summary={<summary>Acessos do Serviço</summary>}>
 
 Esta tela é só de conferência: mostra os recursos FHIR e o tipo de acesso já definidos para o serviço escolhido, sem nada para você preencher.
@@ -239,8 +182,6 @@ Esta tela é só de conferência: mostra os recursos FHIR e o tipo de acesso já
 
 </figure>
 </Details>
-
-<Link id="ganesha-07-resumo-1" />
 
 <Details summary={<summary>Resumo (parte 1 de 2)</summary>}>
 
@@ -253,8 +194,6 @@ Revise os dados do solicitante e do estabelecimento e confira o serviço solicit
 </figure>
 </Details>
 
-<Link id="ganesha-08-resumo-2" />
-
 <Details summary={<summary>Resumo (parte 2 de 2)</summary>}>
 
 Confira os recursos FHIR e os anexos enviados, declare que é o responsável legal pela instituição e clique em "Cadastrar Solicitação" para concluir.
@@ -265,8 +204,6 @@ Confira os recursos FHIR e os anexos enviados, declare que é o responsável leg
 
 </figure>
 </Details>
-
-<Link id="ganesha-09-acompanhar" />
 
 <Details summary={<summary>Acompanhar Solicitações</summary>}>
 

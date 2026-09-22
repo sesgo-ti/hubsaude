@@ -4,12 +4,6 @@ title: "Validador"
 slug: /ferramentas/validador/
 ---
 
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
-
 # Validador
 
 O Validador confere se um registro de saúde está de acordo com as regras dos Guias de Implementação e aponta o que precisa ser corrigido. Ele roda na sua máquina: o [HubSaúde CLI](cli.mdx) baixa e inicia a ferramenta quando você precisa dela, e não existe versão hospedada.
@@ -20,9 +14,7 @@ O Validador confere se um registro de saúde está de acordo com as regras dos G
 
 :::
 
-<Link id="uso" />
-
-## Validando recursos {#utitle}
+## Validando recursos
 
 O caso mais simples é validar um arquivo. O mesmo comando também aceita uma pasta inteira, texto vindo da entrada padrão e diferentes formatos de saída.
 
@@ -45,9 +37,7 @@ cat paciente.json | hubsaude validate -
 
 `hubsaude validate --output json` devolve o resultado em formato legível por máquina, adequado a pipelines de CI. Para checar contra um perfil específico, acrescente `--profile <url>`.
 
-<Link id="servico" />
-
-## Ciclo de vida do serviço {#stitle}
+## Ciclo de vida do serviço
 
 Por trás do comando, o Validador fica rodando como um serviço na sua máquina, iniciado automaticamente no primeiro uso. Para consultar o estado ou encerrá-lo, use os comandos abaixo.
 
@@ -56,9 +46,9 @@ hubsaude validate server status
 hubsaude validate server stop
 ```
 
-A porta usada pode ser alterada com a variável `HUBSAUDE_VALIDADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#ambiente).
+A porta usada pode ser alterada com a variável `HUBSAUDE_VALIDADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
 
-## Onde obter {#ltitle}
+## Onde obter
 
 - [HubSaúde CLI (mesmo binário)](cli.mdx)
 - [Releases](https://github.com/sesgo-ti/hubsaude/releases)

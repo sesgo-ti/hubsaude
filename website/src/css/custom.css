@@ -51,7 +51,6 @@
 .theme-doc-markdown h2 {border-top: 1px solid #dce9e0; padding-top: 1.5rem; letter-spacing: -0.025em;}
 .theme-doc-markdown > p:first-of-type {font-size: 1.1rem; color: #3a5446;}
 .theme-doc-markdown a:not(.hash-link) {text-decoration: underline; text-underline-offset: 0.2em;}
-.theme-doc-markdown a[id] {display: block; scroll-margin-top: calc(var(--ifm-navbar-height) + 1.5rem);}
 .theme-doc-markdown table {font-size: 0.9rem;}
 .theme-doc-markdown th {background: #eaf6ef; text-align: left;}
 .theme-doc-markdown td {vertical-align: top;}

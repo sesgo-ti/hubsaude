@@ -24,7 +24,11 @@ export default defineConfig({
   },
   projects: [
     {name: 'desktop', use: {viewport: {width: 1440, height: 1000}}},
-    {name: 'mobile', use: {viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true}},
+    {
+      name: 'mobile',
+      testIgnore: ['**/search-resilience.spec.mjs', '**/static-server.spec.mjs'],
+      use: {viewport: {width: 390, height: 844}, isMobile: true, hasTouch: true},
+    },
   ],
   webServer: {
     command: 'node tests/serve.mjs',

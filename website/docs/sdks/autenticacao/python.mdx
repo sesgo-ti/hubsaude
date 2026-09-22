@@ -4,21 +4,13 @@ title: "SDK Python"
 slug: /sdks/autenticacao/python/
 ---
 
-import Link from '@docusaurus/Link';
-
-<Link id="main" />
-
-<Link id="ptitle" />
-
 # SDK Python
 
 Biblioteca cliente Python (`hubsaude-client`) para obtenção de access tokens via SMART Backend Services.
 
 - [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
 
-<Link id="instalacao" />
-
-## Instalação {#ititle}
+## Instalação
 
 Ainda não publicado no PyPI. Instale a partir do código-fonte (branch `develop`):
 
@@ -30,9 +22,7 @@ pip install -e .
 
 O extra opcional `hsm` (`pip install "hubsaude-client[hsm]"`) traz a dependência `python-pkcs11`, necessária apenas para assinatura via HSM/smart token.
 
-<Link id="uso-basico" />
-
-## Uso básico {#utitle}
+## Uso básico
 
 `SmartTokenClientBuilder` monta o cliente passo a passo e valida a configuração antes de criar a instância. Reutilize o mesmo cliente durante todo o ciclo de vida da aplicação e chame `close()` uma única vez ao encerrar, ou use o gerenciador de contexto `with`.
 
@@ -53,9 +43,7 @@ print(resultado)
 client.close()
 ```
 
-<Link id="fontes-de-chave" />
-
-## Fontes de chave suportadas {#ftitle}
+## Fontes de chave suportadas
 
 Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com um contrato simples, `hubsaude_client.SigningStrategy` (um `Protocol` com um único método, `sign(bytes) -> bytes`), e já traz pronta uma factory para as quatro fontes mais comuns em `hubsaude_client.strategy_factory`.
 
@@ -108,9 +96,7 @@ client = (
 )
 ```
 
-<Link id="configuracao" />
-
-## Configuração completa {#ctitle}
+## Configuração completa
 
 | Método do builder | Obrigatório | Padrão | Observações |
 | --- | --- | --- | --- |
@@ -136,16 +122,14 @@ client = (
 
 ¹ Exatamente um entre `token_endpoint` e `fhir_base`. ² Exatamente um entre `private_key_pem` e `signing_strategy`. ³ Obrigatório apenas para mTLS via chave em memória.
 
-<Link id="excecoes" />
-
-## Exceções {#etitle}
+## Exceções
 
 | Tipo | Uso |
 | --- | --- |
 | `SmartTokenError` | Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado |
 | `SigningError` | Falha da estratégia criptográfica ao assinar o client\_assertion |
 
-## Repositório e especificação {#ltitle}
+## Repositório e especificação
 
 - [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-python)
 - [Especificação normativa (compartilhada pelos 4 SDKs)](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)
