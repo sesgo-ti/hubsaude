@@ -1,0 +1,189 @@
+---
+id: autenticacao
+title: "Autenticação SMART on FHIR"
+slug: /fluxos/autenticacao/
+pagination_prev: fluxos/preparar
+pagination_next: fluxos/envio-recurso
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Autenticação SMART on FHIR
+
+O HubSaúde não usa senha nem chave de API. Nesta etapa acontecem duas coisas: seu sistema **prova quem é**, apresentando um certificado digital, e **recebe permissão** na forma de um token temporário, limitado ao que a sua instituição foi autorizada a acessar. Quem conduz a troca do outro lado é o **servidor de autorização** do HubSaúde, seguindo o padrão [SMART Backend Services](https://hl7.org/fhir/smart-app-launch/backend-services.html), construído sobre OAuth 2.0 e adotado internacionalmente para integração entre sistemas de saúde.
+
+Na prática os [SDKs oficiais](../sdks/index.mdx) fazem todo esse trabalho por você, e uma chamada de método basta. As seções abaixo servem para quando você precisar entender o que acontece por dentro, seja para investigar um erro, seja para implementar o fluxo sem eles.
+
+## Descoberta da API
+
+Em vez de fixar endereços no seu código, pergunte ao próprio servidor onde ficam as coisas e como a segurança está configurada. Os três endereços abaixo são públicos e você pode abri-los agora mesmo.
+
+| Método | Endereço | Descrição |
+| --- | --- | --- |
+| `GET` | [`/metadata`](https://hub.saude.go.gov.br/metadata) | Capability Statement FHIR R4 do HubSaúde |
+| `GET` | [`/.well-known/smart-configuration`](https://hub.saude.go.gov.br/.well-known/smart-configuration) | Descoberta OAuth2 / SMART |
+| `GET` | [`/cds-services`](https://hub.saude.go.gov.br/cds-services) | Descoberta de serviços CDS Hooks |
+
+Esta documentação não monitora a disponibilidade dos serviços em tempo real.
+
+## Provando a identidade do seu sistema
+
+Esta é a parte de autenticação do fluxo: aqui seu sistema apenas demonstra quem é. A permissão de acesso vem depois, no passo seguinte.
+
+Para provar que é quem diz ser, seu sistema monta um pequeno documento assinado, o `client_assertion`. Tecnicamente é um JWT (JSON Web Token): um texto dividido em três partes separadas por ponto (cabeçalho, conteúdo e assinatura). A assinatura é gerada com a chave privada do seu certificado; o HubSaúde a confere com a chave pública já cadastrada no credenciamento, e só quem possui a chave privada correspondente consegue produzi-la corretamente. É essa assinatura que prova que o pedido veio do seu sistema, e o documento vale por poucos segundos.
+
+Os SDKs oficiais montam e assinam esse documento sozinhos, então você não precisa construí-lo à mão. Conhecer o que ele contém ajuda a investigar falhas de autenticação e atende a exigências de auditoria. As duas primeiras partes (cabeçalho e conteúdo) não são criptografadas, apenas codificadas: qualquer um consegue lê-las. É nelas que ficam as seguintes informações:
+
+### Cabeçalho
+
+Diz qual algoritmo assinou o documento. O padrão é `RS384`, e o HubSaúde aceita apenas `RS384` ou `ES384`. Vem acompanhado de `typ: "JWT"`. Informe também o `kid` sempre que puder: ele identifica qual das suas chaves foi usada e passa a ser obrigatório quando há mais de uma chave registrada. Sem ele, o servidor responde `401 invalid_client`.
+
+### Conteúdo
+
+Identifica quem pede e a quem se destina: `iss` e `sub` trazem o `client_id`, enquanto `aud` aponta o endereço do token. `iat` e `exp` delimitam a validade, por padrão 60 segundos e no máximo 300. O `jti` é um número de série que nunca se repete entre pedidos. Já `hub_ctx` é opcional e declara o Guia de Implementação pretendido, no formato `{ig, versao}`.
+
+## Trocando por um access token
+
+Aqui vem a parte de autorização. Com o documento assinado em mãos, o SDK o envia ao servidor de autorização e recebe o token de acesso de volta. É um `POST` em formato de formulário (`application/x-www-form-urlencoded`) com os campos `grant_type=client_credentials`, `client_id`, `client_assertion_type`, `client_assertion` e `scope`, este último omitido quando vazio.
+
+O campo `scope` declara o que você pretende acessar, mas quem decide é o servidor: ele concede no máximo o que já estava pré-autorizado para o seu cadastro no credenciamento.
+
+Apenas o código `HTTP 200` significa sucesso. Se vier `429`, o servidor está pedindo que você espere, e os SDKs não repetem a tentativa sozinhos nesse caso.
+
+<Tabs groupId="fluxos-autenticacao-token" defaultValue="python">
+
+<TabItem value="python" label="Python">
+
+```python
+from hubsaude_client.builder import SmartTokenClientBuilder
+
+client = (
+    SmartTokenClientBuilder()
+    .client_id("meu-client-id")
+    .token_endpoint("https://auth.hubsaude.exemplo/token")
+    .private_key_pem("/caminho/para/chave-privada.pem")
+    .build()
+)
+
+resultado = client.obtain_token(scope="system/Patient.rs")
+print(resultado)
+
+client.close()
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .privateKeyPem(Path.of("chave-privada.pem"))
+        .certificatePem(Path.of("certificado.pem"))
+        .build();
+
+String token = client.obtainToken("system/Patient.rs");
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="TypeScript">
+
+```typescript
+import { createSmartTokenClient } from "hubsaude-cliente-js";
+
+const client = await createSmartTokenClient({
+  tokenEndpoint: "https://hub.saude.go.gov.br/auth/token",
+  clientId: "meu-sistema",
+  privateKeyPem: "chave-privada.pem",
+  certificatePem: "certificado.pem",
+});
+
+const token = await client.obtainToken("system/Patient.rs");
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="C#">
+
+```csharp
+await using var client = SmartTokenClient.CreateBuilder()
+    .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .CertificatePem("certificado.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.rs");
+```
+
+</TabItem>
+
+</Tabs>
+
+## Cache, renovação e mTLS
+
+Pedir um token novo a cada chamada seria lento e desnecessário, então o SDK guarda o token e o reaproveita enquanto ele valer. O cache é separado por scope, e o token é considerado válido enquanto `agora + margem < expiração`, com margem padrão de 30 segundos. Nesse intervalo, chamadas repetidas não geram tráfego de rede.
+
+### Token preso ao certificado
+
+Numa conexão HTTPS comum, só o servidor comprova sua identidade com um certificado. No mTLS (TLS mútuo), o cliente, ou seja, o seu sistema, também apresenta um certificado ao se conectar. Quando isso acontece, o token emitido pelo HubSaúde fica atrelado a esse certificado (campo `cnf.x5t#S256`, definido pela [RFC 8705](https://www.rfc-editor.org/rfc/rfc8705.html#section-3.1)). Na prática, um token interceptado não serve a mais ninguém: só quem apresentar o mesmo certificado consegue usá-lo. Veja como isso aparece no [Envio de Recurso](envio-recurso.mdx#autenticação-vinculada-a-certificado).
+
+### Quando o token deixa de valer
+
+Um `401` numa chamada FHIR normalmente significa que o token guardado não vale mais. Descarte o cache daquele scope e peça um novo. Se o `401` se repetir com o token recém-obtido, pare de tentar: o problema está na credencial, não no cache.
+
+### Descartando o token guardado
+
+Os exemplos abaixo fazem os dois passos em sequência: primeiro descartam o token que está no cache para aquele scope, depois pedem um novo ao servidor. O primeiro passo é indispensável, porque enquanto o horário de expiração não chega o SDK considera o token válido e devolveria de novo exatamente o mesmo que acabou de ser recusado.
+
+<Tabs groupId="fluxos-autenticacao-cache" defaultValue="python">
+
+<TabItem value="python" label="Python">
+
+```python
+client.invalidate_cache("system/Patient.rs")
+token_renovado = client.obtain_token(scope="system/Patient.rs")
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+client.invalidateCache("system/Patient.rs");
+String renewedToken = client.obtainToken("system/Patient.rs");
+```
+
+</TabItem>
+
+<TabItem value="typescript" label="TypeScript">
+
+```typescript
+client.invalidateCache("system/Patient.rs");
+const renewedToken = await client.obtainToken("system/Patient.rs");
+```
+
+</TabItem>
+
+<TabItem value="csharp" label="C#">
+
+```csharp
+client.InvalidateCache("system/Patient.rs");
+string renewedToken = await client.ObtainTokenAsync("system/Patient.rs");
+```
+
+</TabItem>
+
+</Tabs>
+
+## Erros comuns
+
+| Situação | Causa | O que fazer |
+| --- | --- | --- |
+| 401 invalid\_client | Cliente tem múltiplas chaves registradas e o assertion não informa qual | Configurar `keyId` no SDK |
+| 401 | Certificado mTLS ausente ou divergente do cadastrado | Conferir o par chave/certificado usado pelo SDK |
+| 429 | Limite de requisições atingido | Não há repetição automática: aguarde o `Retry-After` e tente de novo |
+| Erro de assinatura (`SigningException`/`SigningError`) | Falha criptográfica na estratégia de assinatura configurada | Verificar formato/senha da chave PEM ou a configuração do HSM |

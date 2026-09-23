@@ -1,0 +1,443 @@
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.jsx b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.jsx
+index 10ef222..ce35162 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.jsx
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.jsx
+@@ -65,6 +65,8 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+     // Should the input be focused after the index is loaded?
+     const focusAfterIndexLoaded = useRef(false);
+     const [loading, setLoading] = useState(false);
++    const [loadError, setLoadError] = useState(false);
++    const loadGeneration = useRef(0);
+     const [inputChanged, setInputChanged] = useState(false);
+     const [inputValue, setInputValue] = useState("");
+     const search = useRef(null);
+@@ -107,19 +109,34 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+     const hidden = !!hideSearchBarWithNoSearchContext &&
+         Array.isArray(searchContextByPaths) &&
+         searchContext === "";
++    useEffect(() => {
++        setLoading(false);
++        setLoadError(false);
++        return () => {
++            loadGeneration.current++;
++            indexStateMap.current.clear();
++            search.current?.autocomplete.destroy();
++            search.current = null;
++        };
++    }, [hidden, searchContext, versionUrl]);
+     const loadIndex = useCallback(async () => {
+         if (hidden || indexStateMap.current.get(searchContext)) {
+             // Do not load the index (again) if its already loaded or in the process of being loaded.
+             return;
+         }
+         indexStateMap.current.set(searchContext, "loading");
++        const generation = ++loadGeneration.current;
+         search.current?.autocomplete.destroy();
++        search.current = null;
+         setLoading(true);
++        setLoadError(false);
++        try {
+         const [autoComplete, openAskAIModule] = await Promise.all([
+             fetchAutoCompleteJS(),
+             askAi ? fetchOpenAskAI() : Promise.resolve(null),
+             fetchIndexesByWorker(versionUrl, searchContext),
+         ]);
++        if (generation !== loadGeneration.current) return;
+         if (openAskAIModule) {
+             setAskAIWidgetComponent(() => openAskAIModule.AskAIWidget);
+         }
+@@ -200,7 +217,9 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+         }, [
+             {
+                 source: async (input, callback) => {
++                    try {
+                     const result = await searchByWorker(versionUrl, searchContext, input, searchResultLimits);
++                    if (generation !== loadGeneration.current || input !== searchBarRef.current?.value) return;
+                     if (input && askAi) {
+                         callback([
+                             {
+@@ -220,6 +239,13 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+                     else {
+                         callback(result);
+                     }
++                    }
++                    catch {
++                        if (generation !== loadGeneration.current || input !== searchBarRef.current?.value) return;
++                        indexStateMap.current.delete(searchContext);
++                        search.current?.autocomplete.close();
++                        setLoadError(true);
++                    }
+                 },
+                 templates: {
+                     suggestion: SuggestionTemplate,
+@@ -274,6 +300,18 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+                 input.setSelectionRange(input.value.length, input.value.length);
+             }
+         }
++        }
++        catch {
++            if (generation === loadGeneration.current) {
++                indexStateMap.current.delete(searchContext);
++                search.current?.autocomplete.destroy();
++                search.current = null;
++                setLoadError(true);
++            }
++        }
++        finally {
++            if (generation === loadGeneration.current) setLoading(false);
++        }
+     }, [hidden, searchContext, versionUrl, baseUrl, history]);
+     useEffect(() => {
+         if (!Mark) {
+@@ -388,7 +426,7 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+     return (<div className={clsx("navbar__search", styles.searchBarContainer, {
+             [styles.searchIndexLoading]: loading && inputChanged,
+             [styles.focused]: focused,
+-        })} hidden={hidden} 
++        })} hidden={hidden} aria-busy={loading}
+     // Manually make the search bar be LTR even if in RTL
+     dir="ltr">
+       <svg aria-hidden="true" className={styles.searchIcon} focusable="false" viewBox="0 0 16 16">
+@@ -398,11 +436,18 @@ export default function SearchBar({ handleSearchBarToggle, }) {
+             id: "theme.SearchBar.label",
+             message: "Search",
+             description: "The ARIA label and placeholder for search button",
+-        })} aria-label="Search" className={`navbar__search-input ${styles.searchInput}`} onMouseEnter={onInputMouseEnter} onFocus={onInputFocus} onBlur={onInputBlur} onChange={onInputChange} ref={searchBarRef} value={inputValue}/>
++        })} aria-label={translate({id: "theme.SearchBar.label", message: "Search"})} className={`navbar__search-input ${styles.searchInput}`} onMouseEnter={onInputMouseEnter} onFocus={onInputFocus} onBlur={onInputBlur} onChange={onInputChange} ref={searchBarRef} value={inputValue}/>
+       {askAi && AskAIWidgetComponent && (<AskAIWidgetComponent ref={askAIWidgetRef} {...askAi}>
+           <span hidden></span>
+         </AskAIWidgetComponent>)}
+       <LoadingRing className={styles.searchBarLoadingRing}/>
++      {loadError && (<div role="alert" className={styles.loadError}>
++          <p>{translate({id: "theme.SearchBar.loadError", message: "Search could not be loaded. Please try again."})}</p>
++          <button type="button" className="button button--secondary" onClick={() => {
++              focusAfterIndexLoaded.current = true;
++              loadIndex();
++          }}>{translate({id: "theme.SearchBar.retry", message: "Try again"})}</button>
++        </div>)}
+       {searchBarShortcut &&
+             searchBarShortcutHint &&
+             (inputValue !== "" ? (<button className={styles.searchClearButton} onClick={onClearSearch}>
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.module.css b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.module.css
+index 4397cde..f2bfc41 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.module.css
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchBar/SearchBar.module.css
+@@ -226,6 +226,20 @@ html[data-theme="dark"] .noResultsIcon {
+   margin-left: 16px;
+ }
+ 
++.loadError {
++  position: absolute;
++  top: 100%;
++  right: 0;
++  z-index: 1;
++  width: 340px;
++  max-width: calc(100vw - var(--ifm-navbar-padding-horizontal) * 2);
++  margin-top: 8px;
++  padding: var(--search-local-spacing, 12px);
++  border-radius: 6px;
++  background: var(--search-local-modal-background, var(--ifm-background-color));
++  box-shadow: var(--search-local-modal-shadow, 0 3px 8px #555a64);
++}
++
+ .searchIcon {
+   position: absolute;
+   top: 50%;
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchPage/SearchPage.jsx b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchPage/SearchPage.jsx
+index 2efb8b4..a84577b 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchPage/SearchPage.jsx
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/SearchPage/SearchPage.jsx
+@@ -1,4 +1,4 @@
+-import React, { useCallback, useEffect, useMemo, useState } from "react";
++import React, { useEffect, useMemo, useState } from "react";
+ import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+ import Layout from "@theme/Layout";
+ import Head from "@docusaurus/Head";
+@@ -19,15 +19,18 @@ import styles from "./SearchPage.module.css";
+ import { normalizeContextByPath } from "../../utils/normalizeContextByPath";
+ export default function SearchPage() {
+     return (<Layout>
+-      <SearchPageContent />
++      <main><SearchPageContent /></main>
+     </Layout>);
+ }
+ function SearchPageContent() {
+     const { siteConfig: { baseUrl }, i18n: { currentLocale }, } = useDocusaurusContext();
+     const { selectMessage } = usePluralForm();
+     const { searchValue, searchContext, searchVersion, updateSearchPath, updateSearchContext, } = useSearchQuery();
+-    const [searchQuery, setSearchQuery] = useState(searchValue);
++    const searchQuery = searchValue;
+     const [searchResults, setSearchResults] = useState();
++    const [loading, setLoading] = useState(false);
++    const [loadError, setLoadError] = useState(false);
++    const [retry, setRetry] = useState(0);
+     const versionUrl = `${baseUrl}${searchVersion}`;
+     const pageTitle = useMemo(() => searchQuery
+         ? translate({
+@@ -43,39 +46,32 @@ function SearchPageContent() {
+             description: "The search page title for empty query",
+         }), [searchQuery]);
+     useEffect(() => {
+-        updateSearchPath(searchQuery);
+-        if (searchQuery) {
+-            (async () => {
+-                const results = await searchByWorker(versionUrl, searchContext, searchQuery, 100);
+-                setSearchResults(results);
+-            })();
+-        }
+-        else {
+-            setSearchResults(undefined);
+-        }
+-        // `updateSearchPath` should not be in the deps,
+-        // otherwise will cause call stack overflow.
+-    }, [searchQuery, versionUrl, searchContext]);
+-    const handleSearchInputChange = useCallback((e) => {
+-        setSearchQuery(e.target.value);
+-    }, []);
+-    useEffect(() => {
+-        if (searchValue && searchValue !== searchQuery) {
+-            setSearchQuery(searchValue);
+-        }
+-    }, [searchValue]);
+-    const [searchWorkerReady, setSearchWorkerReady] = useState(false);
+-    useEffect(() => {
+-        async function doFetchIndexes() {
+-            if (!Array.isArray(searchContextByPaths) ||
+-                searchContext ||
+-                useAllContextsWithNoSearchContext) {
+-                await fetchIndexesByWorker(versionUrl, searchContext);
++        let active = true;
++        setSearchResults(undefined);
++        setLoadError(false);
++        setLoading(Boolean(searchQuery));
++        async function search() {
++            try {
++                if (!Array.isArray(searchContextByPaths) ||
++                    searchContext ||
++                    useAllContextsWithNoSearchContext) {
++                    await fetchIndexesByWorker(versionUrl, searchContext);
++                }
++                if (active && searchQuery) {
++                    const results = await searchByWorker(versionUrl, searchContext, searchQuery, 100);
++                    if (active) setSearchResults(results);
++                }
++            }
++            catch {
++                if (active) setLoadError(true);
++            }
++            finally {
++                if (active) setLoading(false);
+             }
+-            setSearchWorkerReady(true);
+         }
+-        doFetchIndexes();
+-    }, [searchContext, versionUrl]);
++        search();
++        return () => { active = false; };
++    }, [searchQuery, searchContext, versionUrl, retry]);
+     return (<React.Fragment>
+       <Head>
+         {/*
+@@ -95,7 +91,7 @@ function SearchPageContent() {
+             "col--9": Array.isArray(searchContextByPaths),
+             "col--12": !Array.isArray(searchContextByPaths),
+         })}>
+-            <input type="search" name="q" className={styles.searchQueryInput} aria-label="Search" onChange={handleSearchInputChange} value={searchQuery} autoComplete="off" autoFocus/>
++            <input type="search" name="q" className={styles.searchQueryInput} aria-label={translate({id: "theme.SearchBar.label", message: "Search"})} onChange={(e) => updateSearchPath(e.target.value)} value={searchQuery} autoComplete="off" autoFocus/>
+           </div>
+           {Array.isArray(searchContextByPaths) ? (<div className={clsx("col", "col--3", "padding-left--none", styles.searchContextColumn)}>
+               <select name="search-context" className={styles.searchContextInput} id="context-selector" value={searchContext} onChange={(e) => updateSearchContext(e.target.value)}>
+@@ -115,9 +111,15 @@ function SearchPageContent() {
+             </div>) : null}
+         </div>
+ 
+-        {!searchWorkerReady && searchQuery && (<div>
++        {loading && searchQuery && (<div>
+             <LoadingRing />
+           </div>)}
++        {loadError && (<div role="alert">
++            <p>{translate({id: "theme.SearchPage.loadError", message: "Search could not be loaded. Please try again."})}</p>
++            <button type="button" className="button button--secondary" onClick={() => setRetry((value) => value + 1)}>
++              {translate({id: "theme.SearchPage.retry", message: "Try again"})}
++            </button>
++          </div>)}
+ 
+         {searchResults &&
+             (searchResults.length > 0 ? (<p>
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/searchByWorker.js b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/searchByWorker.js
+index 5ceff29..8aa1abf 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/searchByWorker.js
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/searchByWorker.js
+@@ -3,9 +3,34 @@ let remoteWorkerPromise;
+ function getRemoteWorker() {
+     if (process.env.NODE_ENV === "production" && !remoteWorkerPromise) {
+         remoteWorkerPromise = (async () => {
+-            const Remote = Comlink.wrap(new Worker(new URL("./worker.js", import.meta.url)));
+-            return await new Remote();
+-        })();
++            let worker;
++            let timeout;
++            let onError;
++            try {
++                worker = new Worker(new URL("./worker.js", import.meta.url));
++                const startupFailure = new Promise((_, reject) => {
++                    onError = (event) => {
++                        event.preventDefault();
++                        reject(new Error("Search worker failed to start"));
++                    };
++                    worker.addEventListener("error", onError);
++                    timeout = setTimeout(() => reject(new Error("Search worker startup timed out")), 10000);
++                });
++                const Remote = Comlink.wrap(worker);
++                return await Promise.race([new Remote(), startupFailure]);
++            }
++            catch (error) {
++                worker?.terminate();
++                throw error;
++            }
++            finally {
++                clearTimeout(timeout);
++                if (onError) worker.removeEventListener("error", onError);
++            }
++        })().catch((error) => {
++            remoteWorkerPromise = undefined;
++            throw error;
++        });
+     }
+     return remoteWorkerPromise;
+ }
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/worker.js b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/worker.js
+index 4c84cd0..500cc2c 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/worker.js
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/client/client/theme/worker.js
+@@ -1,5 +1,9 @@
+ import * as Comlink from "comlink";
+ import lunr from "lunr";
++function foldAccents(token) {
++    return token.update((text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
++}
++lunr.Pipeline.registerFunction(foldAccents, "hubsaude-fold-accents");
+ import { searchIndexUrl, language } from "../utils/proxiedGeneratedConstants";
+ import { tokenize } from "../utils/tokenize";
+ import { smartQueries } from "../utils/smartQueries";
+@@ -15,7 +19,10 @@ export class SearchWorker {
+         const cacheKey = `${baseUrl}${searchContext}`;
+         let promise = cache.get(cacheKey);
+         if (!promise) {
+-            promise = legacyFetchIndexes(baseUrl, searchContext);
++            promise = legacyFetchIndexes(baseUrl, searchContext).catch((error) => {
++                if (cache.get(cacheKey) === promise) cache.delete(cacheKey);
++                throw error;
++            });
+             cache.set(cacheKey, promise);
+         }
+         return promise;
+@@ -75,7 +82,9 @@ async function legacyFetchIndexes(baseUrl, searchContext) {
+     if (fullUrl.origin !== location.origin) {
+         throw new Error("Unexpected version url");
+     }
+-    const json = (await (await fetch(url)).json());
++    const response = await fetch(url);
++    if (!response.ok) throw new Error(`Search index request failed: ${response.status}`);
++    const json = await response.json();
+     const wrappedIndexes = json.map(({ documents, index }, type) => ({
+         type: type,
+         documents,
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/index.js b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/index.js
+index 192c935..5cbd71e 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/index.js
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/index.js
+@@ -14,7 +14,7 @@ function DocusaurusSearchLocalPlugin(context, options) {
+     const config = (0, processPluginOptions_1.processPluginOptions)(options, context);
+     const dir = path_1.default.join(context.generatedFilesDir, PLUGIN_NAME, "default");
+     fs_extra_1.default.ensureDirSync(dir);
+-    const searchIndexFilename = (0, generate_1.generate)(config, dir);
++    const searchIndexFilename = (0, generate_1.generate)(config, dir, context);
+     const themePath = path_1.default.resolve(__dirname, "../../client/client/theme");
+     const pagePath = path_1.default.join(themePath, "SearchPage/index.js");
+     return {
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/buildIndex.js b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/buildIndex.js
+index 821d58f..3135407 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/buildIndex.js
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/buildIndex.js
+@@ -5,6 +5,10 @@ const tslib_1 = require("tslib");
+ /* eslint @typescript-eslint/no-var-requires: 0 */
+ const lunr_1 = tslib_1.__importDefault(require("lunr"));
+ const constants_1 = require("../../shared/constants");
++function foldAccents(token) {
++    return token.update((text) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
++}
++lunr_1.default.Pipeline.registerFunction(foldAccents, "hubsaude-fold-accents");
+ let pluginInitialized = false;
+ let plugin;
+ function buildIndex(allDocuments, { language, removeDefaultStopWordFilter, removeDefaultStemmer, zhUserDict, zhUserDictPath, }) {
+@@ -66,6 +70,12 @@ function buildIndex(allDocuments, { language, removeDefaultStopWordFilter, remov
+             if (removeDefaultStemmer) {
+                 this.pipeline.remove(lunr_1.default.stemmer);
+             }
++            // Fold before stemming on both sides; stored text and positions stay unchanged.
++            for (const pipeline of [this.pipeline, this.searchPipeline]) {
++                const functions = pipeline.toJSON().map((name) => lunr_1.default.Pipeline.registeredFunctions[name]);
++                pipeline.reset();
++                pipeline.add(foldAccents, ...functions);
++            }
+             // Override tokenizer when language `zh` is enabled.
+             if (language.includes("zh")) {
+                 this.tokenizer = lunr_1.default.zh.tokenizer;
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/generate.js b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/generate.js
+index 8181a53..dc12fdb 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/generate.js
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/generate.js
+@@ -6,9 +6,9 @@ const fs_1 = tslib_1.__importDefault(require("fs"));
+ const path_1 = tslib_1.__importDefault(require("path"));
+ const getIndexHash_1 = require("./getIndexHash");
+ const constants_1 = require("../../shared/constants");
+-function generate(config, dir) {
++function generate(config, dir, context) {
+     const { language, removeDefaultStopWordFilter, removeDefaultStemmer, highlightSearchTermsOnTargetPage, searchResultLimits, searchResultContextMaxLength, explicitSearchResultPath, searchBarShortcut, searchBarShortcutHint, searchBarShortcutKeymap, searchBarPosition, docsPluginIdForPreferredVersion, indexDocs, searchContextByPaths, hideSearchBarWithNoSearchContext, useAllContextsWithNoSearchContext, fuzzyMatchingDistance, askAi, } = config;
+-    const indexHash = (0, getIndexHash_1.getIndexHash)(config);
++    const indexHash = (0, getIndexHash_1.getIndexHash)(config, context);
+     const contents = [];
+     contents.push(`export const removeDefaultStemmer = ${JSON.stringify(removeDefaultStemmer)};`);
+     if (highlightSearchTermsOnTargetPage) {
+diff --git a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/getIndexHash.js b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/getIndexHash.js
+index eb42978..65fe69b 100644
+--- a/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/getIndexHash.js
++++ b/node_modules/@easyops-cn/docusaurus-search-local/dist/server/server/utils/getIndexHash.js
+@@ -7,7 +7,7 @@ const path_1 = tslib_1.__importDefault(require("path"));
+ const crypto_1 = tslib_1.__importDefault(require("crypto"));
+ const klaw_sync_1 = tslib_1.__importDefault(require("klaw-sync"));
+ const debug_1 = require("./debug");
+-function getIndexHash(config) {
++function getIndexHash(config, context) {
+     if (!config.hashed) {
+         return null;
+     }
+@@ -41,7 +41,26 @@ function getIndexHash(config) {
+         const pluginVersion = require(path_1.default.resolve(__dirname, "../../../../package.json")).version;
+         (0, debug_1.debugInfo)("using @easyops-cn/docusaurus-search-local v%s", pluginVersion);
+         md5sum.update(pluginVersion, "utf8");
+-        for (const item of files) {
++        md5sum.update(JSON.stringify(config, (_, value) => value instanceof RegExp ? value.toString() : value));
++        if (context) {
++            const { siteConfig, siteConfigPath, siteDir } = context;
++            md5sum.update(JSON.stringify(siteConfig));
++            const metadataFiles = new Set([siteConfigPath]);
++            for (const entry of [...(siteConfig.presets || []), ...(siteConfig.plugins || [])]) {
++                if (!Array.isArray(entry)) continue;
++                const options = entry[1];
++                const sidebarPath = options?.docs?.sidebarPath ?? options?.sidebarPath;
++                if (typeof sidebarPath === "string") metadataFiles.add(path_1.default.resolve(siteDir, sidebarPath));
++            }
++            for (const file of [...metadataFiles].filter(Boolean).sort()) {
++                md5sum.update(path_1.default.relative(siteDir, file));
++                md5sum.update(fs_1.default.readFileSync(file));
++            }
++        }
++        md5sum.update(fs_1.default.readFileSync(path_1.default.join(__dirname, "buildIndex.js")));
++        md5sum.update(fs_1.default.readFileSync(path_1.default.resolve(__dirname, "../../../client/client/theme/worker.js")));
++        for (const item of files.sort((a, b) => a.path.localeCompare(b.path))) {
++            md5sum.update(item.path);
+             md5sum.update(fs_1.default.readFileSync(item.path));
+         }
+         const indexHash = md5sum.digest("hex").substring(0, 8);

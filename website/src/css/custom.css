@@ -1,0 +1,76 @@
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
+@import '@fontsource/inter/latin-800.css';
+@import '@fontsource/jetbrains-mono/latin-400.css';
+
+:root {
+  --ifm-color-primary: #036a4c;
+  --ifm-color-primary-dark: #035f44;
+  --ifm-color-primary-darker: #035a41;
+  --ifm-color-primary-darkest: #024a35;
+  --ifm-color-primary-light: #037554;
+  --ifm-color-primary-lighter: #037a57;
+  --ifm-color-primary-lightest: #048a63;
+  --ifm-background-color: #ffffff;
+  --ifm-font-color-base: #10301f;
+  --ifm-heading-color: #10301f;
+  --ifm-font-family-base: 'Inter', system-ui, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', monospace;
+  --ifm-heading-font-weight: 700;
+  --ifm-line-height-base: 1.75;
+  --ifm-navbar-height: 5rem;
+  --ifm-navbar-shadow: 0 1px 0 #dce9e0;
+  --ifm-menu-color: #3a5446;
+  --ifm-menu-color-background-active: #eaf6ef;
+  --ifm-code-font-size: 88%;
+  --ifm-global-radius: 0.65rem;
+  --ifm-footer-background-color: #10301f;
+  --ifm-footer-color: #dcefe3;
+  --ifm-footer-link-color: #dcefe3;
+  --ifm-footer-title-color: #ffffff;
+  --docusaurus-highlighted-code-line-bg: #204e39;
+  --search-local-muted-color: #4c6356;
+}
+
+.navbar {padding-inline: max(1rem, calc((100vw - 1360px) / 2));}
+.navbar__brand {gap: 0.5rem;}
+.navbar__logo {height: 3rem;}
+.navbar__title {font-size: 1.35rem; letter-spacing: -0.04em;}
+.navbar__link {font-size: 0.9rem;}
+.navbar__search-input {width: 15rem; color: #10301f;}
+.navbar__search-input::placeholder {color: #3a5446; opacity: 1;}
+.footer {padding-block: 3rem;}
+.footer--dark {--ifm-footer-background-color: #10301f;}
+.footer__copyright {margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #42614f; font-size: 0.85rem;}
+.theme-doc-sidebar-container {background: #f5faf7;}
+.menu {font-size: 0.9rem;}
+.menu__link {padding-block: 0.6rem; line-height: 1.5;}
+.theme-doc-markdown h1 {font-size: clamp(2rem, 4vw, 2.75rem); letter-spacing: -0.04em; line-height: 1.2;}
+.theme-doc-markdown h2 {border-top: 1px solid #dce9e0; padding-top: 1.5rem; letter-spacing: -0.025em;}
+.theme-doc-markdown > p:first-of-type {font-size: 1.1rem; color: #3a5446;}
+.theme-doc-markdown a:not(.hash-link) {text-decoration: underline; text-underline-offset: 0.2em;}
+.theme-doc-markdown table {font-size: 0.9rem;}
+.theme-doc-markdown th {background: #eaf6ef; text-align: left;}
+.theme-doc-markdown td {vertical-align: top;}
+.theme-doc-markdown pre {font-size: 0.84rem;}
+.tabs__item {padding: 0.75rem 1rem;}
+.tabs__item--active {background: #eaf6ef;}
+.pagination-nav__link:hover {background: #f5faf7;}
+.theme-doc-markdown details {--ifm-alert-background-color: #f5faf7; --ifm-alert-border-color: #cddfd3; --ifm-alert-foreground-color: #10301f;}
+:focus-visible {outline: 3px solid #036a4c; outline-offset: 3px;}
+pre :focus-visible, .theme-code-block button:focus-visible, .footer :focus-visible {outline-color: #7eecc0;}
+
+@media (max-width: 996px) {
+  :root {--ifm-navbar-height: 4.5rem;}
+  .navbar {padding-inline: 1rem;}
+  .navbar-sidebar .navbar__brand {margin-right: 0;}
+  .navbar__search-input {width: 9rem; font-size: 0.75rem;}
+  .theme-doc-markdown h1 {overflow-wrap: anywhere;}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {scroll-behavior: auto;}
+  *, *::before, *::after {animation-duration: 0.01ms !important; transition-duration: 0.01ms !important;}
+}

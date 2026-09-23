@@ -1,0 +1,152 @@
+---
+id: java
+title: "SDK Java"
+slug: /sdks/autenticacao/java/
+---
+
+# SDK Java
+
+Biblioteca cliente Java (`hubsaude-cliente-java`), a **implementação de referência** do contrato normativo compartilhado pelos 4 SDKs.
+
+- [Ver o fluxo de Autenticação](../../fluxos/autenticacao.mdx)
+
+## Instalação
+
+A release `0.4.0` está disponível, somente leitura, no GitHub Packages legado. Novas versões serão promovidas pelo repositório atual, até a publicação no Maven Central. O GitHub Packages exige repositório e credenciais configurados mesmo para leitura pública — a dependência sozinha não resolve.
+
+```xml
+<dependency>
+    <groupId>br.gov.go.saude.hubsaude</groupId>
+    <artifactId>hubsaude-cliente-java</artifactId>
+    <version>0.4.0</version>
+</dependency>
+```
+
+Adicione o repositório no `pom.xml`:
+
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <url>https://maven.pkg.github.com/sesgo-ti/hubsaude-cliente-java</url>
+    </repository>
+</repositories>
+```
+
+E as credenciais no `~/.m2/settings.xml` (um token pessoal com escopo `read:packages`):
+
+```xml
+<servers>
+    <server>
+        <id>github</id>
+        <username>SEU_USUARIO_GITHUB</username>
+        <password>SEU_TOKEN_COM_READ_PACKAGES</password>
+    </server>
+</servers>
+```
+
+## Uso básico
+
+`SmartTokenClient` não expõe construtores públicos, então `builder()` é a única entrada. A instância é thread-safe; reutilize-a pelo ciclo de vida da aplicação e invoque `close()` uma única vez no encerramento.
+
+```java
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .privateKeyPem(Path.of("chave-privada.pem"))
+        .certificatePem(Path.of("certificado.pem"))
+        .build();
+
+String token = client.obtainToken("system/Patient.rs");
+```
+
+## Fontes de chave suportadas
+
+Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com a interface funcional `SigningStrategy` (um único método, `sign(bytes) -> bytes`), e `SigningStrategyFactory` já traz pronta a construção para as fontes mais comuns.
+
+### PEM com senha
+
+```java
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .privateKeyPem(Path.of("chave-encrypted.pem"))
+        .privateKeyPassword("minha-senha".toCharArray())
+        .build();
+```
+
+### PKCS#12 direto (recomendado para produção)
+
+Um único arquivo (`.pfx`/`.p12`) já reúne a chave e o certificado, protegido por senha.
+
+```java
+KeyStore ks = KeyStore.getInstance("PKCS12");
+try (var fis = new FileInputStream("certificado.pfx")) {
+    ks.load(fis, "senha-pfx".toCharArray());
+}
+
+SigningStrategy strategy = SigningStrategyFactory.fromKeyStore(
+        ks, "alias-da-chave", "senha-chave".toCharArray());
+
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .signingStrategy(strategy)
+        .clientKeyStore(ks, "alias-da-chave", "senha-chave".toCharArray())
+        .build();
+```
+
+### HSM via PKCS#11
+
+Um HSM (Hardware Security Module) é um dispositivo dedicado que guarda a chave e nunca a expõe: toda assinatura acontece dentro dele, acessado aqui pelo padrão PKCS#11.
+
+```java
+Provider pkcs11 = SigningStrategyFactory.configurePkcs11Provider("/etc/pkcs11/hsm.cfg");
+SigningStrategy strategy = SigningStrategyFactory.fromPkcs11(
+        pkcs11, "alias-chave-hsm", "123456".toCharArray());
+
+var client = SmartTokenClient.builder()
+        .tokenEndpoint("https://hub.saude.go.gov.br/auth/token")
+        .clientId("meu-sistema")
+        .signingStrategy(strategy)
+        .build();
+```
+
+## Configuração completa
+
+| Método do builder | Obrigatório | Padrão | Observações |
+| --- | --- | --- | --- |
+| `.tokenEndpoint(url)` | sim¹ | — | URL completa do endpoint de token |
+| `.fhirBase(url)` | sim¹ | — | Base FHIR para descoberta automática |
+| `.clientId(id)` | sim | — | Emitido pelo Ganesha |
+| `.privateKeyPem(path)` | sim² | — | Caminho do PEM da chave privada |
+| `.privateKeyPassword(char[])` | não | — | Senha do PEM criptografado |
+| `.signingStrategy(strategy)` | sim² | — | Estratégia pronta (HSM, cofre etc.) |
+| `.certificatePem(path)` | não³ | — | Certificado do cliente (PEM) |
+| `.clientKeyStore(ks, alias, senha)` | não | — | mTLS via KeyStore (PKCS#11/12, JKS) |
+| `.serverTrustAnchor(path)` | não | trust store da plataforma | PEM ou objeto X.509 |
+| `.tlsProtocol(protocolo)` | não | TLSv1.3 | Ex.: TLSv1.2 |
+| `.jwtAlgorithm(alg)` | não | RS384 | HubSaúde aceita RS384/ES384 |
+| `.keyId(kid)` | não | — | Inclui kid no header do JWT |
+| `.hubContext(ig, versao)` | não | — | Inclui o claim hub\_ctx |
+| `.connectTimeout(Duration)` | não | 10s | Conexão TCP |
+| `.requestTimeout(Duration)` | não | 30s | Requisição HTTP completa |
+| `.assertionTtlSeconds(n)` | não | 60 | Deveria ser ≤300 |
+| `.maxRetries(n)` | não | 3 | Tentativas totais |
+| `.enableTokenCache(bool)` | não | true | Ativa ou desativa o cache de tokens |
+| `.tokenCacheMarginSeconds(n)` | não | 30 | Margem de renovação antes da expiração |
+| `.tokenCacheMaxEntries(n)` | não | 1000 | Descarte LRU por scope |
+
+¹ Exatamente um entre `tokenEndpoint` e `fhirBase`. ² Exatamente um entre `privateKeyPem` e `signingStrategy`. ³ Obrigatório apenas para mTLS via chave em memória.
+
+## Exceções
+
+| Tipo | Uso |
+| --- | --- |
+| `SmartTokenException` | Configuração criptográfica inválida, resposta HTTP/JSON inválida ou algoritmo não suportado |
+| `SigningException` | Falha da estratégia criptográfica ao assinar o client\_assertion |
+
+## Repositório e especificação
+
+- [Repositório](https://github.com/sesgo-ti/hubsaude-cliente-java)
+- [Especificação normativa](https://github.com/sesgo-ti/hubsaude-cliente-java/blob/HEAD/ESPECIFICACAO.md)

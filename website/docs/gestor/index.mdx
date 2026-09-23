@@ -1,0 +1,217 @@
+---
+id: index
+title: "A jornada do gestor (credenciamento)"
+slug: /gestor/
+---
+
+import Details from '@theme/Details';
+import categoriaImage from '@site/static/img/gestor/ganesha-01-categoria.png';
+
+Para o gestor de saúde
+
+# A jornada do gestor (credenciamento)
+
+O **Ganesha** é o Sistema de Credenciamento do HubSaúde. Por ele, o **gestor** da instituição solicita e mantém o credenciamento de estabelecimentos e profissionais de saúde, desde a coleta de documentação até a entrega das credenciais que liberam o acesso aos dados em FHIR R4.
+
+## O que é o Ganesha
+
+É o sistema que **conduz todo o processo de credenciamento**: recebe a documentação, verifica se a instituição é elegível e mantém a situação de cada pedido em dia. Ele conversa com o HubSaúde para definir **quem pode acessar o quê**.
+
+## O papel do gestor
+
+Pessoa física responsável pela relação do SIS com o HubSaúde (ex.: diretor de estabelecimento). É quem faz as **solicitações e atualizações** dos pedidos, sempre pelo Ganesha, que intermedia toda a relação com o HubSaúde.
+
+Antes de solicitar
+
+## Entenda os níveis de credenciamento
+
+Ao aprovar o pedido, a SES-GO atribui um nível de credenciamento (N1, N2 ou N3), que define até onde vai o acesso do estabelecimento aos dados de saúde. Não é você quem escolhe o nível na solicitação: ele é definido pela SES-GO com base no perfil da instituição e no serviço pedido.
+
+- **N1** Básico: acesso a dados não sensíveis, só com consentimento do paciente
+- **N2** Pleno: acesso completo dentro do consentimento, incluindo situações de emergência
+- **N3** Regulatório: acesso ampliado para vigilância sanitária/epidemiológica e conformidade com a LGPD
+
+Cada nível também tem requisitos próprios para ser concedido e mantido:
+
+| Nível | Critérios para concessão | Revisão |
+| --- | --- | --- |
+| N1 | Cadastro aprovado pela SES-GO e certificado digital ICP-Brasil válido | Anual |
+| N2 | Tudo do N1, mais equipe de saúde qualificada, infraestrutura de segurança auditável e aceite do termo de responsabilidade sobre dados sensíveis | Semestral |
+| N3 | Tudo do N2, mais designação formal da SES-GO para atividade regulatória e fundamentação legal explícita (LGPD art. 7º, II/III, e Lei 8.080/1990) | Trimestral |
+
+A revisão confere validade do certificado, cumprimento das obrigações do nível e histórico de incidentes. Rebaixamento ou suspensão têm efeito imediato sobre o acesso.
+
+## Passo a passo da solicitação
+
+Na Home do Ganesha, escolha a categoria e depois o serviço desejado (ex.: "Envio de Exames de Laboratório"). A página do serviço mostra contexto e requisitos antes de você seguir para o botão de solicitar acesso, que abre o formulário dividido em cinco abas preenchidas em sequência:
+
+1. **Solicitante**
+
+   Seus dados como responsável: CPF, nome completo, data de nascimento, e-mail, nome da mãe e telefone.
+
+2. **Estabelecimento**
+
+   Informe o CNES e clique em "Consultar". A razão social, o CNPJ e o endereço são preenchidos automaticamente.
+
+3. **Sistema**
+
+   Anexe o certificado digital e o documento de identificação institucional (veja o alerta a seguir).
+
+4. **Acessos do Serviço**
+
+   Tela só de conferência: mostra os recursos FHIR já definidos para o serviço solicitado.
+
+5. **Resumo**
+
+   Revise tudo, declare que é o responsável legal pela instituição e confirme.
+
+## Certificado: só a parte pública, nunca a chave privada
+
+Na aba "Sistema" você anexa o **certificado digital ICP-Brasil da instituição**, em arquivo `.cer` (até 10 MB), mais um documento de identificação institucional (PNG, JPG ou PDF, até 10 MB).
+
+:::warning
+
+**O arquivo `.cer` contém só a chave pública do certificado.** A chave privada nunca deve ser enviada a ninguém, nem ao Ganesha, nem ao HubSaúde: ela fica só com quem administra o certificado na instituição. É justamente por ninguém além do dono ter acesso a ela que o certificado serve como prova de identidade depois, no momento de autenticar o sistema.
+
+:::
+
+Próximo passo
+
+## Como solicitar o credenciamento
+
+O Ganesha é um sistema externo, operado pela SES-GO, que não faz parte do código nem da infraestrutura do HubSaúde. Reunidos os dados e documentos descritos acima, o primeiro contato para abrir a solicitação é o canal institucional da Secretaria.
+
+[Enviar e-mail para solicitar credenciamento](mailto:suporte@saude.go.gov.br)
+
+Bastidores
+
+## O que acontece depois de enviar o pedido
+
+1. **Validação**
+
+   A SES-GO analisa o pedido, confirma que o solicitante é quem diz ser e atribui o [nível de credenciamento](#entenda-os-níveis-de-credenciamento) (N1, N2 ou N3).
+
+2. **Cadastro**
+
+   Aprovado, o Ganesha cadastra a chave pública do certificado no servidor de autorização, já com os acessos definidos para o serviço solicitado.
+
+3. **Credencial**
+
+   O Ganesha devolve um `client_id`, que passa a valer como credencial do estabelecimento para aquele serviço.
+
+4. **Pronto para autenticar**
+
+   Com o `client_id`, o cadastro feito pelo Ganesha e a chave privada do certificado (que só a instituição possui), o sistema já consegue solicitar e receber o token de acesso.
+
+O `client_id` e o certificado são o material de entrada da autenticação técnica. Veja como um sistema os usa na prática no fluxo de [Autenticação](../fluxos/autenticacao.mdx) e na referência dos [SDKs oficiais](../sdks/index.mdx).
+
+Depois de solicitar
+
+## Acompanhando a solicitação
+
+No menu lateral do Ganesha, "Acompanhar Solicitações" mostra o andamento de cada pedido feito pelo estabelecimento, com o status atual (por exemplo, "Aguardando Análise"). Assim que um pedido é aprovado, novas ações relacionadas a ele passam a ficar disponíveis ali mesmo, sem precisar refazer o cadastro. Já em "Credenciais" ficam listadas as credenciais já emitidas para o estabelecimento, por serviço, útil para conferir mais tarde o que está ativo.
+
+Na prática
+
+## Conheça as telas do Ganesha
+
+Capturas de tela reais do Ganesha, com os campos em branco, para você reconhecer cada tela antes de preencher de verdade.
+
+<Details summary={<summary>Escolha o serviço</summary>}>
+
+Na Home do Ganesha, escolha a categoria (por exemplo, Exame de Laboratório) e depois o serviço específico para o qual sua instituição vai solicitar acesso.
+
+<figure>
+
+<img src={categoriaImage} alt={'Tela Serviços por Categoria, listando o serviço "Envio de Exames de Laboratório" dentro da categoria Exame de Laboratório'} loading="lazy" />
+
+</figure>
+</Details>
+
+<Details summary={<summary>Confira o serviço</summary>}>
+
+A página do serviço reúne contexto, objetivo e requisitos nas abas Sobre, Ajuda, Perguntas Frequentes e Informações Técnicas. Depois de conferir tudo, clique no botão de solicitar acesso para abrir o formulário.
+
+<figure>
+
+![Página do serviço Envio de Exames de Laboratório, com as abas Sobre, Ajuda, Perguntas Frequentes e Informações Técnicas, e o botão para solicitar acesso](/img/gestor/ganesha-02-servico.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Solicitante</summary>}>
+
+Preencha seus dados como responsável pela solicitação: CPF, nome completo, data de nascimento, e-mail, nome da mãe e telefone. É esse conjunto de dados que identifica você perante a SES-GO.
+
+<figure>
+
+![Aba Solicitante do formulário, com os campos de CPF, nome completo, data de nascimento, e-mail, nome da mãe e telefone em branco](/img/gestor/ganesha-03-solicitante.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Estabelecimento</summary>}>
+
+Informe apenas o CNES e clique em "Consultar". A razão social, o CNPJ, o nome fantasia e o endereço são preenchidos automaticamente a partir do cadastro nacional de estabelecimentos.
+
+<figure>
+
+![Aba Estabelecimento, com o campo CNES em branco. Razão social, CNPJ, nome fantasia e endereço são preenchidos automaticamente após a consulta](/img/gestor/ganesha-04-estabelecimento.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Sistema</summary>}>
+
+Anexe o certificado digital da instituição (só a parte pública, em arquivo .cer de até 10 MB) e um documento de identificação institucional (PNG, JPG ou PDF, também até 10 MB). A chave privada nunca deve ser enviada.
+
+<figure>
+
+![Aba Sistema, com as áreas para anexar o certificado digital da instituição e o documento de identificação institucional](/img/gestor/ganesha-05-sistema.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Acessos do Serviço</summary>}>
+
+Esta tela é só de conferência: mostra os recursos FHIR e o tipo de acesso já definidos para o serviço escolhido, sem nada para você preencher.
+
+<figure>
+
+![Aba Acessos do Serviço, mostrando os recursos FHIR já definidos para o serviço solicitado, só para conferência](/img/gestor/ganesha-06-acessos.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Resumo (parte 1 de 2)</summary>}>
+
+Revise os dados do solicitante e do estabelecimento e confira o serviço solicitado antes de seguir para a próxima parte do resumo.
+
+<figure>
+
+![Início da aba Resumo, com os dados do solicitante e do estabelecimento em branco e o serviço solicitado preenchido como exemplo](/img/gestor/ganesha-07-resumo-1.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Resumo (parte 2 de 2)</summary>}>
+
+Confira os recursos FHIR e os anexos enviados, declare que é o responsável legal pela instituição e clique em "Cadastrar Solicitação" para concluir.
+
+<figure>
+
+![Continuação da aba Resumo, com os recursos FHIR, a lista de anexos e a declaração de responsabilidade antes de cadastrar a solicitação](/img/gestor/ganesha-08-resumo-2.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Acompanhar Solicitações</summary>}>
+
+Depois de enviado, acompanhe por aqui o status do pedido. Assim que ele for aprovado, novas ações relacionadas a ele passam a aparecer nesta mesma tela.
+
+<figure>
+
+![Tela Acompanhar Solicitações, com estabelecimento e solicitante em branco e as colunas de data, tipo de solicitação e status preenchidas como exemplo](/img/gestor/ganesha-09-acompanhar.png)
+
+</figure>
+</Details>

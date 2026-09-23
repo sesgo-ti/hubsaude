@@ -1,0 +1,25 @@
+---
+id: index
+title: "Fluxos de integração"
+slug: /fluxos/
+pagination_prev: null
+pagination_next: fluxos/preparar
+---
+
+# Fluxos de integração
+
+Integrar-se ao HubSaúde se resume a duas conversas com o servidor: primeiro seu sistema se identifica e recebe permissão para agir, depois envia os dados de saúde propriamente ditos. As páginas abaixo percorrem cada uma dessas conversas na ordem em que elas acontecem, com exemplos prontos em quatro linguagens.
+
+Este é um percurso de leitura, não um tutorial executável completo: os exemplos precisam dos endereços, credenciais e recursos adequados ao ambiente escolhido. Use os controles de próxima página e página anterior para seguir a sequência. Ao retornar para uma consulta pontual, use a referência técnica no menu lateral.
+
+## 1. Preparar o ambiente
+
+Distinga os testes no simulador local do acesso à produção, confira como instalar o CLI e quais materiais do credenciamento são usados na autenticação.
+
+## 2. Autenticação
+
+Como seu sistema descobre os endereços do serviço, comprova sua identidade com um certificado digital e recebe o token que autoriza as chamadas seguintes.
+
+## 3. Envio de recurso
+
+Como enviar um registro de saúde já autenticado. O HubSaúde aceita o envio na hora, mas processa depois, então há um segundo passo para acompanhar o resultado.

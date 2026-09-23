@@ -1,0 +1,16 @@
+{
+  "theme.SearchBar.label": {"message": "Buscar na documentação"},
+  "theme.SearchBar.loadError": {"message": "Não foi possível carregar a busca. Tente novamente."},
+  "theme.SearchBar.retry": {"message": "Tentar novamente"},
+  "theme.SearchPage.loadError": {"message": "Não foi possível carregar a busca. Tente novamente."},
+  "theme.SearchPage.retry": {"message": "Tentar novamente"},
+  "theme.SearchBar.seeAll": {"message": "Ver todos os resultados"},
+  "theme.SearchBar.noResultsText": {"message": "Nenhum resultado. Tente outro termo, como certificado, token ou Python."},
+  "theme.SearchBar.searchInContext": {"message": "Buscar em {context}"},
+  "theme.SearchBar.seeAllOutsideContext": {"message": "Buscar em toda a documentação"},
+  "theme.SearchPage.existingResultsTitle": {"message": "Resultados para \"{query}\""},
+  "theme.SearchPage.emptyResultsTitle": {"message": "Buscar na documentação"},
+  "theme.SearchPage.documentsFound.plurals": {"message": "1 resultado encontrado|{count} resultados encontrados"},
+  "theme.SearchPage.noResultsText": {"message": "Nenhum resultado encontrado. Tente outro termo ou navegue pelos guias de gestores e desenvolvedores."},
+  "theme.SearchPage.searchContext.everywhere": {"message": "Toda a documentação"}
+}

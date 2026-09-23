@@ -1,0 +1,55 @@
+---
+id: validador
+title: "Validador"
+slug: /ferramentas/validador/
+---
+
+# Validador
+
+O Validador confere se um registro de saúde está de acordo com as regras dos Guias de Implementação e aponta o que precisa ser corrigido. Ele roda na sua máquina: o [HubSaúde CLI](cli.mdx) baixa e inicia a ferramenta quando você precisa dela, e não existe versão hospedada.
+
+:::warning
+
+**Use apenas dados sintéticos.** Nunca envie informação real de pacientes ao Validador. Trabalhe sempre com instâncias de teste inventadas. A própria interface da ferramenta mantém esse aviso visível o tempo todo.
+
+:::
+
+## Validando recursos
+
+O caso mais simples é validar um arquivo. O mesmo comando também aceita uma pasta inteira, texto vindo da entrada padrão e diferentes formatos de saída.
+
+```bash
+# um arquivo
+hubsaude validate paciente.json
+
+# todos os recursos de um diretório
+hubsaude validate --dir ./recursos/
+
+# lendo da entrada padrão
+cat paciente.json | hubsaude validate -
+```
+
+### Inspeção no navegador
+
+`hubsaude validate --output web` abre uma tela onde você percorre os problemas encontrados, recurso a recurso.
+
+### Uso em automação
+
+`hubsaude validate --output json` devolve o resultado em formato legível por máquina, adequado a pipelines de CI. Para checar contra um perfil específico, acrescente `--profile <url>`.
+
+## Ciclo de vida do serviço
+
+Por trás do comando, o Validador fica rodando como um serviço na sua máquina, iniciado automaticamente no primeiro uso. Para consultar o estado ou encerrá-lo, use os comandos abaixo.
+
+```bash
+hubsaude validate server status
+hubsaude validate server stop
+```
+
+A porta usada pode ser alterada com a variável `HUBSAUDE_VALIDADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
+
+## Onde obter
+
+- [HubSaúde CLI (mesmo binário)](cli.mdx)
+- [Releases](https://github.com/sesgo-ti/hubsaude/releases)
+- [Guias de Implementação](https://fhir.saude.go.gov.br)
