@@ -256,11 +256,6 @@ do conteúdo; o job de deploy depende dele e recebe apenas as permissões de Pag
 e de identidade necessárias à publicação. O build tem limite de 15 minutos para
 acomodar a instalação do navegador e das dependências; o deploy mantém 10 minutos.
 
-Capturas e traces ficam como artefatos do job por sete dias, inclusive quando os
-testes falham. Não entram no artefato do Pages. A antiga configuração Lychee foi
-retirada porque não era executada; build e testes verificam os links internos.
-Disponibilidade de links externos exige uma checagem separada.
-
 ### Antes de publicar
 
 - Revisar os alertas de dependências e a aprovação editorial das capturas do Ganesha.
