@@ -60,23 +60,42 @@ irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
 
 ## Comandos
 
-Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instalado acima.
+Todos os comandos partem do programa `hubsaude` instalado acima. Para ver as opções de qualquer comando, acrescente `--help`, como em `hubsaude validate --help`.
+
+### Conferir registros
 
 | Comando | O que faz |
 | --- | --- |
-| `hubsaude validate <arquivo>` | Valida um recurso FHIR R4 a partir de um arquivo |
-| `hubsaude validate --dir <dir>` | Valida todos os recursos de um diretório |
+| `hubsaude validate <arquivo>` | Valida um ou mais arquivos com recursos FHIR |
+| `hubsaude validate --dir <pasta> --recursive` | Valida todos os recursos de uma pasta, incluindo subpastas |
 | `hubsaude validate -` | Lê o recurso da entrada padrão (stdin) |
-| `hubsaude validate --output json\|web` | Saída em JSON ou na interface web interativa |
-| `hubsaude validate --profile <url>` | Valida contra um perfil específico |
-| `hubsaude validate server status\|stop` | Consulta ou encerra o serviço local do Validador |
-| `hubsaude sim start\|status\|stop` | Ciclo de vida do Simulador SMART on FHIR local |
-| `hubsaude server start [--reset]` | Sobe o servidor HAPI FHIR local; `--reset` zera os dados |
-| `hubsaude server stop` | Encerra o servidor HAPI FHIR local |
-| `hubsaude auth verify` | Diagnóstico de credenciamento, detalhado abaixo |
-| `hubsaude status` | Agrega, numa única invocação, o estado dos três componentes com ciclo de vida (validador, simulador e server) |
-| `hubsaude update --check` | Verifica se há versão mais recente disponível |
-| `hubsaude version` | Exibe a versão do CLI e dos componentes provisionados |
+| `hubsaude validate <arquivo> -o json` | Apresenta o resultado em JSON, adequado a automações |
+| `hubsaude validate <arquivo> --report` | Gera um relatório em HTML e o abre no navegador |
+| `hubsaude validate <arquivo> --profile <url>` | Valida contra um perfil específico |
+| `hubsaude fhirpath '<expressão>' <arquivo>` | Extrai informações de um recurso com uma expressão FHIRPath |
+
+### Controlar as ferramentas locais
+
+Validador, Simulador e servidor FHIR local aceitam os mesmos quatro subcomandos.
+
+| Comando | O que faz |
+| --- | --- |
+| `hubsaude validador start\|stop\|status\|logs` | Controla o Validador, que também é iniciado automaticamente pelo `validate` |
+| `hubsaude simulador start\|stop\|status\|logs` | Controla o [Simulador](simulador.mdx); também aceita a forma abreviada `hubsaude sim` |
+| `hubsaude server start\|stop\|status\|logs` | Controla o [servidor FHIR local](#servidor-fhir-local); `start --reset` apaga os dados antes de iniciar |
+| `hubsaude status` | Mostra, de uma só vez, a situação das três ferramentas |
+
+Use `logs -f` para acompanhar os registros de funcionamento em tempo real, como em `hubsaude simulador logs -f`.
+
+### Credencial, atualização e remoção
+
+| Comando | O que faz |
+| --- | --- |
+| `hubsaude auth verify` | Confirma se a credencial do credenciamento funciona, conforme [detalhado abaixo](#hubsaude-auth-verify) |
+| `hubsaude update` | Atualiza o Validador, o Simulador, o servidor FHIR local e o Java utilizado por eles |
+| `hubsaude self-update` | Atualiza o próprio programa `hubsaude` |
+| `hubsaude version` | Exibe a versão do programa e das ferramentas instaladas |
+| `hubsaude uninstall` | Remove o programa e todos os dados locais |
 
 O Validador e o Simulador têm páginas próprias, com exemplos de uso de cada um: [Validador](validador.mdx) e [Simulador](simulador.mdx).
 
