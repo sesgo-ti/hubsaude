@@ -37,6 +37,10 @@ cat paciente.json | hubsaude validate -
 
 `hubsaude validate paciente.json -o json` devolve o resultado em formato legível por máquina, adequado a pipelines de integração contínua. Os [códigos de saída](cli.mdx#códigos-de-saída) indicam se houve erros ou apenas avisos. Para conferir contra um perfil específico, acrescente `--profile <url>`.
 
+### Consultar campos com FHIRPath
+
+Para verificar o valor de um campo sem abrir o arquivo, use `hubsaude fhirpath`, que também utiliza o Validador local. Veja [Extrair informações com FHIRPath](cli.mdx#extrair-informações-com-fhirpath).
+
 ## Ciclo de vida do serviço
 
 Por trás do comando, o Validador fica rodando como um serviço na sua máquina, iniciado automaticamente no primeiro uso e encerrado após um período sem uso. Para controlá-lo diretamente, use os comandos abaixo.
