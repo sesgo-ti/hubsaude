@@ -80,6 +80,31 @@ Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instala
 
 O Validador e o Simulador têm páginas próprias, com exemplos de uso de cada um: [Validador](validador.mdx) e [Simulador](simulador.mdx).
 
+## Servidor FHIR local
+
+O `hubsaude server` sobe um servidor FHIR completo no endereço `http://127.0.0.1:8100/fhir`, útil para experimentar o formato dos registros antes de usar o Simulador.
+
+```bash
+hubsaude server start          # baixa na primeira vez e inicia o servidor
+hubsaude server status
+hubsaude server logs -f
+hubsaude server stop
+hubsaude server start --reset  # apaga os dados locais antes de iniciar
+```
+
+Diferenças em relação às demais ferramentas:
+
+- **Os dados são mantidos** entre um uso e outro. Para recomeçar do zero, pare o servidor e use `start --reset`.
+- **Não encerra sozinho** por inatividade: permanece ativo até `hubsaude server stop`.
+- **Recusa registros inválidos**, devolvendo a explicação do problema.
+- **É baixado apenas no primeiro uso**, pois tem cerca de 150 MB.
+
+:::warning
+
+**O servidor FHIR local não tem autenticação nem criptografia** e só aceita conexões do próprio computador. Não o exponha na rede e use apenas dados fictícios. O comando `hubsaude uninstall` apaga também os dados armazenados nele.
+
+:::
+
 ## hubsaude auth verify
 
 Assim que o credenciamento é aprovado, este comando confirma em segundos que a sua chave e o seu certificado realmente funcionam, sem precisar escrever uma linha de código. Ele existe para conferência: para obter tokens no funcionamento normal da aplicação, use um dos [SDKs](../sdks/index.mdx).
@@ -107,6 +132,7 @@ Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribu�
 | --- | --- | --- |
 | `HUBSAUDE_VALIDADOR_PORT` | Porta local do Validador | 8090 |
 | `HUBSAUDE_SIMULADOR_PORT` | Porta local do Simulador | 8443 |
+| `HUBSAUDE_SERVER_PORT` | Porta local do servidor FHIR | 8100 |
 | `HUBSAUDE_IDLE_TIMEOUT` | Tempo de ociosidade antes de encerrar um componente local | 30m |
 | `HUBSAUDE_HTTP_TIMEOUT` | Timeout das requisições HTTP feitas pelo CLI | 120s |
 | `HUBSAUDE_RELEASE_CHANNEL` | Canal de release usado para baixar os componentes | stable |
