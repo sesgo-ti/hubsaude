@@ -60,7 +60,7 @@ irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
 
 ## Comandos
 
-Todos os comandos partem do programa `hubsaude` instalado acima. Para ver as opções de qualquer comando, acrescente `--help`, como em `hubsaude validate --help`.
+Todos os comandos partem do programa `hubsaude` instalado acima e são digitados no terminal do seu computador: no Windows, o PowerShell; no macOS e no Linux, o aplicativo Terminal. Para ver as opções de qualquer comando, acrescente `--help`, como em `hubsaude validate --help`.
 
 ### Conferir registros
 
@@ -155,6 +155,8 @@ hubsaude auth verify \
     --cert meu-certificado.pem \
     --ig hemograma --ig-versao 0.0.1
 ```
+
+No Windows, o PowerShell não reconhece a barra invertida (`\`) como continuação de linha. Digite o comando em uma única linha ou troque cada `\` no fim da linha pelo acento grave (`` ` ``).
 
 | Exit | Significado | Ação recomendada |
 | --- | --- | --- |
