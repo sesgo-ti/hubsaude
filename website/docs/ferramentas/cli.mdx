@@ -146,6 +146,8 @@ hubsaude auth verify \
 
 Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribuída com certeza à credencial, ela é classificada como `4`, ou seja, inconclusiva. Uma credencial nunca é declarada inapta sem evidência clara. Os mesmos códigos de saída valem para a ferramenta Java autônoma [hubsaude-cliente-cli](https://github.com/sesgo-ti/hubsaude-cliente-cli).
 
+O comando aceita a chave em arquivo PEM, cifrado ou não, e também arquivos `.p12` ou `.pfx`. Se a chave tiver senha, prefira informá-la com `--password-stdin` ou pela variável `HUBSAUDE_KEY_PASSWORD`: a opção `--password` deixa a senha visível no histórico do terminal. O token completo só é exibido com `--show-token`; evite essa opção em automações, para que o token não fique registrado em logs.
+
 ## Atualizar e desinstalar
 
 Há duas atualizações independentes:
