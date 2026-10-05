@@ -1,25 +1,198 @@
 ---
 id: index
-title: "Fluxos de integração"
+title: "Panorama da integração"
 slug: /fluxos/
 pagination_prev: null
 pagination_next: fluxos/preparar
 ---
 
-# Fluxos de integração
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
 
-Integrar-se ao HubSaúde se resume a duas conversas com o servidor: primeiro seu sistema se identifica e recebe permissão para agir, depois envia os dados de saúde propriamente ditos. As páginas abaixo percorrem cada uma dessas conversas na ordem em que elas acontecem, com exemplos prontos em quatro linguagens.
+# Panorama da integração
 
-Este é um percurso de leitura, não um tutorial executável completo: os exemplos precisam dos endereços, credenciais e recursos adequados ao ambiente escolhido. Use os controles de próxima página e página anterior para seguir a sequência. Ao retornar para uma consulta pontual, use a referência técnica no menu lateral.
+O HubSaúde é a plataforma do Estado de Goiás que permite aos sistemas de saúde, como os de hospitais, laboratórios e unidades básicas, trocar informações de pacientes de forma segura e padronizada. Integrar um sistema ao HubSaúde significa prepará-lo para se identificar perante a plataforma e enviar registros de saúde seguindo regras comuns a todas as instituições.
 
-## 1. Preparar o ambiente
+Esta página foi pensada para quem ainda não conhece o HubSaúde. Ela apresenta, em um só lugar, todo o caminho da integração, o que é feito em cada etapa e as ferramentas oferecidas para ajudar. Volte a ela sempre que precisar se situar.
 
-Distinga os testes no simulador local do acesso à produção, confira como instalar o CLI e quais materiais do credenciamento são usados na autenticação.
+## Como usar esta documentação
 
-## 2. Autenticação
+A documentação pode ser usada de duas formas, conforme o momento em que você está.
 
-Como seu sistema descobre os endereços do serviço, comprova sua identidade com um certificado digital e recebe o token que autoriza as chamadas seguintes.
+**Para aprender o processo, siga a leitura guiada.** As páginas "1. Preparar o ambiente", "2. Autenticar" e "3. Enviar e conferir", no menu lateral, formam uma sequência. Ao final de cada página, os botões de próxima página e página anterior levam à etapa seguinte ou à anterior. Recomenda-se lê-las nessa ordem na primeira vez.
 
-## 3. Envio de recurso
+**Para tirar uma dúvida específica, use a referência.** A seção **Consultar referência**, no menu lateral, reúne as páginas de cada ferramenta e de cada biblioteca, que podem ser consultadas em qualquer ordem. A busca, no topo da página, localiza um assunto em toda a documentação.
 
-Como enviar um registro de saúde já autenticado. O HubSaúde aceita o envio na hora, mas processa depois, então há um segundo passo para acompanhar o resultado.
+Os exemplos de código apresentados ilustram o funcionamento da integração. Para executá-los, é preciso ajustá-los ao seu ambiente, com os endereços e as credenciais corretos.
+
+## Conceitos essenciais
+
+Alguns termos aparecem em toda a documentação. Conhecê-los antes facilita a leitura das próximas seções.
+
+- **FHIR**: padrão internacional para a troca de informações em saúde, adotado pelo HubSaúde. Ele define como os dados devem ser organizados, para que sistemas diferentes consigam entendê-los da mesma forma.
+- **Recurso**: cada unidade de informação no padrão FHIR, como um paciente (`Patient`) ou um resultado de exame (`Observation`). No HubSaúde, os recursos são enviados em formato JSON.
+- **Guias de Implementação**: documentos que detalham como cada recurso deve ser preenchido no HubSaúde, por exemplo quais campos são obrigatórios.
+- **Credenciamento**: processo pelo qual a instituição solicita e obtém autorização para usar o HubSaúde. É conduzido pelo gestor da instituição, no sistema Ganesha.
+- **Certificado digital ICP-Brasil**: documento eletrônico que identifica a instituição de forma segura. Tem uma parte pública, que pode ser compartilhada, e uma chave privada, que permanece apenas com a instituição.
+- **`client_id`**: identificador do seu sistema, entregue ao final do credenciamento.
+- **Token de acesso**: autorização temporária que o sistema recebe depois de comprovar sua identidade. Ele acompanha cada envio de dados e precisa ser renovado periodicamente.
+- **SDK ou biblioteca**: código pronto, oferecido pelo HubSaúde, que você incorpora ao seu sistema para não precisar implementar tudo do zero.
+- **CLI**: programa usado por meio de comandos digitados no terminal, a janela de texto do sistema operacional.
+
+## O caminho, etapa por etapa
+
+A integração acontece em cinco momentos. Abra cada etapa para entender por que ela existe, o que você precisa fazer e o que terá ao final. Se quiser, marque as etapas concluídas para acompanhar seu progresso; a marcação fica salva apenas neste navegador.
+
+<Trilha>
+
+<Etapa id="credenciamento" titulo="Antes de começar: credenciamento" resumo="A instituição solicita autorização para usar o ambiente oficial do HubSaúde." ambiente="gestor">
+
+**Por que esta etapa existe:** o HubSaúde lida com dados de saúde, que são informações sensíveis. Por isso, somente instituições autorizadas podem enviar e consultar dados no ambiente oficial.
+
+**O que é feito:** o gestor da instituição, que é a pessoa responsável pela relação com o HubSaúde, solicita o credenciamento no Ganesha, o sistema de credenciamento da plataforma. Nesse pedido, ele envia a parte pública do certificado digital da instituição. A Secretaria de Estado da Saúde analisa a solicitação e define o nível de acesso, ou seja, até onde a instituição poderá acessar os dados.
+
+**Ao final:** a instituição recebe o `client_id` do sistema. Junto com o certificado digital, ele forma a credencial usada para acessar o ambiente oficial.
+
+**Importante:** o desenvolvimento não precisa esperar pela aprovação. As etapas 1 a 3 usam o Simulador, um ambiente de testes que dispensa a credencial oficial. Assim, o sistema pode ser preparado enquanto o pedido é analisado.
+
+- Leia: [A jornada do gestor](../gestor/index.mdx)
+
+</Etapa>
+
+<Etapa id="preparar" marcador="1" titulo="Preparar o ambiente" resumo="Instale as ferramentas de teste e prepare o Simulador no seu computador." ambiente="testes">
+
+**Por que esta etapa existe:** antes de se conectar ao ambiente oficial, é importante testar a integração em um lugar seguro, onde erros não causam problemas e nenhum dado real é usado.
+
+**O que você faz:** instale o HubSaúde CLI, o programa que baixa e controla as ferramentas de teste. A instalação é feita com um único comando, digitado no terminal do seu computador (no Windows, o PowerShell; no macOS e no Linux, o aplicativo Terminal), e não exige permissão de administrador. Depois, inicie o Simulador, que reproduz o HubSaúde no seu computador, e cadastre nele o seu sistema usando um certificado de teste, criado por você mesmo para esse fim.
+
+**Ao final:** você terá o Validador, o Simulador e o servidor FHIR local disponíveis, e o seu sistema cadastrado no Simulador.
+
+- Ferramentas: [HubSaúde CLI](../ferramentas/cli.mdx) e [Simulador](../ferramentas/simulador.mdx#preparar-seu-sistema-para-o-simulador)
+- Leia: [Preparar o ambiente](preparar.mdx)
+
+</Etapa>
+
+<Etapa id="autenticar" marcador="2" titulo="Autenticar" resumo="Faça o sistema comprovar sua identidade e receber a autorização de acesso." ambiente="testes">
+
+**Por que esta etapa existe:** antes de aceitar qualquer dado, o HubSaúde precisa ter certeza de qual sistema está se comunicando com ele e do que esse sistema pode fazer.
+
+**O que você faz:** o HubSaúde não usa usuário e senha. O sistema comprova sua identidade com o certificado digital e, em troca, recebe um token de acesso, uma autorização temporária que acompanha cada envio. Esse processo segue um padrão internacional chamado SMART Backend Services. As bibliotecas oficiais, disponíveis em Python, Java, TypeScript e C#, realizam toda essa troca e renovam o token automaticamente. Durante os testes, configure a biblioteca para usar o Simulador.
+
+**Ao final:** o seu sistema consegue obter um token de acesso no Simulador.
+
+- Ferramentas: [bibliotecas de autenticação](../sdks/index.mdx) e [Simulador](../ferramentas/simulador.mdx)
+- Veja: [como apontar a biblioteca para o Simulador](../ferramentas/simulador.mdx#4-apontar-o-sdk-para-o-simulador)
+- Leia: [Autenticação SMART on FHIR](autenticacao.mdx)
+
+</Etapa>
+
+<Etapa id="enviar" marcador="3" titulo="Enviar e conferir" resumo="Monte o registro, confira se está correto, envie ao HubSaúde e acompanhe o resultado." ambiente="testes">
+
+**Por que esta etapa existe:** esta é a finalidade da integração. Depois de comprovar sua identidade, o sistema pode enviar ao HubSaúde os registros de saúde que produz, como o cadastro de um paciente ou o resultado de um exame.
+
+**O que você faz:** o envio de cada registro passa por cinco passos.
+
+1. **Conhecer as regras do registro.** Cada tipo de informação tem um formato próprio, definido nos Guias de Implementação. O guia indica, por exemplo, quais dados de um paciente são obrigatórios e como devem ser escritos. Consulte o guia do tipo de registro que o seu sistema vai enviar.
+2. **Montar o registro.** O sistema transforma a informação que já possui em um arquivo no formato FHIR, seguindo as regras do guia.
+3. **Conferir antes de enviar.** O Validador analisa o arquivo e informa se ele está de acordo com as regras, apontando cada problema e o que precisa ser corrigido. Corrigir nesta fase evita que o registro seja recusado depois.
+4. **Enviar ao HubSaúde.** O sistema envia o registro junto com o token de acesso obtido na etapa anterior. O HubSaúde não devolve o resultado final na mesma hora: ele confirma que recebeu o pedido e informa um endereço de acompanhamento, semelhante a um número de protocolo.
+5. **Acompanhar o resultado.** O sistema consulta o endereço de acompanhamento até que o processamento termine. A resposta final indica se o registro foi aceito, com o endereço onde ele passou a ficar disponível, ou recusado, com a explicação do motivo.
+
+Se a conexão cair durante um envio e não for possível saber se ele chegou, o sistema pode repeti-lo usando o mesmo identificador de envio, chamado `Idempotency-Key`. O HubSaúde reconhece a repetição e não registra a informação em duplicidade.
+
+Alguns documentos também precisam de assinatura digital, que comprova quem os produziu e garante que não foram alterados. Nesses casos, a assinatura segue a política do HubSaúde e pode ser feita com a Safira.
+
+**Ao final:** você terá enviado um registro ao Simulador e acompanhado o processamento até a confirmação do resultado.
+
+- Ferramentas: [Validador](../ferramentas/validador.mdx), [Simulador](../ferramentas/simulador.mdx) e [Safira](https://github.com/sesgo-ti/safira), para assinatura digital
+- Consulte: [Guias de Implementação](https://fhir.saude.go.gov.br) e [Política de Assinatura](https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html)
+- Leia: [Enviando um recurso FHIR](envio-recurso.mdx)
+
+</Etapa>
+
+<Etapa id="producao" titulo="Entrar em produção" resumo="Confirme a credencial oficial com o HubSaúde CLI e conecte o sistema ao HubSaúde real." ambiente="oficial">
+
+**Por que esta etapa existe:** depois de testada, a integração precisa passar a funcionar no ambiente oficial, com dados reais.
+
+**O que você faz:** com o credenciamento aprovado, o primeiro passo é confirmar que a credencial recebida funciona, antes de alterar o seu sistema. Para isso, use o HubSaúde CLI, o mesmo programa instalado na etapa 1. Abra o terminal do seu computador (no Windows, o PowerShell; no macOS e no Linux, o aplicativo Terminal) e digite o comando abaixo, trocando os valores de exemplo pelos da sua instituição:
+
+```bash
+hubsaude auth verify --client-id hs-12345678 --key chave-privada.pem --cert certificado.pem --ig hemograma --ig-versao 0.0.1 --fhir-base https://hub.saude.go.gov.br
+```
+
+O comando é longo e ocupa uma única linha. Para não digitá-lo, use o botão de copiar, que aparece no canto do bloco ao passar o mouse, cole no terminal e ajuste os valores. Cada opção do comando corresponde a uma informação:
+
+- `--client-id`: o identificador do sistema entregue no credenciamento;
+- `--key`: o arquivo com a chave privada do certificado digital da instituição, em formato PEM ou em um arquivo `.pfx` ou `.p12`;
+- `--cert`: o arquivo com o certificado digital da instituição;
+- `--ig` e `--ig-versao`: o Guia de Implementação que o sistema vai usar e a respectiva versão;
+- `--fhir-base`: o endereço do ambiente oficial.
+
+A chave privada é usada apenas no seu computador, para assinar a verificação, e nunca é enviada ao HubSaúde. Se a credencial estiver correta, o programa exibe um relatório confirmando que a autorização de acesso foi obtida. Caso contrário, ele informa o motivo da falha.
+
+Confirmada a credencial, ajuste a configuração do seu sistema: troque o endereço do Simulador pelo endereço oficial, use o `client_id` recebido no credenciamento e substitua o certificado de teste pelo certificado ICP-Brasil da instituição.
+
+**Ao final:** o seu sistema passa a enviar dados reais ao HubSaúde, dentro do nível de acesso concedido à instituição.
+
+- Ferramenta: [HubSaúde CLI](../ferramentas/cli.mdx), com o comando [`hubsaude auth verify`](../ferramentas/cli.mdx#hubsaude-auth-verify), que explica o significado de cada resultado
+- Consulte: [Visão geral e requisitos](visao-geral.mdx)
+
+</Etapa>
+
+</Trilha>
+
+## Ferramentas disponíveis
+
+O HubSaúde oferece ferramentas para facilitar cada etapa. Elas se dividem em três grupos: as que funcionam no seu computador durante os testes, as que são incorporadas ao seu sistema e os materiais de consulta.
+
+### No seu computador
+
+Estas ferramentas são instaladas e controladas pelo HubSaúde CLI. Elas funcionam apenas no seu computador e não enviam dados ao HubSaúde, por isso podem ser usadas livremente durante o desenvolvimento.
+
+<Cartoes>
+  <Cartao titulo="HubSaúde CLI" href="/ferramentas/cli/" quando="desde o início da integração">Programa de linha de comando que instala, atualiza e controla as demais ferramentas desta lista.</Cartao>
+  <Cartao titulo="Validador" href="/ferramentas/validador/" quando="antes de cada envio">Verifica se um registro segue as regras dos Guias de Implementação e explica o que precisa ser corrigido.</Cartao>
+  <Cartao titulo="Simulador" href="/ferramentas/simulador/" quando="para testar a autenticação e o envio completos">Cópia do HubSaúde que funciona no seu computador, com as mesmas exigências de segurança do ambiente oficial.</Cartao>
+  <Cartao titulo="Servidor FHIR local" href="/ferramentas/cli/#servidor-fhir-local" quando="para experimentar o formato dos registros">Servidor simples, sem autenticação, que recebe e guarda registros para você observar como eles ficam.</Cartao>
+  <Cartao titulo="Verificação da credencial" href="/ferramentas/cli/#hubsaude-auth-verify" quando="logo após a aprovação do credenciamento">Comando `hubsaude auth verify` do HubSaúde CLI. Digitado no terminal, confirma em poucos segundos se a credencial recebida funciona no ambiente oficial.</Cartao>
+</Cartoes>
+
+### No seu sistema
+
+Estas bibliotecas são incorporadas ao código da sua aplicação e passam a fazer parte dela.
+
+<Cartoes>
+  <Cartao titulo="Bibliotecas de autenticação" href="/sdks/" quando="em toda comunicação com o HubSaúde">Obtêm e renovam automaticamente a autorização de acesso do seu sistema. Disponíveis em Python, Java, TypeScript e C#.</Cartao>
+  <Cartao titulo="Safira" href="https://github.com/sesgo-ti/safira" quando="quando o documento exige assinatura digital">Assina documentos e confere assinaturas de acordo com a política de assinatura do HubSaúde.</Cartao>
+</Cartoes>
+
+### Materiais de consulta
+
+Documentos e arquivos de apoio para entender as regras e o funcionamento do HubSaúde.
+
+<Cartoes>
+  <Cartao titulo="Guias de Implementação" href="https://fhir.saude.go.gov.br">Regras de preenchimento de cada tipo de registro, como os campos obrigatórios e os valores aceitos.</Cartao>
+  <Cartao titulo="Endereços públicos do servidor" href="/fluxos/autenticacao/#descoberta-da-api">Endereços que informam o que o servidor oferece e como a segurança está configurada.</Cartao>
+  <Cartao titulo="Contrato FHIR" href="/ferramentas/#contrato-fhir">Descrição técnica completa das operações aceitas pelo servidor, útil para equipes que geram código automaticamente.</Cartao>
+  <Cartao titulo="Coleção do produtor" href="/ferramentas/#coleção-do-produtor">Exemplos prontos de requisições, que permitem percorrer o envio de dados sem programar.</Cartao>
+  <Cartao titulo="hubsaude-cliente-cli" href="https://github.com/sesgo-ti/hubsaude-cliente-cli">Alternativa em Java para verificar a credencial, com os mesmos resultados do comando hubsaude auth verify.</Cartao>
+</Cartoes>
+
+## Ambiente de testes e ambiente oficial
+
+A integração usa dois ambientes. O ambiente de testes é o Simulador, que funciona no seu computador e serve para desenvolver e experimentar sem riscos. O ambiente oficial, também chamado de produção, é o HubSaúde real, onde circulam os dados dos pacientes. A tabela abaixo resume as diferenças.
+
+| | Testes (Simulador) | Oficial (produção) |
+| --- | --- | --- |
+| Endereço | `https://localhost:8443`, no seu computador | `https://hub.saude.go.gov.br` |
+| Credencial | Não exige credenciamento: o sistema é [cadastrado no próprio Simulador](../ferramentas/simulador.mdx#preparar-seu-sistema-para-o-simulador) com um certificado de teste | `client_id` entregue no credenciamento e certificado digital ICP-Brasil da instituição |
+| Dados | Apenas de teste, apagados quando o Simulador é reiniciado | Reais, limitados ao nível de acesso concedido |
+| Finalidade | Desenvolver e testar a integração | Funcionamento do sistema integrado |
+
+:::warning
+
+**Fora do ambiente oficial, use apenas dados fictícios.** Nunca utilize informações reais de pacientes no Validador, no Simulador ou no servidor FHIR local.
+
+:::
+
+Pronto para começar? Avance para [Preparar o ambiente](preparar.mdx), a primeira etapa da leitura guiada.
