@@ -1,0 +1,293 @@
+.trilha {
+  margin-block: 1.5rem 2rem;
+}
+
+.painel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #dce9e0;
+  border-radius: var(--ifm-global-radius);
+  background: #f5faf7;
+}
+
+.progresso {
+  flex: 1 1 16rem;
+}
+
+.progresso p {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.barra {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dce9e0;
+}
+
+.barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ifm-color-primary);
+  transition: width 0.3s ease;
+}
+
+.acoes {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.acao {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid #b9d3c3;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--ifm-color-primary-darker);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.acao:hover {
+  background: #eaf6ef;
+}
+
+.etapas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etapa {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding-bottom: 1.25rem;
+}
+
+.etapa:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 2.5rem;
+  bottom: 0;
+  left: calc(1.25rem - 1px);
+  width: 2px;
+  background: #cddfd3;
+}
+
+.marcador {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--ifm-color-primary);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--ifm-color-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.marcadorMarco {
+  background: #eaf6ef;
+}
+
+.marcadorMarco::after {
+  content: '';
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--ifm-color-primary);
+}
+
+.concluida .marcador {
+  background: var(--ifm-color-primary);
+  color: #ffffff;
+}
+
+.concluida .marcador::after {
+  content: none;
+}
+
+.cartao {
+  overflow: hidden;
+  border: 1px solid #dce9e0;
+  border-radius: var(--ifm-global-radius);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(16 48 31 / 6%);
+}
+
+.cartao[open] {
+  border-color: #9cc5ae;
+}
+
+.cabecalho {
+  position: relative;
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 3rem 1rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.cabecalho::-webkit-details-marker {
+  display: none;
+}
+
+.cabecalho::after {
+  content: '';
+  position: absolute;
+  top: 1.35rem;
+  right: 1.25rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: 2px solid var(--ifm-color-primary);
+  border-bottom: 2px solid var(--ifm-color-primary);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.cartao[open] > .cabecalho::after {
+  top: 1.6rem;
+  transform: rotate(-135deg);
+}
+
+.cabecalho:hover {
+  background: #f5faf7;
+}
+
+.titulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.situacao {
+  color: var(--ifm-color-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.resumo {
+  color: #3a5446;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.selo {
+  justify-self: start;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.selo[data-ambiente='gestor'] {
+  background: #fdf3dc;
+  color: #6b4a00;
+}
+
+.selo[data-ambiente='testes'] {
+  background: #e4f0fb;
+  color: #17466e;
+}
+
+.selo[data-ambiente='oficial'] {
+  background: #eaf6ef;
+  color: #035a41;
+}
+
+.corpo {
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid #dce9e0;
+  font-size: 0.95rem;
+}
+
+.corpo > :last-child {
+  margin-bottom: 0;
+}
+
+.corpo ul,
+.corpo ol {
+  margin-bottom: var(--ifm-paragraph-margin-bottom);
+  padding-left: 1.25rem;
+}
+
+.corpo ol {
+  list-style: decimal;
+}
+
+.corpo li + li {
+  margin-top: 0.4rem;
+}
+
+.concluir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #b9d3c3;
+  border-radius: 999px;
+  background: #f5faf7;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.concluir input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--ifm-color-primary);
+}
+
+@media (max-width: 576px) {
+  .etapa {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .etapa:not(:last-child)::before {
+    top: 2rem;
+    left: calc(1rem - 1px);
+  }
+
+  .marcador {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .cabecalho {
+    padding: 0.85rem 2.5rem 0.85rem 1rem;
+  }
+
+  .cabecalho::after {
+    right: 1rem;
+  }
+
+  .corpo {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .acoes {
+    width: 100%;
+  }
+
+  .acao {
+    flex: 1;
+  }
+}
