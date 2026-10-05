@@ -152,6 +152,40 @@ test('native guided pagination follows the approved order and terminates in both
   }
 });
 
+function trailSteps(page) {
+  return page.locator('main li[id^="etapa-"]');
+}
+
+async function openStep(page, step) {
+  const details = step.locator('details');
+  await step.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(details).toHaveAttribute('open');
+  await expect(step.locator('details > div a[href]').first()).toBeVisible();
+}
+
+test('integration trail opens with the keyboard and keeps progress after reload', async ({page}, testInfo) => {
+  await visit(page, 'fluxos/');
+  const steps = trailSteps(page);
+  expect(await steps.count()).toBeGreaterThan(1);
+  const progress = page.getByRole('progressbar');
+  await expect(progress).toHaveAttribute('aria-valuenow', '0');
+  const first = steps.first();
+  await openStep(page, first);
+  await first.getByRole('checkbox').check();
+  await expect(progress).toHaveAttribute('aria-valuenow', '1');
+  await screenshot(page, testInfo, 'trail');
+  await page.reload();
+  await expect(progress).toHaveAttribute('aria-valuenow', '1');
+  await expect(first.locator('summary')).toContainText('conclu\u00edda');
+  await openStep(page, first);
+  await expect(first.getByRole('checkbox')).toBeChecked();
+  await page.getByRole('button', {name: 'Abrir todas'}).click();
+  await expect(page.locator('main li[id^="etapa-"] details:not([open])')).toHaveCount(0);
+  await page.getByRole('button', {name: 'Fechar todas'}).click();
+  await expect(page.locator('main li[id^="etapa-"] details[open]')).toHaveCount(0);
+});
+
 test('reference category opens with the keyboard and reaches a representative SDK', async ({page}, testInfo) => {
   await visit(page, 'fluxos/');
   const mobile = testInfo.project.name === 'mobile';
@@ -215,6 +249,11 @@ test('blocked localStorage does not break content or tab selection', async ({pag
   await select(page, 0, 'TypeScript');
   await visit(page, 'ferramentas/cli/');
   await select(page, 0, 'Windows');
+  await visit(page, 'fluxos/');
+  const step = trailSteps(page).first();
+  await openStep(page, step);
+  await step.getByRole('checkbox').check();
+  await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1');
 });
 
 test('a manager detail opens and closes with the keyboard and loads its accessible image', async ({page}, testInfo) => {
@@ -281,6 +320,10 @@ test.describe('progressive enhancement', () => {
     await expect(page).toHaveURL(/\/hubsaude\/gestor\/$/);
     await expect(page.locator('main h1')).toBeVisible();
     await openManagerDetail(page);
+    await visit(page, 'fluxos/');
+    await openStep(page, trailSteps(page).last());
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
     await visit(page, 'fluxos/autenticacao/');
     await expect(panel(page, 0)).toBeVisible();
     expect(renderedCode(await panel(page, 0).locator('pre').innerHTML()).trim()).not.toBe('');
