@@ -125,6 +125,17 @@ Exige certificado de cliente e prende o token emitido a ele, exatamente como a p
 
 Os endereços `/fhir/*` respondendo no mesmo modelo de envio em duas etapas. [Veja como funciona o envio](../fluxos/envio-recurso.mdx#como-funciona-o-envio-em-duas-etapas).
 
+## Diferenças em relação à produção
+
+| Aspecto | Simulador | Produção |
+| --- | --- | --- |
+| Cadastro do sistema | Feito por você, pelo endereço `/clients/register` | Feito pelo credenciamento no Ganesha |
+| Certificado do cliente | Qualquer certificado, inclusive de teste | Certificado ICP-Brasil válido da instituição |
+| Conferência dos registros | Apenas a estrutura do JSON FHIR | Regras completas dos Guias de Implementação |
+| Dados | Em memória, apagados ao reiniciar | Persistidos |
+
+Como o Simulador confere apenas a estrutura, um registro aceito por ele ainda pode ser recusado na produção. Confira sempre os registros no [Validador](validador.mdx) antes de enviá-los.
+
 ## Próximos passos
 
 - [Testando localmente](../fluxos/envio-recurso.mdx#testando-localmente-antes-de-produção)
