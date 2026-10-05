@@ -146,6 +146,31 @@ hubsaude auth verify \
 
 Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribuída com certeza à credencial, ela é classificada como `4`, ou seja, inconclusiva. Uma credencial nunca é declarada inapta sem evidência clara. Os mesmos códigos de saída valem para a ferramenta Java autônoma [hubsaude-cliente-cli](https://github.com/sesgo-ti/hubsaude-cliente-cli).
 
+## Atualizar e desinstalar
+
+Há duas atualizações independentes:
+
+```bash
+hubsaude update          # atualiza as ferramentas: Validador, Simulador, servidor FHIR local e Java
+hubsaude self-update     # atualiza o próprio programa hubsaude
+```
+
+As ferramentas só mudam de versão com `hubsaude update`. Os demais comandos reutilizam a versão já instalada, sem consultar a internet.
+
+```bash
+hubsaude self-update --check     # apenas verifica se há versão nova
+hubsaude self-update --to 0.3.16 # instala uma versão específica
+```
+
+Para remover o programa e todos os dados locais, inclusive os do servidor FHIR local:
+
+```bash
+hubsaude uninstall --dry-run     # mostra o que seria removido, sem remover
+hubsaude uninstall               # remove após confirmação
+```
+
+Use `--keep-cache` para preservar os arquivos já baixados e `--yes` para dispensar a confirmação.
+
 ## Variáveis de ambiente
 
 | Variável | Efeito | Padrão |
