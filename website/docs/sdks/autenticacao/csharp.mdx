@@ -40,6 +40,60 @@ await using var client = SmartTokenClient.CreateBuilder()
 string token = await client.ObtainTokenAsync("system/Patient.rs");
 ```
 
+## Testar com o Simulador
+
+O [Simulador](../../ferramentas/simulador.mdx) reproduz o HubSaúde no seu computador e permite testar a biblioteca antes de receber a credencial oficial. Ele exige os mesmos cuidados de segurança da produção, então a configuração é praticamente a mesma: muda apenas o endereço, a origem do certificado e a confiança no servidor.
+
+### Antes de executar o código
+
+Siga os passos de [Preparar seu sistema para o Simulador](../../ferramentas/simulador.mdx#preparar-seu-sistema-para-o-simulador). Ao final deles, você terá:
+
+1. o Simulador em execução, iniciado com `hubsaude sim start`;
+2. um certificado de teste (`client-cert.pem`) e a respectiva chave (`client-key.pem`), gerados com o OpenSSL;
+3. o sistema cadastrado no Simulador com o identificador `meu-sistema` e a permissão `system/Patient.rs`;
+4. o certificado do próprio Simulador (`simulador-server.pem`), baixado do endereço `https://localhost:8443/certs/simulador-server.pem`.
+
+### Configurar a biblioteca
+
+```csharp
+await using var client = SmartTokenClient.CreateBuilder()
+    .FhirBase("https://localhost:8443")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("client-key.pem")
+    .CertificatePem("client-cert.pem")
+    .ServerTrustAnchor("simulador-server.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.rs");
+```
+
+Em relação ao uso com a produção, há três diferenças:
+
+- `.FhirBase` aponta para o Simulador, e a biblioteca descobre sozinha os demais endereços;
+- a chave e o certificado são os de teste, cadastrados no Simulador, e o identificador é o informado no cadastro;
+- `.ServerTrustAnchor` faz a biblioteca confiar no certificado do Simulador, que não é emitido por uma autoridade reconhecida.
+
+Se você gerou o certificado de teste com o Java `keytool`, a chave fica dentro do arquivo `client-keystore.p12`. Nesse caso, use o PKCS#12, descrito em [Fontes de chave suportadas](#pkcs12-direto-recomendado-para-produção).
+
+### Passar para a produção
+
+Depois que o credenciamento for aprovado, ajuste a mesma configuração:
+
+- troque o endereço do Simulador por `https://hub.saude.go.gov.br`;
+- use o `client_id` entregue no credenciamento;
+- substitua a chave e o certificado de teste pelos da instituição;
+- remova a linha da âncora de confiança: o certificado do HubSaúde já é reconhecido automaticamente.
+
+### Problemas comuns no Simulador
+
+| Situação | Causa provável | O que fazer |
+| --- | --- | --- |
+| Erro de certificado ao conectar, como falha na verificação da cadeia | O certificado do Simulador não foi informado | Baixe o `simulador-server.pem` e configure a âncora de confiança |
+| `401 invalid_client` informando que o certificado não corresponde ao cadastrado | O certificado usado é diferente do enviado no cadastro | Use o mesmo par de chave e certificado do cadastro |
+| `401 invalid_client` informando que o certificado de cliente é obrigatório | O certificado de cliente não foi configurado | Informe o certificado de teste na configuração da biblioteca |
+| Erro de permissão ao pedir o token | A permissão solicitada não foi liberada no cadastro | Cadastre o sistema novamente incluindo a permissão desejada |
+| O sistema deixa de ser reconhecido | O Simulador foi reiniciado e apagou os cadastros | Cadastre o sistema novamente |
+
 ## Fontes de chave suportadas
 
 Sua chave privada pode estar em diferentes lugares: um arquivo, um cofre de segredos ou um dispositivo de hardware. O SDK abstrai isso com a interface `ISigningStrategy` (um único método que assina bytes), e `SigningStrategyFactory` já traz pronta a construção para as fontes mais comuns.
