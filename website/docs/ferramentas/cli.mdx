@@ -171,6 +171,22 @@ hubsaude uninstall               # remove após confirmação
 
 Use `--keep-cache` para preservar os arquivos já baixados e `--yes` para dispensar a confirmação.
 
+## Códigos de saída
+
+Os códigos de saída permitem usar o programa em scripts e pipelines de integração contínua.
+
+| Código | Significado |
+| --- | --- |
+| `0` | Sucesso |
+| `1` | A validação encontrou erros |
+| `2` | A validação encontrou apenas avisos |
+| `3` | Erro de uso: argumentos ou opções inválidos |
+| `4` | Falha de rede ou de instalação das ferramentas |
+| `5` | Há atualização disponível (`--check`) |
+| `6` | Credencial não apta (`auth verify`) |
+
+Para investigar um problema, acrescente `-v` a qualquer comando. O detalhamento omite o conteúdo dos registros enviados, para não expor dados de saúde no terminal ou em logs.
+
 ## Variáveis de ambiente
 
 | Variável | Efeito | Padrão |
