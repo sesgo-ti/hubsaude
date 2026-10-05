@@ -97,7 +97,7 @@ Nos SDKs oficiais, informe o endereço do Simulador como base FHIR e o certifica
 | TypeScript | `fhirBase: "https://localhost:8443"` | `serverTrustAnchor: "simulador-server.pem"` |
 | C# | `.FhirBase("https://localhost:8443")` | `.ServerTrustAnchor("simulador-server.pem")` |
 
-Use também o `client_id` cadastrado, a chave e o certificado de teste gerados no primeiro passo. Os demais detalhes estão na página de cada [SDK](../sdks/index.mdx). A âncora de confiança serve apenas para testes locais: em produção, o certificado do HubSaúde já é reconhecido automaticamente.
+Use também o `client_id` cadastrado, a chave e o certificado de teste gerados no primeiro passo. O exemplo completo, com a passagem para a produção e os problemas mais comuns, está na seção **Testar com o Simulador** de cada SDK: [Python](../sdks/autenticacao/python.mdx#testar-com-o-simulador), [Java](../sdks/autenticacao/java.mdx#testar-com-o-simulador), [TypeScript](../sdks/autenticacao/typescript.mdx#testar-com-o-simulador) e [C#](../sdks/autenticacao/csharp.mdx#testar-com-o-simulador). A âncora de confiança serve apenas para testes locais: em produção, o certificado do HubSaúde já é reconhecido automaticamente.
 
 ### Gerenciar o cadastro
 
