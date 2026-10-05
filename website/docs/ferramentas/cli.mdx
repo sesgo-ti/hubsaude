@@ -80,6 +80,26 @@ Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instala
 
 O Validador e o Simulador têm páginas próprias, com exemplos de uso de cada um: [Validador](validador.mdx) e [Simulador](simulador.mdx).
 
+## Extrair informações com FHIRPath
+
+FHIRPath é uma linguagem de consulta para recursos FHIR. Com ela, você confere rapidamente o valor de um campo sem abrir o arquivo inteiro.
+
+```bash
+# nome de um paciente
+hubsaude fhirpath 'Patient.name.given' paciente.json
+
+# o mesmo campo em vários arquivos
+hubsaude fhirpath 'name.family' a.json b.json
+
+# todos os arquivos de uma pasta
+hubsaude fhirpath 'Patient.id' --dir ./recursos --recursive
+
+# resultado em JSON
+hubsaude fhirpath 'Patient.name' paciente.json -o json
+```
+
+Escreva a expressão entre **aspas simples**, para que o terminal não interprete caracteres como `$` e `*`. Quando o resultado é vazio, nada é impresso; para que esse caso seja tratado como falha em uma automação, acrescente `--fail-empty`. A consulta usa o Validador local; se ele estiver desatualizado, o programa orienta a executar `hubsaude update`.
+
 ## Servidor FHIR local
 
 O `hubsaude server` sobe um servidor FHIR completo no endereço `http://127.0.0.1:8100/fhir`, útil para experimentar o formato dos registros antes de usar o Simulador.
