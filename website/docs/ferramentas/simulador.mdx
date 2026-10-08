@@ -4,13 +4,16 @@ title: "Simulador"
 slug: /ferramentas/simulador/
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Simulador
 
 O Simulador é uma cópia reduzida do HubSaúde que roda na sua máquina. Ele responde como o ambiente real, inclusive nas exigências de segurança, o que permite testar autenticação e envio de ponta a ponta sem depender de credenciais de produção. Quem instala e controla é o [HubSaúde CLI](cli.mdx).
 
 :::warning
 
-**Os dados não sobrevivem ao reinício.** O Simulador guarda tudo apenas em memória, então parar e subir de novo devolve o ambiente limpo. Ele escuta em HTTPS na porta `8443`.
+**Os dados não sobrevivem ao reinício.** O Simulador guarda tudo apenas em memória, então parar e subir de novo devolve o ambiente limpo, inclusive os sistemas cadastrados. Ele escuta em HTTPS na porta `8443`.
 
 :::
 
@@ -19,10 +22,92 @@ O Simulador é uma cópia reduzida do HubSaúde que roda na sua máquina. Ele re
 ```bash
 hubsaude sim start
 hubsaude sim status
+hubsaude sim logs -f
 hubsaude sim stop
 ```
 
-A porta pode ser alterada com a variável `HUBSAUDE_SIMULADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
+Com o Simulador em execução, a página `https://localhost:8443` apresenta um resumo do ambiente. A porta pode ser alterada com a variável `HUBSAUDE_SIMULADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
+
+## Preparar seu sistema para o Simulador
+
+Assim como na produção, o Simulador só emite autorização para sistemas previamente cadastrados. A diferença é que o cadastro é feito por você mesmo, em poucos minutos, com um certificado de teste. Não use o certificado ICP-Brasil da instituição nem sua chave privada no Simulador.
+
+### 1. Gerar um certificado de teste
+
+Crie um par de chave e certificado próprio para os testes. Escolha a ferramenta disponível no seu computador:
+
+<Tabs groupId="simulador-certificado-ferramenta" defaultValue="openssl">
+
+<TabItem value="openssl" label="OpenSSL">
+
+```bash
+openssl req -x509 -newkey rsa:2048 -keyout client-key.pem \
+  -out client-cert.pem -days 365 -nodes \
+  -subj "/CN=meu-sistema/O=MinhaInstituicao/C=BR"
+```
+
+</TabItem>
+
+<TabItem value="keytool" label="Java keytool">
+
+```bash
+keytool -genkeypair -alias meu-sistema -keyalg RSA -keysize 2048 -validity 365 \
+  -dname "CN=meu-sistema, O=MinhaInstituicao, C=BR" \
+  -keystore client-keystore.p12 -storetype PKCS12 -storepass changeit
+
+keytool -exportcert -alias meu-sistema -keystore client-keystore.p12 \
+  -storepass changeit -rfc -file client-cert.pem
+```
+
+</TabItem>
+
+</Tabs>
+
+O arquivo `client-cert.pem` é a parte pública, usada no cadastro. A chave fica em `client-key.pem` (OpenSSL) ou dentro de `client-keystore.p12` (keytool).
+
+### 2. Cadastrar o sistema
+
+Informe um identificador para o sistema, o certificado de teste e as permissões desejadas. O identificador faz o papel do `client_id` que, na produção, é entregue pelo credenciamento.
+
+```bash
+curl -k -X POST https://localhost:8443/clients/register \
+  -F "client_id=meu-sistema" \
+  -F "certificate=@client-cert.pem" \
+  -F "allowed_scopes=system/Patient.rs system/Observation.rs"
+```
+
+A opção `-k` aceita o certificado próprio do Simulador, que não é emitido por uma autoridade reconhecida. No Windows, use `curl.exe` no lugar de `curl` para evitar o atalho do PowerShell com o mesmo nome.
+
+### 3. Confiar no certificado do Simulador
+
+Bibliotecas e aplicações recusam conexões com servidores cujo certificado não reconhecem. Baixe o certificado do Simulador e informe-o ao seu sistema:
+
+```bash
+curl -k https://localhost:8443/certs/simulador-server.pem -o simulador-server.pem
+```
+
+### 4. Apontar o SDK para o Simulador
+
+Nos SDKs oficiais, informe o endereço do Simulador como base FHIR e o certificado baixado como âncora de confiança. A descoberta dos demais endereços é automática.
+
+| Linguagem | Endereço do Simulador | Certificado do Simulador |
+| --- | --- | --- |
+| Python | `.fhir_base("https://localhost:8443")` | `.server_trust_anchor("simulador-server.pem")` |
+| Java | `.fhirBase("https://localhost:8443")` | `.serverTrustAnchor(Path.of("simulador-server.pem"))` |
+| TypeScript | `fhirBase: "https://localhost:8443"` | `serverTrustAnchor: "simulador-server.pem"` |
+| C# | `.FhirBase("https://localhost:8443")` | `.ServerTrustAnchor("simulador-server.pem")` |
+
+Use também o `client_id` cadastrado, a chave e o certificado de teste gerados no primeiro passo. O exemplo completo, com a passagem para a produção e os problemas mais comuns, está na seção **Testar com o Simulador** de cada SDK: [Python](../sdks/autenticacao/python.mdx#testar-com-o-simulador), [Java](../sdks/autenticacao/java.mdx#testar-com-o-simulador), [TypeScript](../sdks/autenticacao/typescript.mdx#testar-com-o-simulador) e [C#](../sdks/autenticacao/csharp.mdx#testar-com-o-simulador). A âncora de confiança serve apenas para testes locais: em produção, o certificado do HubSaúde já é reconhecido automaticamente.
+
+### Gerenciar o cadastro
+
+```bash
+# consultar os dados de um sistema cadastrado
+curl -k https://localhost:8443/clients/meu-sistema
+
+# remover o cadastro
+curl -k -X DELETE https://localhost:8443/clients/meu-sistema
+```
 
 ## O que o Simulador reproduz
 
@@ -30,7 +115,7 @@ Não se trata de uma versão simplificada: o Simulador reproduz a mesma mecânic
 
 ### Descoberta
 
-Os mesmos endereços de descoberta que os SDKs consultam para localizar o servidor de autorização.
+Os mesmos endereços de descoberta que os SDKs consultam para localizar o servidor de autorização: `/.well-known/smart-configuration`, `/metadata` e `/cds-services`.
 
 ### Emissão de token
 
@@ -39,6 +124,17 @@ Exige certificado de cliente e prende o token emitido a ele, exatamente como a p
 ### Envio de recursos
 
 Os endereços `/fhir/*` respondendo no mesmo modelo de envio em duas etapas. [Veja como funciona o envio](../fluxos/envio-recurso.mdx#como-funciona-o-envio-em-duas-etapas).
+
+## Diferenças em relação à produção
+
+| Aspecto | Simulador | Produção |
+| --- | --- | --- |
+| Cadastro do sistema | Feito por você, pelo endereço `/clients/register` | Feito pelo credenciamento no Ganesha |
+| Certificado do cliente | Qualquer certificado, inclusive de teste | Certificado ICP-Brasil válido da instituição |
+| Conferência dos registros | Apenas a estrutura do JSON FHIR | Regras completas dos Guias de Implementação |
+| Dados | Em memória, apagados ao reiniciar | Persistidos |
+
+Como o Simulador confere apenas a estrutura, um registro aceito por ele ainda pode ser recusado na produção. Confira sempre os registros no [Validador](validador.mdx) antes de enviá-los.
 
 ## Próximos passos
 

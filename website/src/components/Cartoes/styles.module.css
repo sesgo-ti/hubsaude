@@ -1,0 +1,63 @@
+.grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.cartao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid #dce9e0;
+  border-radius: var(--ifm-global-radius);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(16 48 31 / 6%);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cartao:hover,
+.cartao:focus-within {
+  border-color: #9cc5ae;
+  box-shadow: 0 4px 14px rgb(16 48 31 / 10%);
+}
+
+.titulo {
+  color: var(--ifm-heading-color);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+:global(.theme-doc-markdown) .cartao a.titulo {
+  text-decoration: none;
+}
+
+.titulo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.cartao:hover .titulo {
+  color: var(--ifm-color-primary);
+}
+
+.descricao,
+.quando {
+  margin: 0;
+  color: #3a5446;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.quando {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eef4f0;
+}

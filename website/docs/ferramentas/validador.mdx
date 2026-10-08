@@ -22,28 +22,34 @@ O caso mais simples é validar um arquivo. O mesmo comando também aceita uma pa
 # um arquivo
 hubsaude validate paciente.json
 
-# todos os recursos de um diretório
-hubsaude validate --dir ./recursos/
+# todos os recursos de uma pasta, incluindo subpastas
+hubsaude validate --dir ./recursos --recursive
 
 # lendo da entrada padrão
 cat paciente.json | hubsaude validate -
 ```
 
-### Inspeção no navegador
+### Relatório no navegador
 
-`hubsaude validate --output web` abre uma tela onde você percorre os problemas encontrados, recurso a recurso.
+`hubsaude validate paciente.json --report` gera um relatório em HTML e o abre no navegador, para que você percorra os problemas encontrados, recurso a recurso. Para apenas gerar o arquivo, sem abrir o navegador, use `--report --report-dir ./relatorio --open=false`.
 
 ### Uso em automação
 
-`hubsaude validate --output json` devolve o resultado em formato legível por máquina, adequado a pipelines de CI. Para checar contra um perfil específico, acrescente `--profile <url>`.
+`hubsaude validate paciente.json -o json` devolve o resultado em formato legível por máquina, adequado a pipelines de integração contínua. Os [códigos de saída](cli.mdx#códigos-de-saída) indicam se houve erros ou apenas avisos. Para conferir contra um perfil específico, acrescente `--profile <url>`.
+
+### Consultar campos com FHIRPath
+
+Para verificar o valor de um campo sem abrir o arquivo, use `hubsaude fhirpath`, que também utiliza o Validador local. Veja [Extrair informações com FHIRPath](cli.mdx#extrair-informações-com-fhirpath).
 
 ## Ciclo de vida do serviço
 
-Por trás do comando, o Validador fica rodando como um serviço na sua máquina, iniciado automaticamente no primeiro uso. Para consultar o estado ou encerrá-lo, use os comandos abaixo.
+Por trás do comando, o Validador fica rodando como um serviço na sua máquina, iniciado automaticamente no primeiro uso e encerrado após um período sem uso. Para controlá-lo diretamente, use os comandos abaixo.
 
 ```bash
-hubsaude validate server status
-hubsaude validate server stop
+hubsaude validador start
+hubsaude validador status
+hubsaude validador logs -f
+hubsaude validador stop
 ```
 
 A porta usada pode ser alterada com a variável `HUBSAUDE_VALIDADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).

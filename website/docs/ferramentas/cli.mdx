@@ -60,25 +60,89 @@ irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
 
 ## Comandos
 
-Estes são os comandos do dia a dia. Todos partem do programa `hubsaude` instalado acima.
+Todos os comandos partem do programa `hubsaude` instalado acima e são digitados no terminal do seu computador: no Windows, o PowerShell; no macOS e no Linux, o aplicativo Terminal. Para ver as opções de qualquer comando, acrescente `--help`, como em `hubsaude validate --help`.
+
+### Conferir registros
 
 | Comando | O que faz |
 | --- | --- |
-| `hubsaude validate <arquivo>` | Valida um recurso FHIR R4 a partir de um arquivo |
-| `hubsaude validate --dir <dir>` | Valida todos os recursos de um diretório |
+| `hubsaude validate <arquivo>` | Valida um ou mais arquivos com recursos FHIR |
+| `hubsaude validate --dir <pasta> --recursive` | Valida todos os recursos de uma pasta, incluindo subpastas |
 | `hubsaude validate -` | Lê o recurso da entrada padrão (stdin) |
-| `hubsaude validate --output json\|web` | Saída em JSON ou na interface web interativa |
-| `hubsaude validate --profile <url>` | Valida contra um perfil específico |
-| `hubsaude validate server status\|stop` | Consulta ou encerra o serviço local do Validador |
-| `hubsaude sim start\|status\|stop` | Ciclo de vida do Simulador SMART on FHIR local |
-| `hubsaude server start [--reset]` | Sobe o servidor HAPI FHIR local; `--reset` zera os dados |
-| `hubsaude server stop` | Encerra o servidor HAPI FHIR local |
-| `hubsaude auth verify` | Diagnóstico de credenciamento, detalhado abaixo |
-| `hubsaude status` | Agrega, numa única invocação, o estado dos três componentes com ciclo de vida (validador, simulador e server) |
-| `hubsaude update --check` | Verifica se há versão mais recente disponível |
-| `hubsaude version` | Exibe a versão do CLI e dos componentes provisionados |
+| `hubsaude validate <arquivo> -o json` | Apresenta o resultado em JSON, adequado a automações |
+| `hubsaude validate <arquivo> --report` | Gera um relatório em HTML e o abre no navegador |
+| `hubsaude validate <arquivo> --profile <url>` | Valida contra um perfil específico |
+| `hubsaude fhirpath '<expressão>' <arquivo>` | Extrai informações de um recurso com uma expressão FHIRPath |
+
+### Controlar as ferramentas locais
+
+Validador, Simulador e servidor FHIR local aceitam os mesmos quatro subcomandos.
+
+| Comando | O que faz |
+| --- | --- |
+| `hubsaude validador start\|stop\|status\|logs` | Controla o Validador, que também é iniciado automaticamente pelo `validate` |
+| `hubsaude simulador start\|stop\|status\|logs` | Controla o [Simulador](simulador.mdx); também aceita a forma abreviada `hubsaude sim` |
+| `hubsaude server start\|stop\|status\|logs` | Controla o [servidor FHIR local](#servidor-fhir-local); `start --reset` apaga os dados antes de iniciar |
+| `hubsaude status` | Mostra, de uma só vez, a situação das três ferramentas |
+
+Use `logs -f` para acompanhar os registros de funcionamento em tempo real, como em `hubsaude simulador logs -f`.
+
+### Credencial, atualização e remoção
+
+| Comando | O que faz |
+| --- | --- |
+| `hubsaude auth verify` | Confirma se a credencial do credenciamento funciona, conforme [detalhado abaixo](#hubsaude-auth-verify) |
+| `hubsaude update` | Atualiza o Validador, o Simulador, o servidor FHIR local e o Java utilizado por eles |
+| `hubsaude self-update` | Atualiza o próprio programa `hubsaude` |
+| `hubsaude version` | Exibe a versão do programa e das ferramentas instaladas |
+| `hubsaude uninstall` | Remove o programa e todos os dados locais |
 
 O Validador e o Simulador têm páginas próprias, com exemplos de uso de cada um: [Validador](validador.mdx) e [Simulador](simulador.mdx).
+
+## Extrair informações com FHIRPath
+
+FHIRPath é uma linguagem de consulta para recursos FHIR. Com ela, você confere rapidamente o valor de um campo sem abrir o arquivo inteiro.
+
+```bash
+# nome de um paciente
+hubsaude fhirpath 'Patient.name.given' paciente.json
+
+# o mesmo campo em vários arquivos
+hubsaude fhirpath 'name.family' a.json b.json
+
+# todos os arquivos de uma pasta
+hubsaude fhirpath 'Patient.id' --dir ./recursos --recursive
+
+# resultado em JSON
+hubsaude fhirpath 'Patient.name' paciente.json -o json
+```
+
+Escreva a expressão entre **aspas simples**, para que o terminal não interprete caracteres como `$` e `*`. Quando o resultado é vazio, nada é impresso; para que esse caso seja tratado como falha em uma automação, acrescente `--fail-empty`. A consulta usa o Validador local; se ele estiver desatualizado, o programa orienta a executar `hubsaude update`.
+
+## Servidor FHIR local
+
+O `hubsaude server` sobe um servidor FHIR completo no endereço `http://127.0.0.1:8100/fhir`, útil para experimentar o formato dos registros antes de usar o Simulador.
+
+```bash
+hubsaude server start          # baixa na primeira vez e inicia o servidor
+hubsaude server status
+hubsaude server logs -f
+hubsaude server stop
+hubsaude server start --reset  # apaga os dados locais antes de iniciar
+```
+
+Diferenças em relação às demais ferramentas:
+
+- **Os dados são mantidos** entre um uso e outro. Para recomeçar do zero, pare o servidor e use `start --reset`.
+- **Não encerra sozinho** por inatividade: permanece ativo até `hubsaude server stop`.
+- **Recusa registros inválidos**, devolvendo a explicação do problema.
+- **É baixado apenas no primeiro uso**, pois tem cerca de 150 MB.
+
+:::warning
+
+**O servidor FHIR local não tem autenticação nem criptografia** e só aceita conexões do próprio computador. Não o exponha na rede e use apenas dados fictícios. O comando `hubsaude uninstall` apaga também os dados armazenados nele.
+
+:::
 
 ## hubsaude auth verify
 
@@ -92,6 +156,8 @@ hubsaude auth verify \
     --ig hemograma --ig-versao 0.0.1
 ```
 
+No Windows, o PowerShell não reconhece a barra invertida (`\`) como continuação de linha. Digite o comando em uma única linha ou troque cada `\` no fim da linha pelo acento grave (`` ` ``).
+
 | Exit | Significado | Ação recomendada |
 | --- | --- | --- |
 | `0` | Sucesso: token obtido, credencial apta | Nenhuma |
@@ -101,12 +167,56 @@ hubsaude auth verify \
 
 Na dúvida, o comando erra para o lado seguro. Se a falha não puder ser atribuída com certeza à credencial, ela é classificada como `4`, ou seja, inconclusiva. Uma credencial nunca é declarada inapta sem evidência clara. Os mesmos códigos de saída valem para a ferramenta Java autônoma [hubsaude-cliente-cli](https://github.com/sesgo-ti/hubsaude-cliente-cli).
 
+O comando aceita a chave em arquivo PEM, cifrado ou não, e também arquivos `.p12` ou `.pfx`. Se a chave tiver senha, prefira informá-la com `--password-stdin` ou pela variável `HUBSAUDE_KEY_PASSWORD`: a opção `--password` deixa a senha visível no histórico do terminal. O token completo só é exibido com `--show-token`; evite essa opção em automações, para que o token não fique registrado em logs.
+
+## Atualizar e desinstalar
+
+Há duas atualizações independentes:
+
+```bash
+hubsaude update          # atualiza as ferramentas: Validador, Simulador, servidor FHIR local e Java
+hubsaude self-update     # atualiza o próprio programa hubsaude
+```
+
+As ferramentas só mudam de versão com `hubsaude update`. Os demais comandos reutilizam a versão já instalada, sem consultar a internet.
+
+```bash
+hubsaude self-update --check     # apenas verifica se há versão nova
+hubsaude self-update --to 0.3.16 # instala uma versão específica
+```
+
+Para remover o programa e todos os dados locais, inclusive os do servidor FHIR local:
+
+```bash
+hubsaude uninstall --dry-run     # mostra o que seria removido, sem remover
+hubsaude uninstall               # remove após confirmação
+```
+
+Use `--keep-cache` para preservar os arquivos já baixados e `--yes` para dispensar a confirmação.
+
+## Códigos de saída
+
+Os códigos de saída permitem usar o programa em scripts e pipelines de integração contínua.
+
+| Código | Significado |
+| --- | --- |
+| `0` | Sucesso |
+| `1` | A validação encontrou erros |
+| `2` | A validação encontrou apenas avisos |
+| `3` | Erro de uso: argumentos ou opções inválidos |
+| `4` | Falha de rede ou de instalação das ferramentas |
+| `5` | Há atualização disponível (`--check`) |
+| `6` | Credencial não apta (`auth verify`) |
+
+Para investigar um problema, acrescente `-v` a qualquer comando. O detalhamento omite o conteúdo dos registros enviados, para não expor dados de saúde no terminal ou em logs.
+
 ## Variáveis de ambiente
 
 | Variável | Efeito | Padrão |
 | --- | --- | --- |
 | `HUBSAUDE_VALIDADOR_PORT` | Porta local do Validador | 8090 |
 | `HUBSAUDE_SIMULADOR_PORT` | Porta local do Simulador | 8443 |
+| `HUBSAUDE_SERVER_PORT` | Porta local do servidor FHIR | 8100 |
 | `HUBSAUDE_IDLE_TIMEOUT` | Tempo de ociosidade antes de encerrar um componente local | 30m |
 | `HUBSAUDE_HTTP_TIMEOUT` | Timeout das requisições HTTP feitas pelo CLI | 120s |
 | `HUBSAUDE_RELEASE_CHANNEL` | Canal de release usado para baixar os componentes | stable |
