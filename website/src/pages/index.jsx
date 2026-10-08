@@ -24,7 +24,7 @@ export default function Home() {
                 <Link to="/gestor/">Credenciar minha instituição</Link>
               </article>
               <article className={styles.path}>
-                <p className={styles.audience}>Desenvolvedores e integradores</p>
+                <p className={styles.audience}>Integradores</p>
                 <h3>Integração de sistemas</h3>
                 <p>Prepare o ambiente e siga o caminho da autenticação ao envio de um recurso FHIR.</p>
                 <Link to="/fluxos/">Integrar meu sistema</Link>

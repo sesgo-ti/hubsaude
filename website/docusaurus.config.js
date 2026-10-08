@@ -7,7 +7,7 @@ const codeTheme = {
 
 export default {
   title: 'HubSaúde',
-  tagline: 'Integração em saúde para gestores e desenvolvedores de Goiás',
+  tagline: 'Integração em saúde para gestores e integradores de Goiás',
   url: 'https://sesgo-ti.github.io',
   baseUrl: '/hubsaude/',
   trailingSlash: true,
@@ -53,7 +53,7 @@ export default {
       logo: {alt: 'Brasão do Estado de Goiás', src: 'img/brasao-goias.svg', width: 36, height: 48},
       items: [
         {type: 'docSidebar', sidebarId: 'gestor', label: 'Gestores', position: 'left'},
-        {type: 'docSidebar', sidebarId: 'integrador', label: 'Desenvolvedores', position: 'left'},
+        {type: 'docSidebar', sidebarId: 'integrador', label: 'Integradores', position: 'left'},
         {type: 'search', position: 'right'},
       ],
     },

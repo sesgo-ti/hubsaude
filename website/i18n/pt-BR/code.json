@@ -11,6 +11,6 @@
   "theme.SearchPage.existingResultsTitle": {"message": "Resultados para \"{query}\""},
   "theme.SearchPage.emptyResultsTitle": {"message": "Buscar na documentação"},
   "theme.SearchPage.documentsFound.plurals": {"message": "1 resultado encontrado|{count} resultados encontrados"},
-  "theme.SearchPage.noResultsText": {"message": "Nenhum resultado encontrado. Tente outro termo ou navegue pelos guias de gestores e desenvolvedores."},
+  "theme.SearchPage.noResultsText": {"message": "Nenhum resultado encontrado. Tente outro termo ou navegue pelos guias de gestores e integradores."},
   "theme.SearchPage.searchContext.everywhere": {"message": "Toda a documentação"}
 }

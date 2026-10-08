@@ -61,10 +61,10 @@ ou versionamento da documentação.
 
 A home tem apenas duas entradas no corpo: **Credenciar minha instituição** e
 **Integrar meu sistema**. Não apresenta diagramas, catálogos, a jornada detalhada
-nem chamadas repetidas para começar. Navbar: gestores, desenvolvedores e uma
+nem chamadas repetidas para começar. Navbar: gestores, integradores e uma
 única busca; a marca retorna ao início. O rodapé contém suporte e identificação.
 
-**Desenvolvedores** leva sempre a `/fluxos/`. A paginação nativa define o percurso
+**Integradores** leva sempre a `/fluxos/`. A paginação nativa define o percurso
 de leitura: introdução, preparação, autenticação e envio/conferência. O último
 documento não encaminha automaticamente para um SDK. Não é um wizard nem uma
 promessa de tutorial executável completo: os exemplos continuam exigindo os

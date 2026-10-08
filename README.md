@@ -1,7 +1,7 @@
 # HubSaúde — distribuição e página do integrador
 
 Canal de distribuição das ferramentas HubSaúde e portal de documentação
-para gestores e desenvolvedores, construído com Docusaurus.
+para gestores e integradores, construído com Docusaurus.
 
 > A página encontra-se disponível em **<https://sesgo-ti.github.io/hubsaude/>**.
 
