@@ -4,6 +4,7 @@ title: "Simulador"
 slug: /ferramentas/simulador/
 ---
 
+import Details from '@theme/Details';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -135,6 +136,152 @@ Os endereços `/fhir/*` respondendo no mesmo modelo de envio em duas etapas. [Ve
 | Dados | Em memória, apagados ao reiniciar | Persistidos |
 
 Como o Simulador confere apenas a estrutura, um registro aceito por ele ainda pode ser recusado na produção. Confira sempre os registros no [Validador](validador.mdx) antes de enviá-los.
+
+Na prática
+
+## Usar a interface do Simulador
+
+Depois de `hubsaude sim start`, abra **`https://localhost:8443`** no navegador (aceite o certificado autoassinado na primeira visita). Tudo fica numa única página de referência: o **menu superior** salta para cada bloco de endpoints e, dentro de cada card, **Exemplos** traz comandos prontos para copiar.
+
+Use a interface em conjunto com os passos [Preparar seu sistema para o Simulador](#preparar-seu-sistema-para-o-simulador) acima. O diagrama do fluxo indica a ordem; os cards detalham cada chamada. Se preferir ir direto pelo SDK, os endereços são os mesmos descritos aqui.
+
+<Details summary={<summary>Topo e menu</summary>}>
+
+Confira se o Simulador responde: o indicador **em execução** (verde) confirma que o processo está no ar. O chip **testes / homologação** deixa claro que não é produção.
+
+O menu é o mapa da página — clique em **Fluxo**, **Gerar Cert.**, **Clientes** e assim por diante, ou role até a seção. Cada item corresponde a uma etapa da integração local.
+
+<figure>
+
+![Cabeçalho do Simulador com o brasão, o título HubSaúde — Simulador, o indicador em execução, o chip de ambiente testes / homologação e o menu das seções](/img/simulador/simulador-01-fluxo-navbar.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Fluxo (visão geral)</summary>}>
+
+Comece por aqui para ver a sequência completa antes de executar qualquer comando:
+
+1. Gerar certificado de teste
+2. Registrar o cliente (`POST /clients/register`)
+3. Gerar a assertion (`POST /auth/client-assertion`)
+4. Obter o token com mTLS (`POST /auth/token`)
+5. Chamar FHIR com Bearer token
+
+O banner no topo repete o endereço base (`https://localhost:8443`) e o link para baixar o certificado do servidor — o mesmo arquivo do [passo 3](#3-confiar-no-certificado-do-simulador) desta página.
+
+<figure>
+
+![Banner de HTTPS em localhost:8443 e o fluxo SMART Backend Services em cinco passos](/img/simulador/simulador-02-fluxo.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Gerar certificado (passo 1)</summary>}>
+
+Antes de cadastrar o sistema, você precisa de `client-cert.pem` (público) e `client-key.pem` (privada). Os comandos da seção **Gerar Cert.** espelham o [passo 1](#1-gerar-um-certificado-de-teste) desta página; abra **Exemplos → OpenSSL**, copie e adapte o `-subj` ao nome do seu sistema.
+
+Use o card **Verificar o certificado gerado** para conferir validade e fingerprint antes do registro. Só o `.pem` público vai em `/clients/register`; a chave privada entra depois, no mTLS de `/auth/token`.
+
+<figure>
+
+![Seção Gerar Certificado do Cliente, com o aviso sobre o arquivo .pem público e os exemplos OpenSSL abertos para gerar e verificar o certificado](/img/simulador/simulador-03-gerar-certificado.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Descoberta (consulta opcional)</summary>}>
+
+Estes três GET são públicos: servem para inspecionar o ambiente ou depurar a descoberta que o SDK já faz sozinho ao apontar para `https://localhost:8443`.
+
+- **`/.well-known/smart-configuration`** — endereços de token e capacidades SMART
+- **`/metadata`** — CapabilityStatement FHIR R4
+- **`/cds-services`** — serviços CDS Hooks disponíveis
+
+Expanda **Exemplos → cURL** em cada card e execute no terminal (com `-k`, como nos exemplos desta página).
+
+<figure>
+
+![Seção Descoberta e Metadados, com os GET públicos e os exemplos cURL de /.well-known/smart-configuration, /metadata e /cds-services](/img/simulador/simulador-04-descoberta-e-metadados.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Certificados do Simulador (JWKS)</summary>}>
+
+Diferente do certificado **do seu cliente** (passo 1), esta seção trata das chaves **do próprio Simulador** usadas para assinar access tokens.
+
+- **`GET /certs`** — JWKS para quem valida tokens manualmente
+- **`POST /certs/rotate`** — só para testes de rotação de chave; invalida tokens já emitidos
+
+Para confiar no HTTPS do servidor no seu código, use o download em [`/certs/simulador-server.pem`](#3-confiar-no-certificado-do-simulador), não este JWKS.
+
+<figure>
+
+![Seção Certificados e JWKS, com GET /certs e POST /certs/rotate e os respectivos exemplos cURL](/img/simulador/simulador-05-certificados.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Clientes (passo 2)</summary>}>
+
+Aqui você faz o equivalente local ao credenciamento: associa um `client_id` ao certificado de teste e define os escopos permitidos.
+
+1. Abra **Clientes** no menu.
+2. No card **`POST /clients/register`**, expanda os exemplos (multipart ou JSON).
+3. Substitua `my-backend-app`, o caminho de `client-cert.pem` e os escopos pelos seus valores — como no [passo 2](#2-cadastrar-o-sistema) acima.
+4. Use **`GET /clients/{clientId}`** para conferir o cadastro e **`DELETE`** para limpar antes de um novo teste.
+
+<figure>
+
+![Seção Gerenciamento de Clientes, com POST /clients/register, GET e DELETE /clients/{clientId} e os exemplos cURL abertos](/img/simulador/simulador-06-gerenciamento-clientes.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Autenticação (passos 3 e 4)</summary>}>
+
+Com o cliente cadastrado, obtenha o access token:
+
+1. **`POST /auth/client-assertion`** — informe `client_id` e `private_key_pem` (conteúdo de `client-key.pem`). A resposta traz o JWT pronto; o Simulador **não guarda** sua chave privada.
+2. **`POST /auth/token`** — envie o JWT no formulário OAuth **e** apresente o mesmo par certificado/chave no TLS (`--cert` / `--key` no cURL). O distintivo **mTLS** no card lembra que este passo é obrigatório.
+
+Se receber `401` por certificado, confira se o `.pem` registrado é exatamente o apresentado no handshake. Veja também [Autenticação](../fluxos/autenticacao.mdx).
+
+<figure>
+
+![Seção Autenticação SMART Backend Services, com POST /auth/client-assertion, exemplo de resposta e POST /auth/token exigindo mTLS](/img/simulador/simulador-07-autenticacao.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>FHIR (passo 5)</summary>}>
+
+Com o Bearer token, exercise o envio assíncrono descrito em [Enviar e conferir](../fluxos/envio-recurso.mdx):
+
+1. **`POST /fhir/{resourceType}`** — envie o Bundle com `Prefer: respond-async` e `Idempotency-Key`; anote o `Content-Location` / id da Task na resposta `202`.
+2. **`GET /Task/{id}`** — faça polling até a Task concluir e leia o resultado em `Task.output`.
+3. **PUT, PATCH e DELETE** — mesma ideia assíncrona; os cards listam os headers exigidos.
+
+Copie o exemplo de **`POST /fhir/Bundle`** e substitua `<ACCESS_TOKEN>` e `@bundle.json` pelos seus.
+
+<figure>
+
+![Seção FHIR R4 Resource Server Simulado, com POST /fhir/{resourceType}, GET /Task/{id}, PUT/PATCH e DELETE, e os exemplos cURL de envio e polling](/img/simulador/simulador-08-resource-server-simulado.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>Administração (encerrar)</summary>}>
+
+Para parar o processo pela API, use **`POST /shutdown`** (exemplo cURL no card). No dia a dia, o equivalente pelo CLI é [`hubsaude sim stop`](#ciclo-de-vida).
+
+<figure>
+
+![Seção Administração, com POST /shutdown e o exemplo cURL para encerrar o Simulador](/img/simulador/simulador-09-admin.png)
+
+</figure>
+</Details>
 
 ## Próximos passos
 
