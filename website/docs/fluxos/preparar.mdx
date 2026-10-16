@@ -25,6 +25,8 @@ O credenciamento da instituição é tratado na [jornada do gestor](../gestor/in
 
 :::
 
+Se o certificado da instituição está em outro formato, como `.pfx`, `.p12` ou `.pem`, veja [Preparar o certificado digital](../certificados.mdx), que explica como gerar o `.cer` para o credenciamento e como preparar o certificado para o sistema.
+
 O Ganesha devolve um `client_id`, que passa a valer como credencial do estabelecimento para aquele serviço.
 
 Com o `client_id`, o cadastro feito pelo Ganesha e a chave privada do certificado (que só a instituição possui), o sistema já consegue solicitar e receber o token de acesso.
