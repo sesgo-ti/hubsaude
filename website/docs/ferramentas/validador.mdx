@@ -4,6 +4,8 @@ title: "Validador"
 slug: /ferramentas/validador/
 ---
 
+import Details from '@theme/Details';
+
 # Validador
 
 O Validador confere se um registro de saúde está de acordo com as regras dos Guias de Implementação e aponta o que precisa ser corrigido. Ele roda na sua máquina: o [HubSaúde CLI](cli.mdx) baixa e inicia a ferramenta quando você precisa dela, e não existe versão hospedada.
@@ -53,6 +55,116 @@ hubsaude validador stop
 ```
 
 A porta usada pode ser alterada com a variável `HUBSAUDE_VALIDADOR_PORT`. Veja as [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
+
+Na prática
+
+## Passo a passo na interface web
+
+Além do terminal (`hubsaude validate`), você pode validar pelo navegador. Este tutorial parte do [serviço já em execução](#ciclo-de-vida-do-serviço) (`hubsaude validador start`).
+
+1. Abra a interface e confira se o Validador está no ar.
+2. (Opcional) Veja quais Guias de Implementação entram na validação.
+3. Carregue ou cole o JSON do recurso no editor.
+4. Clique em **Validar**.
+5. Leia erros, avisos e informações na aba **Resumo** e, se quiser, no **Histórico** da sessão.
+6. Abra a aba **JSON** para ver o `OperationOutcome` completo.
+
+Trabalhe **sempre com dados sintéticos** — nunca cole prontuário ou identificação real de paciente. O aviso amarelo no topo da página reforça isso o tempo todo.
+
+As capturas abaixo seguem essa ordem, para você reconhecer cada tela enquanto executa o fluxo.
+
+<Details summary={<summary>1. Abra a interface e confira o status</summary>}>
+
+No terminal, confirme que o Validador subiu ([ciclo de vida](#ciclo-de-vida-do-serviço)). Em seguida abra **`http://localhost:8090/index.html`** no navegador (porta padrão do CLI: `8090`; se usou `HUBSAUDE_VALIDADOR_PORT`, troque o número na URL).
+
+Na barra superior, verifique se o indicador está **em execução** (verde). O endereço ao lado (por exemplo, `http://127.0.0.1:8090`) deve bater com o que você abriu.
+
+Antes de validar o primeiro arquivo, clique em **Guias de Implementação considerados** para saber contra quais IGs o recurso será conferido. No passo seguinte você vê essa lista ampliada.
+
+<figure>
+
+![Cabeçalho do Validador FHIR com o brasão, o botão Guias de Implementação considerados, o indicador em execução e o endereço do servidor](/img/validador/validador-01-barra-superior.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>2. (Opcional) Confira os Guias de Implementação</summary>}>
+
+Depois de clicar em **Guias de Implementação considerados**, percorra a lista: cada linha mostra o pacote do IG e quantos perfis ele traz.
+
+Se precisar ler a documentação publicada, clique em **abrir ↗** na linha desejada ou em **Abrir portal FHIR ↗** no rodapé. Quando terminar a consulta, feche o modal com **×** e volte ao editor — você ainda não precisa ter JSON carregado.
+
+<figure>
+
+![Modal Guias de Implementação considerados, listando IGs como Avante, Core e Hemograma, com a quantidade de perfis e o link abrir](/img/validador/validador-02-guias-implementacao.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>3. Carregue ou cole o recurso FHIR</summary>}>
+
+Na coluna **Recurso FHIR**, coloque o JSON que quer testar — **somente instâncias inventadas**:
+
+- Clique em **Carregar arquivo**, escolha um `.json` sintético no seu computador; **ou**
+- Clique dentro do editor, apague o exemplo se houver e **cole** o conteúdo do recurso.
+
+O painel **Resultado** ainda mostra “Clique em **Validar** para ver os resultados” e o **Histórico** fica em “Nenhuma validação realizada” até você concluir o passo 4.
+
+<figure>
+
+![Painel Recurso FHIR com o botão Carregar arquivo, o editor JSON e os painéis Resultado e Histórico ainda vazios](/img/validador/validador-03-carregar-arquivo.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>4. Clique em Validar</summary>}>
+
+Revise o JSON no editor. Quando estiver pronto, clique no botão azul **Validar** (canto superior direito do painel **Recurso FHIR**).
+
+Aguarde alguns segundos: o botão pode mostrar “Validando…”. Em seguida o painel **Resultado** e o **Histórico** são preenchidos (passos 5 e 6).
+
+<figure>
+
+![Painel Recurso FHIR com um Condition de exemplo no editor e o botão Validar em destaque, ainda sem resultado](/img/validador/validador-04-validar.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>5. Leia o resultado na aba Resumo</summary>}>
+
+No painel **Resultado**, permaneça na aba **Resumo** (já selecionada após a validação).
+
+Percorra a lista de issues: **Erros** impedem conformidade; **Avisos** e **Info** apontam ajustes ou observações. Use os chips acima da lista para mostrar ou ocultar cada severidade. Cada linha indica onde no recurso o problema foi encontrado — corrija o JSON no editor e clique em **Validar** de novo se precisar.
+
+À direita, em **Histórico**, aparece esta validação com tipo de recurso e horário. Esse histórico vale **só para a aba aberta**; recarregar a página apaga tudo. Clique numa entrada antiga para rever o recurso e o resultado daquela rodada.
+
+<figure>
+
+![Painel Resultado na aba Resumo, com avisos da validação, e o Histórico da sessão com uma entrada Condition](/img/validador/validador-05-validado-resumo.png)
+
+</figure>
+</Details>
+
+<Details summary={<summary>6. Veja o OperationOutcome na aba JSON</summary>}>
+
+Ainda no painel **Resultado**, clique na aba **JSON**.
+
+Você verá o `OperationOutcome` bruto — o mesmo tipo de resposta que o comando `hubsaude validate arquivo.json -o json` devolve no terminal. Use essa tela para copiar o JSON inteiro, comparar com sua automação ou enviar o trecho a quem depura a integração.
+
+O **Histórico** à direita continua listando a mesma validação; você pode alternar entre **Resumo** e **JSON** quantas vezes quiser sem validar de novo.
+
+<figure>
+
+![Painel Resultado na aba JSON, mostrando o OperationOutcome da validação, com o Histórico da sessão à direita](/img/validador/validador-06-validado-json.png)
+
+</figure>
+</Details>
+
+Depois de terminar
+
+## Próximo passo
+
+Corrigiu o recurso com base no **Resumo**? Valide de novo pelo botão **Validar** ou, em lote e em CI, use os comandos da seção [Validando recursos](#validando-recursos) acima. Antes de apontar para produção, combine o Validador com o [Simulador](simulador.mdx) para testar autenticação e envio de ponta a ponta.
 
 ## Onde obter
 
