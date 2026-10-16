@@ -1,0 +1,319 @@
+---
+id: certificados
+title: "Preparar o certificado digital"
+slug: /certificados/
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Preparar o certificado digital
+
+O certificado digital ICP-Brasil da instituição é usado em dois momentos da integração: no credenciamento, quando o gestor envia ao Ganesha apenas a parte pública do certificado, e no funcionamento do sistema, quando a aplicação usa o certificado completo para se identificar perante o HubSaúde. Como os certificados chegam em formatos diferentes, muitas vezes é preciso convertê-los antes de usá-los.
+
+Esta página explica como reconhecer o formato do seu certificado e como convertê-lo com o OpenSSL, uma ferramenta gratuita de linha de comando, de forma segura e sem expor a chave privada.
+
+:::danger
+
+**A chave privada nunca deve ser enviada a ninguém**, nem ao Ganesha, nem ao HubSaúde, nem ao suporte. Ela é o que comprova que a instituição é dona do certificado. Se um arquivo contém a chave privada, ele não deve ser anexado ao credenciamento.
+
+:::
+
+## Antes de começar: identifique o tipo do certificado
+
+O tipo do certificado define onde está a chave privada e, portanto, o que pode ser feito com ele.
+
+| Tipo | Onde a chave privada fica | O que esta página cobre |
+| --- | --- | --- |
+| **A1** | Em um arquivo no computador, geralmente `.pfx` ou `.p12`, protegido por senha | Todas as conversões |
+| **A3** | Em um token ou cartão, de onde não pode ser extraída | Apenas a conversão do certificado público já exportado pelo software do token |
+| **Em nuvem** | Em um prestador de serviço de confiança, acessado pela internet | Apenas a conversão do certificado público fornecido pelo prestador |
+
+Se você não sabe qual é o tipo do seu certificado, consulte quem o adquiriu na instituição ou a autoridade certificadora que o emitiu.
+
+## Formatos de arquivo
+
+A extensão do arquivo ajuda, mas não garante o conteúdo. Um arquivo `.cer`, por exemplo, pode estar em formato binário (DER) ou em formato de texto (PEM). Por isso, a seção [Identificar o conteúdo de um arquivo](#identificar-o-conteúdo-de-um-arquivo) mostra como conferir o que há dentro dele.
+
+| Extensão | O que costuma conter | Contém a chave privada? |
+| --- | --- | --- |
+| `.pfx` ou `.p12` | Chave privada, certificado da instituição e certificados das autoridades certificadoras, protegidos por senha | **Sim** |
+| `.pem` | Texto que pode conter certificados, chave privada ou ambos | **Pode conter** |
+| `.key` | Somente a chave privada | **Sim** |
+| `.cer`, `.crt` ou `.der` | Somente um certificado | Não |
+| `.p7b` ou `.p7c` | Um conjunto de certificados, normalmente o da instituição e os das autoridades certificadoras | Não |
+
+## O que cada momento precisa
+
+| Momento | Quem faz | Arquivo necessário |
+| --- | --- | --- |
+| Credenciamento no Ganesha | Gestor | Somente o certificado público, em arquivo `.cer` de até 10 MB. Veja [Gerar o arquivo .cer para o credenciamento](#gerar-o-arquivo-cer-para-o-credenciamento). |
+| Funcionamento do sistema | Equipe de desenvolvimento | Chave privada e certificado. Sempre que possível, use o próprio `.pfx`. Veja [Preparar o certificado para o sistema](#preparar-o-certificado-para-o-sistema). |
+
+## Instalar o OpenSSL
+
+Os comandos desta página foram escritos para o **OpenSSL 3** e devem ser digitados no terminal do computador. Escolha o seu sistema operacional:
+
+<Tabs groupId="certificados-openssl-instalacao" defaultValue="windows">
+
+<TabItem value="windows" label="Windows">
+
+O Windows não traz o OpenSSL instalado. A forma recomendada de obtê-lo é instalar o **Git for Windows**, que inclui o OpenSSL 3 e o programa **Git Bash**. Os comandos desta página foram escritos para o Git Bash e não funcionam no Prompt de Comando nem no PowerShell.
+
+1. Acesse [gitforwindows.org](https://gitforwindows.org/) e clique em **Download**.
+2. Abra o arquivo baixado e avance pelas telas do instalador. As opções já marcadas atendem a esta página.
+3. Ao final, abra o menu **Iniciar**, digite `Git Bash` e abra o programa.
+4. Na janela do Git Bash, digite os comandos desta página.
+
+Se preferir instalar pelo PowerShell, o comando abaixo faz a mesma instalação por meio do gerenciador de pacotes do Windows:
+
+```powershell
+winget install --id Git.Git -e --source winget
+```
+
+Em computadores institucionais, a instalação pode exigir permissão de administrador. Nesse caso, solicite-a à equipe de tecnologia da informação.
+
+</TabItem>
+
+<TabItem value="macos" label="macOS">
+
+O comando `openssl` que acompanha o macOS é, na verdade, o LibreSSL, que não aceita todas as opções usadas nesta página. Instale o OpenSSL 3 pelo [Homebrew](https://brew.sh/) e use o caminho completo do programa instalado. Se o Homebrew ainda não estiver instalado, siga primeiro as instruções da página dele. Depois, abra o aplicativo **Terminal** e digite:
+
+```bash
+brew install openssl@3
+$(brew --prefix openssl@3)/bin/openssl version
+```
+
+Nos comandos desta página, substitua `openssl` por `$(brew --prefix openssl@3)/bin/openssl`.
+
+</TabItem>
+
+<TabItem value="linux" label="Linux">
+
+A maioria das distribuições já traz o OpenSSL instalado. Para conferir, abra o aplicativo **Terminal** e digite `openssl version`, conforme indicado abaixo das abas.
+
+Caso o programa não esteja instalado, digite no Terminal o comando correspondente à sua distribuição. A senha de administrador do computador será solicitada.
+
+| Distribuição | Comando |
+| --- | --- |
+| Ubuntu, Debian e derivadas | `sudo apt update && sudo apt install openssl` |
+| Fedora, Red Hat, Rocky Linux e AlmaLinux | `sudo dnf install openssl` |
+| openSUSE | `sudo zypper install openssl` |
+| Arch Linux | `sudo pacman -S openssl` |
+
+Versões mais antigas de algumas distribuições, como Ubuntu 20.04, Debian 11 e Red Hat 8, oferecem apenas o OpenSSL 1.1. Nesses casos, siga as orientações para a versão 1.1, abaixo das abas.
+
+</TabItem>
+
+</Tabs>
+
+Para confirmar a instalação, digite:
+
+```bash
+openssl version
+```
+
+O resultado deve começar com `OpenSSL 3`, por exemplo `OpenSSL 3.0.13 30 Jan 2024`. Se aparecer outro resultado:
+
+- **`LibreSSL`**: você está usando o programa que acompanha o macOS. Siga as instruções da aba **macOS** acima.
+- **`OpenSSL 1.1` ou anterior**: recomenda-se instalar a versão 3, pois as versões anteriores não recebem mais atualizações do projeto OpenSSL. Se não for possível, faça os ajustes da tabela abaixo ao digitar os comandos desta página.
+
+| Nos comandos desta página | Na versão 1.1 |
+| --- | --- |
+| Opção `-legacy` | Remova a opção |
+| Opções `-provider legacy -provider default` | Remova as opções |
+| Opção `-noenc` | Troque por `-nodes` |
+| `openssl x509 -in instituicao.cer ...`, lendo um arquivo `.cer` | Acrescente `-inform DER` |
+
+## Identificar o conteúdo de um arquivo
+
+O comando abaixo lista o que há dentro de um arquivo, sem alterá-lo. Se o arquivo for `.pfx` ou `.p12`, a senha será solicitada.
+
+```bash
+openssl storeutl -noout certificado.pfx
+```
+
+O resultado mostra um item por linha:
+
+```text
+0: Pkey
+1: Certificate
+2: Certificate
+Total found: 3
+```
+
+- `Pkey` indica uma **chave privada**. Um arquivo com essa linha nunca deve ser enviado ao Ganesha.
+- `Certificate` indica um certificado. Um arquivo `.cer` adequado ao credenciamento mostra apenas uma linha `Certificate`.
+
+Arquivos de texto, como `.pem` e `.key`, também podem ser abertos em um editor de texto. Se aparecer a expressão `PRIVATE KEY`, o arquivo contém uma chave privada.
+
+Se o comando terminar com `Total found: 0` e uma mensagem com `unsupported` e `RC2-40-CBC`, o arquivo `.pfx` usa um formato antigo. Repita o comando com as opções abaixo:
+
+```bash
+openssl storeutl -noout -provider legacy -provider default certificado.pfx
+```
+
+## Gerar o arquivo .cer para o credenciamento
+
+O Ganesha precisa apenas do certificado público da instituição. Escolha o caso que corresponde ao arquivo que você tem.
+
+### A partir de um arquivo .pfx ou .p12
+
+Este é o caso mais comum para certificados A1. São dois comandos: o primeiro separa o certificado da instituição, sem a chave privada, e o segundo grava o arquivo `.cer`.
+
+```bash
+openssl pkcs12 -in certificado.pfx -clcerts -nokeys -out certificado-publico.pem
+openssl x509 -in certificado-publico.pem -outform DER -out instituicao.cer
+```
+
+O primeiro comando solicita a senha do arquivo `.pfx`. A opção `-nokeys` é a que impede a cópia da chave privada: **não a remova**.
+
+Se o primeiro comando falhar com uma mensagem que contenha `unsupported` e `RC2-40-CBC`, o arquivo usa um formato antigo, comum em certificados exportados pelo Windows ou por aplicativos de autoridades certificadoras. Repita-o com a opção `-legacy`:
+
+```bash
+openssl pkcs12 -legacy -in certificado.pfx -clcerts -nokeys -out certificado-publico.pem
+```
+
+### A partir de um arquivo .pem
+
+Se o arquivo `.pem` contém o certificado, com ou sem a chave privada, o comando abaixo copia apenas o primeiro certificado encontrado:
+
+```bash
+openssl x509 -in certificado.pem -outform DER -out instituicao.cer
+```
+
+Se o arquivo também contém certificados das autoridades certificadoras, o primeiro certificado pode não ser o da instituição. Confira o resultado conforme a seção [Conferir o arquivo antes de enviar](#conferir-o-arquivo-antes-de-enviar).
+
+### A partir de um arquivo .p7b
+
+Primeiro, liste os certificados contidos no arquivo:
+
+```bash
+openssl pkcs7 -in cadeia.p7b -print_certs -out certificados.pem
+```
+
+Se aparecer a mensagem `Expecting: PKCS7`, o arquivo está em formato binário: repita o comando acrescentando `-inform DER`. Em seguida, siga o caso [A partir de um arquivo .pem](#a-partir-de-um-arquivo-pem) com o arquivo `certificados.pem` gerado.
+
+### A partir de um certificado A3 ou em nuvem
+
+Nesses casos não há um arquivo com a chave privada. Exporte o certificado público pelo software do token, pelo repositório de certificados do sistema operacional ou pelo portal do prestador, escolhendo a opção que **não** inclui a chave privada. Se o arquivo obtido estiver em outro formato, use um dos casos acima para gerar o `.cer`.
+
+### Conferir o arquivo antes de enviar
+
+```bash
+openssl x509 -in instituicao.cer -noout -subject -issuer -enddate
+```
+
+O resultado mostra três informações:
+
+- `subject`: o titular do certificado, que deve ser a instituição, normalmente com o nome e o CNPJ;
+- `issuer`: a autoridade certificadora que emitiu o certificado;
+- `notAfter`: a data de validade, que deve ser futura.
+
+Se o comando exibe esses dados, o arquivo contém apenas um certificado e pode ser anexado ao Ganesha. Se exibe os dados de uma autoridade certificadora no lugar dos da instituição, o certificado copiado não é o correto.
+
+## Preparar o certificado para o sistema
+
+Para se identificar perante o HubSaúde, o sistema precisa da chave privada e do certificado. Esta seção é destinada à equipe de desenvolvimento.
+
+### Use o arquivo .pfx diretamente
+
+Sempre que possível, **não converta o certificado**. As bibliotecas oficiais e o HubSaúde CLI aceitam o arquivo `.pfx` ou `.p12` diretamente, o que evita criar cópias da chave privada.
+
+| Ferramenta | Como usar o `.pfx` |
+| --- | --- |
+| [SDK Python](sdks/autenticacao/python.mdx#pkcs12-direto) | `.client_key_store(caminho, senha)` |
+| [SDK Java](sdks/autenticacao/java.mdx#pkcs12-direto-recomendado-para-produção) | `SigningStrategyFactory.fromKeyStore(...)` com `.clientKeyStore(...)` |
+| [SDK TypeScript](sdks/autenticacao/typescript.mdx#pkcs12-direto-recomendado-para-produção) | `fromPkcs12(pfx, senha)` com `clientPfx` |
+| [SDK C#](sdks/autenticacao/csharp.mdx#pkcs12-direto-recomendado-para-produção) | `.ClientPkcs12(caminho, alias, senha)` |
+| [HubSaúde CLI](ferramentas/cli.mdx#hubsaude-auth-verify) | `hubsaude auth verify --key certificado.pfx` |
+
+### Atualizar um arquivo .pfx antigo
+
+Arquivos `.pfx` gerados com algoritmos antigos (RC2 e Triple DES) não são aceitos por algumas ferramentas atuais. É o caso do SDK TypeScript na conexão com o servidor (`clientPfx`), que falha com a mensagem `Unsupported PKCS12 PFX data`. Para saber se o arquivo usa esses algoritmos, digite:
+
+```bash
+openssl pkcs12 -legacy -in certificado.pfx -info -noout
+```
+
+Se o resultado mencionar `RC2` ou `TripleDES`, gere uma nova versão do arquivo com algoritmos atuais. A chave e o certificado continuam os mesmos; muda apenas a proteção do arquivo.
+
+<Tabs groupId="certificados-atualizar-pfx" defaultValue="openssl">
+
+<TabItem value="openssl" label="OpenSSL (Linux, macOS e Git Bash)">
+
+```bash
+read -rs -p "Senha do arquivo original: " SENHA_PFX; echo
+export SENHA_PFX
+openssl pkcs12 -export -out certificado-atualizado.pfx \
+  -inkey <(openssl pkcs12 -legacy -in certificado.pfx -nocerts -noenc -passin env:SENHA_PFX) \
+  -in <(openssl pkcs12 -legacy -in certificado.pfx -nokeys -passin env:SENHA_PFX)
+unset SENHA_PFX
+```
+
+A primeira linha solicita a senha do arquivo original, sem exibi-la na tela, e a última a apaga da memória do terminal. O comando principal solicita a senha do novo arquivo. A chave privada é repassada entre os comandos sem ser gravada em disco.
+
+</TabItem>
+
+<TabItem value="keytool" label="Java keytool (qualquer sistema com Java)">
+
+```bash
+keytool -importkeystore -srckeystore certificado.pfx -srcstoretype PKCS12 \
+  -destkeystore certificado-atualizado.pfx -deststoretype PKCS12
+```
+
+O comando solicita a senha do novo arquivo, duas vezes, e depois a do arquivo original. É a alternativa recomendada no Windows, pois não depende do Git Bash.
+
+</TabItem>
+
+</Tabs>
+
+### Separar a chave e o certificado em arquivos PEM
+
+Alguns sistemas exigem a chave e o certificado em arquivos PEM separados. Nesse caso, mantenha a chave protegida por senha:
+
+```bash
+openssl pkcs12 -in certificado.pfx -clcerts -nokeys -out certificado.pem
+openssl pkcs12 -in certificado.pfx -nocerts -out chave-privada.pem
+```
+
+O segundo comando solicita a senha do `.pfx` e, depois, uma nova senha para proteger a chave. As bibliotecas oficiais aceitam a chave protegida, informando essa senha na configuração.
+
+:::warning
+
+Evite a opção `-noenc`, que grava a chave privada **sem nenhuma proteção**. Se ela for inevitável, restrinja o acesso ao arquivo e apague-o assim que deixar de ser necessário. Nunca inclua arquivos de chave privada em repositórios de código.
+
+:::
+
+### Juntar a chave e o certificado em um arquivo .pfx
+
+Se você recebeu a chave e o certificado em arquivos separados, é possível reuni-los em um único `.pfx`:
+
+```bash
+openssl pkcs12 -export -inkey chave-privada.pem -in certificado.pem -out certificado.pfx
+```
+
+### Conferir se a chave corresponde ao certificado
+
+Os dois primeiros comandos extraem a chave pública do certificado e a da chave privada. O terceiro calcula uma identificação de cada uma:
+
+```bash
+openssl x509 -in certificado.pem -noout -pubkey -out publica-do-certificado.pem
+openssl pkey -in chave-privada.pem -pubout -out publica-da-chave.pem
+openssl sha256 publica-do-certificado.pem publica-da-chave.pem
+```
+
+Se os dois códigos exibidos forem iguais, a chave corresponde ao certificado. Se forem diferentes, os arquivos não formam um par e não funcionarão juntos.
+
+## Problemas comuns
+
+| Mensagem ou situação | Causa | O que fazer |
+| --- | --- | --- |
+| `unsupported` e `RC2-40-CBC` | O arquivo `.pfx` usa um formato antigo | Acrescente a opção `-legacy` ao comando |
+| `Unknown option` ou `Unrecognized flag` mencionando `legacy` | A versão do OpenSSL é anterior à 3 ou é o LibreSSL do macOS | Remova a opção `-legacy` ou instale o OpenSSL 3 |
+| No Git Bash, o comando parece parado ao solicitar a senha | O terminal do Git Bash não repassa a digitação da senha a alguns programas | Repita o comando digitando `winpty` antes de `openssl` |
+| `Mac verify error: invalid password?` | A senha do arquivo `.pfx` está incorreta | Confirme a senha com quem administra o certificado |
+| `Expecting: PKCS7` | O arquivo `.p7b` está em formato binário | Acrescente a opção `-inform DER` |
+| O certificado conferido é o da autoridade certificadora | O arquivo continha vários certificados e o primeiro não era o da instituição | Extraia o certificado a partir do `.pfx` original ou separe o certificado correto do arquivo `.pem` |
+| O arquivo gerado contém `PRIVATE KEY` | A opção `-nokeys` foi esquecida | Apague o arquivo e gere-o novamente com `-nokeys` |
+| Não é possível exportar a chave de um certificado A3 | A chave privada do A3 não sai do token | Use o certificado pelo próprio token; somente o certificado público pode ser exportado |

@@ -10,6 +10,7 @@ export default {
     {type: 'category', label: 'Consultar referência', collapsed: true,
       items: [
         {type: 'doc', id: 'fluxos/visao-geral', label: 'Visão geral e requisitos'},
+        {type: 'doc', id: 'certificados', label: 'Preparar o certificado digital'},
         {type: 'category', label: 'SDKs por linguagem',
           link: {type: 'doc', id: 'sdks/index'},
           items: ['python', 'java', 'typescript', 'csharp'].map((language, index) => ({
@@ -23,6 +24,7 @@ export default {
   ],
   gestor: [
     {type: 'doc', id: 'gestor/index', label: 'Credenciar a instituição'},
+    {type: 'ref', id: 'certificados', label: 'Preparar o certificado digital'},
     {type: 'ref', id: 'sobre', label: 'Sobre o HubSaúde'},
   ],
 };
