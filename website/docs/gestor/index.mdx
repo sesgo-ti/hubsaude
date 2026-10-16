@@ -69,6 +69,8 @@ Na Home do Ganesha, escolha a categoria e depois o serviço desejado (ex.: "Envi
 
 Na aba "Sistema" você anexa o **certificado digital ICP-Brasil da instituição**, em arquivo `.cer` (até 10 MB), mais um documento de identificação institucional (PNG, JPG ou PDF, até 10 MB).
 
+Se o certificado da instituição está em outro formato, como `.pfx`, `.p12` ou `.pem`, veja como [gerar o arquivo `.cer` sem a chave privada](../certificados.mdx#gerar-o-arquivo-cer-para-o-credenciamento).
+
 :::warning
 
 **O arquivo `.cer` contém só a chave pública do certificado.** A chave privada nunca deve ser enviada a ninguém, nem ao Ganesha, nem ao HubSaúde: ela fica só com quem administra o certificado na instituição. É justamente por ninguém além do dono ter acesso a ela que o certificado serve como prova de identidade depois, no momento de autenticar o sistema.
@@ -163,7 +165,7 @@ Informe apenas o CNES e clique em "Consultar". A razão social, o CNPJ, o nome f
 
 <Details summary={<summary>Sistema</summary>}>
 
-Anexe o certificado digital da instituição (só a parte pública, em arquivo .cer de até 10 MB) e um documento de identificação institucional (PNG, JPG ou PDF, também até 10 MB). A chave privada nunca deve ser enviada.
+Anexe o certificado digital da instituição (só a parte pública, em arquivo .cer de até 10 MB) e um documento de identificação institucional (PNG, JPG ou PDF, também até 10 MB). A chave privada nunca deve ser enviada. Para gerar o `.cer` a partir de outro formato, veja [Preparar o certificado digital](../certificados.mdx).
 
 <figure>
 
