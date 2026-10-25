@@ -29,6 +29,23 @@ Isso adiciona ao seu projeto:
 
 `SmartTokenClient.CreateBuilder()` é a única forma de construção, já que a classe não expõe construtores públicos. Implementa `IDisposable`/`IAsyncDisposable`.
 
+Informe a base do servidor: a biblioteca consulta `/.well-known/smart-configuration` e resolve o endpoint de token. Não combine `.FhirBase` com `.TokenEndpoint`.
+
+```csharp
+await using var client = SmartTokenClient.CreateBuilder()
+    .FhirBase("https://hub.saude.go.gov.br")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("chave-privada.pem")
+    .CertificatePem("certificado.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.rs");
+```
+
+### Endpoint de token explícito
+
+Se preferir fixar o endereço de token, use `.TokenEndpoint` no lugar de `.FhirBase`:
+
 ```csharp
 await using var client = SmartTokenClient.CreateBuilder()
     .TokenEndpoint("https://hub.saude.go.gov.br/auth/token")
