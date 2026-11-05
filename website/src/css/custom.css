@@ -59,6 +59,12 @@
 .tabs__item--active {background: #eaf6ef;}
 .pagination-nav__link:hover {background: #f5faf7;}
 .theme-doc-markdown details {--ifm-alert-background-color: #f5faf7; --ifm-alert-border-color: #cddfd3; --ifm-alert-foreground-color: #10301f;}
+.alert--info {--ifm-alert-background-color: #f5faf7; --ifm-alert-background-color-highlight: #eaf6ef; --ifm-alert-border-color: #036a4c; --ifm-alert-foreground-color: #10301f;}
+.alert--info [class*="admonitionHeading"] {color: #036a4c;}
+.alert--info [class*="admonitionIcon"] svg {fill: #036a4c;}
+.alert--success {--ifm-alert-background-color: #eaf6ef; --ifm-alert-background-color-highlight: #dcefe3; --ifm-alert-border-color: #036a4c; --ifm-alert-foreground-color: #10301f;}
+.alert--success [class*="admonitionHeading"] {color: #035a41;}
+.alert--success [class*="admonitionIcon"] svg {fill: #035a41;}
 :focus-visible {outline: 3px solid #036a4c; outline-offset: 3px;}
 pre :focus-visible, .theme-code-block button:focus-visible, .footer :focus-visible {outline-color: #7eecc0;}
 
