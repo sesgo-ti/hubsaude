@@ -7,6 +7,16 @@
   list-style: none;
 }
 
+.fixa {
+  grid-template-columns: repeat(var(--colunas), minmax(0, 1fr));
+}
+
+@media (max-width: 600px) {
+  .fixa {
+    grid-template-columns: 1fr;
+  }
+}
+
 .cartao {
   position: relative;
   display: flex;
@@ -37,6 +47,13 @@
   text-decoration: none;
 }
 
+.tituloFixo {
+  margin: 0;
+  color: var(--ifm-heading-color);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 .titulo::after {
   content: '';
   position: absolute;
@@ -60,4 +77,9 @@
   margin-top: auto;
   padding-top: 0.5rem;
   border-top: 1px solid #eef4f0;
+}
+
+:global(.theme-doc-markdown) .cartao,
+:global(.theme-doc-markdown) .cartao > p {
+  margin: 0;
 }
