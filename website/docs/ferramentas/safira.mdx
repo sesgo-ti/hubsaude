@@ -1,0 +1,381 @@
+---
+id: safira
+title: "Safira"
+slug: /ferramentas/safira/
+---
+
+# Safira
+
+O Safira assina registros de saúde no formato FHIR e confere assinaturas já feitas, de acordo com a [Política de Assinatura Digital](https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html) do HubSaúde, versão 0.2.0. Ele roda na sua máquina: o [HubSaúde CLI](cli.mdx) baixa e inicia a ferramenta quando você precisa dela, e não existe versão hospedada.
+
+A assinatura digital comprova quem produziu um registro e garante que ele não foi alterado depois de assinado. Ela só é necessária quando o Guia de Implementação do serviço exige assinatura para o tipo de registro enviado.
+
+:::warning
+
+**Use apenas dados sintéticos nos testes.** Nunca assine registros reais de pacientes enquanto estiver aprendendo a usar a ferramenta. A chave privada do certificado e a senha são lidas do seu computador e enviadas apenas ao Safira local, sem passar por nenhum serviço externo.
+
+:::
+
+## Como funciona a assinatura
+
+Uma assinatura envolve três elementos:
+
+| Elemento | Papel |
+| --- | --- |
+| `Bundle` | Reúne os registros que serão assinados. Cada registro é identificado no campo `entry.fullUrl` por um endereço no formato `urn:uuid:`. |
+| `Provenance` | Indica quais registros do `Bundle` são assinados, em `target`, e quem assina, em `agent`. |
+| `Signature` | É o resultado da assinatura. O Safira a grava no campo `Provenance.signature`. |
+
+O `Provenance` precisa identificar quem assina com o mesmo número que consta no certificado digital: o CNPJ, com 14 dígitos e sem pontuação, no caso de um certificado de instituição, ou o CPF, com 11 dígitos, no caso de um certificado de pessoa. Se os números forem diferentes, a assinatura é recusada.
+
+O exemplo abaixo assina um paciente e um resultado de exame. Ele será usado nos passos desta página. Salve o primeiro bloco como `bundle.json` e o segundo como `provenance.json`.
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "resource": {
+        "resourceType": "Patient",
+        "name": [{ "family": "Souza", "given": ["Maria"] }],
+        "gender": "female",
+        "birthDate": "1985-04-12"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9b2b8c1e-2f4a-4d5b-8c6d-7e8f9a0b1c2d",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "code": { "coding": [{ "system": "http://loinc.org", "code": "718-7", "display": "Hemoglobina" }] },
+        "subject": { "reference": "urn:uuid:3fa85f64-5717-4562-b3fc-2c963f66afa6" },
+        "valueQuantity": { "value": 13.50, "unit": "g/dL", "system": "http://unitsofmeasure.org", "code": "g/dL" }
+      }
+    }
+  ]
+}
+```
+
+```json
+{
+  "resourceType": "Provenance",
+  "target": [
+    { "reference": "urn:uuid:3fa85f64-5717-4562-b3fc-2c963f66afa6" },
+    { "reference": "urn:uuid:9b2b8c1e-2f4a-4d5b-8c6d-7e8f9a0b1c2d" }
+  ],
+  "recorded": "2026-10-15T10:00:00-03:00",
+  "agent": [
+    { "who": { "identifier": { "system": "urn:brasil:cpf", "value": "52998224725" } } }
+  ]
+}
+```
+
+O CPF `52998224725` é o do certificado fictício usado no [modo simulação](#testar-sem-certificado-icp-brasil). Para assinar com o certificado da instituição, troque o `agent` pelo CNPJ dela, como em `{ "system": "urn:brasil:cnpj", "value": "12345678000195" }`.
+
+## Antes de começar
+
+| Requisito | Detalhe |
+| --- | --- |
+| Certificado digital | ICP-Brasil dos tipos A3, A4, SE-S ou SE-H, emitido a partir de 1º de julho de 2025. Certificados A1 são recusados pela política. |
+| Certificado em arquivo | O HubSaúde CLI lê a chave privada de um arquivo `.pfx`, `.p12` ou `.pem`. Por isso, na prática, apenas o selo eletrônico **SE-S**, que é instalado em software, assina pelo CLI. Os tipos A3, A4 e SE-H ficam em token, cartão ou equipamento próprio e ainda não são suportados para assinar, mas assinaturas feitas com eles podem ser validadas. |
+| Acesso à internet | Ao contrário das demais ferramentas, o Safira não funciona sem rede. Na primeira subida, ele baixa do ITI a lista oficial de autoridades certificadoras da ICP-Brasil e, a cada operação, consulta se o certificado foi revogado. Os registros FHIR não saem da máquina. |
+| Relógio correto | O relógio do computador deve estar certo, com diferença de no máximo 5 minutos. |
+
+Se ainda não tiver um certificado adequado, use o [modo simulação](#testar-sem-certificado-icp-brasil) para conhecer o fluxo.
+
+## Ciclo de vida do serviço
+
+O Safira fica rodando como um serviço na sua máquina, iniciado automaticamente pelos comandos de assinatura e encerrado após um período sem uso. Para controlá-lo diretamente, use os comandos abaixo.
+
+```bash
+hubsaude safira start
+hubsaude safira status
+hubsaude safira logs -f
+hubsaude safira stop
+```
+
+Antes da primeira subida, é preciso [autorizar o certificado](#1-autorizar-o-certificado). A primeira subida pode levar mais de um minuto, por causa do download da lista de autoridades certificadoras. O serviço escuta em `http://127.0.0.1:8095`, e a porta pode ser alterada com a variável `HUBSAUDE_SAFIRA_PORT`. Os comandos `hubsaude status`, `hubsaude update` e `hubsaude uninstall` também consideram o Safira.
+
+## Assinar um registro
+
+### 1. Autorizar o certificado
+
+O Safira só aceita certificados cuja combinação de tipo e autoridade certificadora emissora tenha sido autorizada no seu computador. Essa lista de autorização é chamada de allowlist e precisa ser preenchida uma vez, antes do primeiro uso.
+
+```bash
+hubsaude signature allowlist add --pfx certificado.pfx
+```
+
+O comando pede a senha do arquivo, mostra os dados do certificado e da autoridade emissora e pede confirmação antes de gravar:
+
+```text
+Certificado:  CN=INSTITUICAO EXEMPLO:12345678000195,...
+AC emissora:  CN=AC EXEMPLO,...
+
+Entrada da allowlist:
+  oid:           2.16.76.1.2.201.1
+  type:          SE-S
+  issuer-sha256: 5d1f...e07a
+```
+
+Confira se a autoridade emissora é a esperada antes de confirmar. A autorização vale para qualquer certificado do mesmo tipo emitido pela mesma autoridade, e não para uma pessoa ou instituição específica. Quem assina é conferido em cada assinatura, pelo `Provenance`.
+
+Para consultar ou remover autorizações:
+
+```bash
+hubsaude signature allowlist list        # mostra as autorizações numeradas
+hubsaude signature allowlist remove 1    # remove a autorização de número 1
+hubsaude signature allowlist remove --all
+```
+
+Alterar a allowlist reinicia o Safira no próximo comando de assinatura.
+
+### 2. Assinar
+
+```bash
+hubsaude signature sign --bundle bundle.json --provenance provenance.json \
+    --pfx certificado.pfx --out provenance-assinado.json
+```
+
+O comando pede a senha do certificado sem exibi-la na tela e grava em `provenance-assinado.json` uma cópia do `Provenance` com a assinatura no campo `signature`. Sem `--out`, o resultado é exibido no terminal.
+
+No Windows, o PowerShell não reconhece a barra invertida (`\`) como continuação de linha. Digite o comando em uma única linha ou troque cada `\` no fim da linha pelo acento grave (`` ` ``).
+
+Outras opções do comando:
+
+| Opção | Efeito |
+| --- | --- |
+| `--key chave.pem --cert certificado.pem` | Usa chave e certificado em arquivos PEM separados, no lugar do `--pfx` |
+| `--password-stdin` | Lê a senha da entrada padrão, para uso em automações |
+| `--strategy iat` | Registra o horário da assinatura informado pelo próprio sistema. É o padrão. |
+| `--strategy tsa` | Registra o horário por um carimbo do tempo emitido por uma autoridade de carimbo do tempo, que precisa estar configurada |
+
+A senha também pode ser informada pela variável `HUBSAUDE_KEY_PASSWORD`. Evite a opção `--password`, que deixa a senha visível no histórico do terminal.
+
+### 3. Validar
+
+```bash
+hubsaude signature verify --bundle bundle.json --provenance provenance-assinado.json
+```
+
+O comando confere cada assinatura presente no `Provenance` e mostra uma linha por assinatura, como `assinatura 1: válida`. Se o `Bundle` tiver sido alterado depois da assinatura, a assinatura é rejeitada. Para obter o resultado completo em JSON, no formato `OperationOutcome`, acrescente `-o json`.
+
+## Testar sem certificado ICP-Brasil
+
+O modo simulação executa o mesmo processo de assinatura e validação com certificados fictícios, criados pelo próprio Safira. Ele permite conhecer o fluxo e testar o sistema sem um certificado ICP-Brasil e sem acesso à internet.
+
+:::warning
+
+**Assinaturas simuladas não têm validade jurídica.** Elas são marcadas como simulação e recusadas por qualquer Safira que não esteja no modo simulação.
+
+:::
+
+O modo simulação é usado diretamente pelo programa do Safira, sem o HubSaúde CLI. É preciso ter o **Java 21** instalado e baixar o arquivo `hubsaude-safira-X.Y.Z.jar` da página de [releases](https://github.com/sesgo-ti/hubsaude/releases). Nos comandos abaixo, o arquivo foi renomeado para `hubsaude-safira.jar`. Os passos 2 e 3 também usam o programa [jq](https://jqlang.org/download/).
+
+**1. Gerar os certificados fictícios.** O comando abaixo cria, na primeira execução, uma autoridade certificadora fictícia, um certificado válido e um certificado revogado, e mostra onde os arquivos foram gravados:
+
+```bash
+java -jar hubsaude-safira.jar simulador pki
+```
+
+Os arquivos ficam na pasta `.safira-simulador/pki`, dentro da pasta do usuário. O certificado válido é `signatario.p12`, e a senha está no arquivo `senha.txt`, na mesma pasta.
+
+**2. Assinar.** Com os arquivos `bundle.json` e `provenance.json` do [exemplo acima](#como-funciona-a-assinatura):
+
+```bash
+PKI=~/.safira-simulador/pki
+java -jar hubsaude-safira.jar assinar --modo simulacao \
+    --bundle bundle.json --provenance provenance.json \
+    --p12 $PKI/signatario.p12 --senha-arquivo $PKI/senha.txt \
+    --estrategia iat --saida assinada.json
+
+jq '.signature' assinada.json > assinatura.json
+jq '.provenance' assinada.json > provenance-assinado.json
+```
+
+**3. Validar.**
+
+```bash
+java -jar hubsaude-safira.jar validar --modo simulacao \
+    --signature assinatura.json --bundle bundle.json \
+    --provenance provenance-assinado.json | jq -r '.issue[].details.text'
+```
+
+O resultado esperado é:
+
+```text
+Assinatura digital validada com sucesso
+SIMULAÇÃO — sem validade jurídica ICP-Brasil
+```
+
+Para ver uma recusa, altere qualquer valor do `bundle.json`, como o resultado do exame, e valide novamente: o Safira informa `CRYPTO.HASH-VERIFICATION-FAILED`. Assinar com o certificado `revogado.p12` resulta em `CERT.REVOKED`.
+
+Neste modo, o programa termina com um dos códigos de saída abaixo:
+
+| Código | Significado |
+| --- | --- |
+| `0` | Assinatura criada ou válida |
+| `1` | Erro interno inesperado |
+| `3` | Erro de uso: opções, arquivos ou JSON inválidos |
+| `4` | Resultado inconclusivo. Repita mais tarde. |
+| `6` | Assinatura recusada: alterada, revogada, vencida ou não confiável |
+
+## Integrar pela API REST
+
+Sistemas que precisam assinar registros automaticamente podem chamar o Safira pela API REST, em vez de usar a linha de comando. O serviço iniciado por `hubsaude safira start` atende em `http://127.0.0.1:8095`. Para testes com certificados fictícios, suba o servidor do modo simulação, que atende em `http://127.0.0.1:8081`:
+
+```bash
+java -jar hubsaude-safira.jar servidor iniciar --modo simulacao
+java -jar hubsaude-safira.jar servidor parar --modo simulacao
+```
+
+:::warning
+
+**O servidor local não tem autenticação** e só aceita conexões do próprio computador. Não o exponha na rede. Para implantar o Safira em um servidor da instituição, siga as orientações do [repositório do Safira](https://github.com/sesgo-ti/safira).
+
+:::
+
+| Método e caminho | O que faz |
+| --- | --- |
+| `POST /assinar` | Assina um `Bundle` |
+| `POST /validar` | Valida uma assinatura |
+| `GET /versoes` | Lista as versões da política de assinatura aceitas |
+| `GET /actuator/health/readiness` | Informa se o serviço está pronto para receber pedidos |
+
+As requisições usam o cabeçalho `Content-Type: application/json`. As respostas usam `application/fhir+json`. Uma operação recusada devolve o código HTTP `422` com um `OperationOutcome`, cujo código explica o motivo, como `CERT.REVOKED`.
+
+### Assinar
+
+O corpo do `POST /assinar` reúne os registros, o certificado e as opções da assinatura:
+
+```json
+{
+  "bundle": { "resourceType": "Bundle" },
+  "provenance": { "resourceType": "Provenance" },
+  "signerCryptoMaterial": {
+    "type": "PKCS12",
+    "contentBase64": "<arquivo .pfx em Base64>",
+    "password": "<senha do .pfx>",
+    "alias": "<nome da chave dentro do .pfx>"
+  },
+  "certificateChain": ["<certificado do signatário em Base64, formato DER>"],
+  "referenceTimestamp": 1792000000,
+  "strategy": "iat",
+  "policyIdentifierUri": "https://fhir.saude.go.gov.br/r4/seguranca/assinatura/politica/0.2.0"
+}
+```
+
+| Campo | Conteúdo |
+| --- | --- |
+| `bundle` e `provenance` | Os registros a assinar e o `Provenance` que os referencia, completos |
+| `signerCryptoMaterial` | O certificado com a chave privada. Use `"type": "PKCS12"` para arquivos `.pfx` ou `.p12`, ou `"type": "PEM"` com o campo `privateKeyBase64` para uma chave em PEM. |
+| `certificateChain` | O certificado do signatário e, se houver, os das autoridades emissoras, cada um em Base64 no formato DER |
+| `referenceTimestamp` | O horário atual, em segundos desde 1º de janeiro de 1970. Deve estar a no máximo 5 minutos do relógio do servidor, por isso precisa ser gerado no momento do pedido. |
+| `strategy` | `iat` ou `tsa`, com o mesmo significado das opções do [comando de assinatura](#2-assinar) |
+| `policyIdentifierUri` | A versão da política de assinatura, conforme `GET /versoes` |
+
+A resposta `200` traz a assinatura e uma cópia do `Provenance` com a assinatura incluída:
+
+```json
+{
+  "signature": { "type": [ ], "when": "...", "who": { }, "data": "..." },
+  "provenance": { "resourceType": "Provenance", "signature": [ ] }
+}
+```
+
+### Validar
+
+O corpo do `POST /validar` reúne a assinatura, os registros e o `Provenance` assinado:
+
+```json
+{
+  "signature": { "type": [ ], "when": "...", "who": { }, "data": "..." },
+  "bundle": { "resourceType": "Bundle" },
+  "provenance": { "resourceType": "Provenance", "signature": [ ] },
+  "referenceTimestamp": 1792000000,
+  "policyIdentifierUri": "https://fhir.saude.go.gov.br/r4/seguranca/assinatura/politica/0.2.0"
+}
+```
+
+A resposta `200` traz um `OperationOutcome` com o código `VALIDATION.SUCCESS`.
+
+### Exemplo com o servidor do modo simulação
+
+Os comandos abaixo montam o pedido com o certificado fictício e os arquivos do [exemplo acima](#como-funciona-a-assinatura), assinam e validam:
+
+```bash
+PKI=~/.safira-simulador/pki
+P12=$(base64 < $PKI/signatario.p12 | tr -d '\n')
+CERT=$(openssl pkcs12 -in $PKI/signatario.p12 -passin file:$PKI/senha.txt -nokeys -clcerts \
+    | openssl x509 -outform DER | base64 | tr -d '\n')
+POLITICA="https://fhir.saude.go.gov.br/r4/seguranca/assinatura/politica/0.2.0"
+
+jq -n --slurpfile b bundle.json --slurpfile p provenance.json \
+    --arg p12 "$P12" --rawfile senha $PKI/senha.txt --arg cert "$CERT" \
+    --arg politica "$POLITICA" --argjson ts "$(date +%s)" \
+    '{bundle: $b[0], provenance: $p[0],
+      signerCryptoMaterial: {type: "PKCS12", contentBase64: $p12, password: ($senha | rtrimstr("\n")), alias: "signatario"},
+      certificateChain: [$cert], referenceTimestamp: $ts, strategy: "iat",
+      policyIdentifierUri: $politica}' > pedido-assinar.json
+
+curl -s -H 'Content-Type: application/json' --data-binary @pedido-assinar.json \
+    http://127.0.0.1:8081/assinar > resposta-assinar.json
+
+jq -n --slurpfile r resposta-assinar.json --slurpfile b bundle.json \
+    --arg politica "$POLITICA" --argjson ts "$(date +%s)" \
+    '{signature: $r[0].signature, bundle: $b[0], provenance: $r[0].provenance,
+      referenceTimestamp: $ts, policyIdentifierUri: $politica}' > pedido-validar.json
+
+curl -s -H 'Content-Type: application/json' --data-binary @pedido-validar.json \
+    http://127.0.0.1:8081/validar | jq -r '.issue[].details.text'
+```
+
+O pedido de assinatura contém a chave privada e a senha. Apague os arquivos `pedido-assinar.json` e `resposta-assinar.json` ao terminar os testes e nunca grave esses pedidos em logs.
+
+## Problemas comuns
+
+| Mensagem | O que fazer |
+| --- | --- |
+| `o Safira exige uma allowlist de certificados` | [Autorize o certificado](#1-autorizar-o-certificado) com `hubsaude signature allowlist add`. |
+| `o safira não ficou pronto` | Verifique o acesso a `https://acraiz.icpbrasil.gov.br`. Se a rede exigir proxy, informe-o ao Java na variável `HUBSAUDE_JAVA_OPTS`, como em `-Dhttps.proxyHost=proxy.exemplo -Dhttps.proxyPort=3128`. Em redes lentas, aumente o prazo com `HUBSAUDE_SAFIRA_READY_TIMEOUT`, como em `300s`. |
+| `falha ao abrir o PKCS#12` | A senha está incorreta, o arquivo está corrompido ou contém mais de uma chave. |
+| `CERT.NOT-ICP-BRASIL` | O certificado é do tipo A1, não pertence à ICP-Brasil ou a autoridade emissora não está na allowlist. |
+| `CERT.ISSUE-DATE-TOO-OLD` | O certificado foi emitido antes de 1º de julho de 2025. É preciso um certificado mais recente. |
+| `CERT.REVOKED` | O certificado foi revogado pela autoridade emissora e não pode mais assinar. |
+| `VALIDATION.POLICY-COMPLIANCE-FAILED` | O `Provenance.agent` não tem o CPF ou CNPJ exato do certificado. Confira os dígitos, sem pontuação. |
+| `CRYPTO.HASH-VERIFICATION-FAILED` | O `Bundle` foi alterado depois da assinatura. Use exatamente o mesmo conteúdo que foi assinado. |
+| `FORMAT.INVALID-TIMESTAMP` | O relógio do computador está errado ou o horário do pedido foi gerado há mais de 5 minutos. |
+| `REVOCATION.*` ou `TSA.UNAVAILABLE` | O Safira não conseguiu consultar a autoridade certificadora ou de carimbo do tempo. Verifique a conexão e tente novamente. |
+| `CONFIG.TSA-CONFIG-MISSING` | A opção `--strategy tsa` exige uma autoridade de carimbo do tempo configurada. Use `--strategy iat`. |
+
+## Códigos de saída
+
+Os comandos `hubsaude signature` terminam com um dos códigos abaixo, o que permite usá-los em scripts e pipelines de integração contínua.
+
+| Código | Significado |
+| --- | --- |
+| `0` | Assinatura criada, ou todas as assinaturas são válidas |
+| `1` | Assinatura recusada ou rejeitada pelo Safira |
+| `3` | Erro de uso: opções ou arquivos inválidos, allowlist ausente ou senha incorreta |
+| `4` | Falha de infraestrutura: Safira indisponível, sem rede ou com configuração local inválida |
+
+## Variáveis de ambiente
+
+| Variável | Efeito | Padrão |
+| --- | --- | --- |
+| `HUBSAUDE_SAFIRA_PORT` | Porta local do Safira | 8095 |
+| `HUBSAUDE_SAFIRA_READY_TIMEOUT` | Prazo de espera pela subida do Safira | 120s |
+| `HUBSAUDE_SAFIRA_ALLOWLIST` | Caminho de um arquivo YAML com a allowlist, que prevalece sobre a mantida pelo CLI | |
+| `HUBSAUDE_KEY_PASSWORD` | Senha do certificado, para uso em automações | |
+| `HUBSAUDE_JAVA_OPTS` | Opções repassadas ao Java, como as de proxy | |
+
+As demais variáveis do CLI estão em [variáveis de ambiente](cli.mdx#variáveis-de-ambiente).
+
+## Onde obter
+
+- [HubSaúde CLI](cli.mdx)
+- [Releases](https://github.com/sesgo-ti/hubsaude/releases)
+- [Repositório do Safira](https://github.com/sesgo-ti/safira)
+- [Política de Assinatura Digital](https://fhir.saude.go.gov.br/r4/seguranca/assinatura.html)
