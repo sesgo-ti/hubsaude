@@ -30,6 +30,7 @@ export default {
     {type: 'doc', id: 'curso/autenticar', label: '4. Autenticar'},
     {type: 'doc', id: 'curso/enviar', label: '5. Enviar e acompanhar'},
     {type: 'doc', id: 'curso/projeto-final', label: '6. Projeto final'},
+    {type: 'doc', id: 'curso/safira', label: 'Extra: assinar com o Safira'},
   ],
   gestor: [
     {type: 'doc', id: 'gestor/index', label: 'Credenciar a instituição'},
