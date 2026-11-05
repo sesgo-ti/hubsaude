@@ -60,3 +60,25 @@ test('download links point to existing files and are listed on the materials pag
   }
   assert.deepEqual([...listados].sort(), arquivos, 'the materials page must list every course download');
 });
+
+test('module PDFs are valid, linked from their module page and listed on the materials page', async () => {
+  const pdfs = (await readdir(`${site}static/curso/pdf`)).filter((arquivo) => extname(arquivo) === '.pdf').sort();
+  assert.ok(pdfs.length > 0, 'static/curso/pdf is empty');
+  const listados = new Set();
+  const nosModulos = new Set();
+  for (const pagina of await paginas()) {
+    const $ = load(await readFile(pagina, 'utf8'));
+    for (const elemento of $('a[data-pdf]').toArray()) {
+      const link = $(elemento);
+      const arquivo = link.attr('data-pdf');
+      assert.equal(link.attr('href'), `/hubsaude/curso/pdf/${arquivo}`, `${pagina}: unexpected href for ${arquivo}`);
+      assert.equal(link.attr('download'), arquivo, `${pagina}: ${arquivo} without download attribute`);
+      const conteudo = await readFile(`${site}build/curso/pdf/${arquivo}`);
+      assert.equal(conteudo.subarray(0, 5).toString(), '%PDF-', `${arquivo} is not a PDF`);
+      if (pagina.endsWith(`curso${sep}materiais${sep}index.html`)) listados.add(arquivo);
+      else nosModulos.add(arquivo);
+    }
+  }
+  assert.deepEqual([...listados].sort(), pdfs, 'the materials page must list every module PDF');
+  assert.deepEqual([...nosModulos].sort(), pdfs, 'every module PDF must be linked from its module page');
+});
