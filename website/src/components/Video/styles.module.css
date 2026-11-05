@@ -1,0 +1,68 @@
+.reserva,
+.video {
+  margin: 1.5rem 0 2rem;
+  border: 1px solid #dce9e0;
+  border-radius: var(--ifm-global-radius);
+  background: #ffffff;
+}
+
+.reserva {
+  padding: 1.1rem 1.25rem;
+  border-style: dashed;
+  border-color: #9cc5ae;
+  background: #f5faf7;
+}
+
+.video {
+  overflow: hidden;
+}
+
+.video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #10301f;
+}
+
+.video video::cue {
+  font-size: 0.8em;
+  line-height: 1.3;
+  background: rgb(16 48 31 / 80%);
+}
+
+.video figcaption {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #eef4f0;
+}
+
+.situacao {
+  margin: 0 0 0.25rem;
+  color: var(--ifm-color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin: 0;
+  color: var(--ifm-heading-color);
+  font-weight: 700;
+}
+
+.detalhes {
+  margin: 0.15rem 0 0;
+  color: #4c6356;
+  font-size: 0.9rem;
+}
+
+.descricao {
+  margin-top: 0.5rem;
+  color: #3a5446;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.descricao > :last-child {
+  margin-bottom: 0;
+}

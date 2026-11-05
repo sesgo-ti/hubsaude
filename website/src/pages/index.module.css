@@ -20,6 +20,16 @@
 .path > p:not(.audience) {color: #3a5446; margin-bottom: 1.75rem;}
 .path a {margin-top: auto; color: #036a4c; font-weight: 600; text-decoration: underline; text-underline-offset: 0.25em;}
 .path a:focus-visible {outline: 3px solid #036a4c; outline-offset: 5px;}
+.course {display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center; gap: 2rem; margin-top: 1.25rem; padding: 1.75rem; background: #fff; border: 1px solid #cddfd3; border-top: 4px solid #036a4c; border-radius: 12px;}
+.thumbnail {display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; border: 1px solid #cddfd3;}
+.courseLabel {display: inline-block; margin-bottom: 0.75rem; padding: 0.15rem 0.7rem; background: #eaf6ef; border-radius: 999px; color: #036a4c; font-size: 0.8rem; font-weight: 600;}
+.courseText h2 {font-size: 1.6rem; letter-spacing: -0.025em; line-height: 1.25; margin-bottom: 0.75rem;}
+.courseText > p:not(.courseLabel) {color: #3a5446; margin-bottom: 1.25rem;}
+.courseFacts {display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; margin: 0 0 1.5rem; padding: 0; list-style: none; color: #10301f; font-size: 0.9rem; font-weight: 600;}
+.courseFacts li::before {content: '✓'; margin-right: 0.4rem; color: #036a4c;}
+.courseLink {display: inline-block; padding: 0.65rem 1.25rem; background: #036a4c; border-radius: 8px; color: #fff; font-weight: 600;}
+.courseLink:hover {background: #024a35; color: #fff; text-decoration: none;}
+.courseLink:focus-visible {outline: 3px solid #036a4c; outline-offset: 4px;}
 
 @media (max-width: 600px) {
   .home {align-items: flex-start; padding: 2rem 1rem;}
@@ -28,4 +38,6 @@
   .paths {grid-template-columns: 1fr; gap: 1rem;}
   .path {padding: 1.25rem;}
   .path > p:not(.audience) {margin-bottom: 1rem;}
+  .course {grid-template-columns: 1fr; gap: 1.25rem; padding: 1.25rem; margin-top: 1rem;}
+  .courseText h2 {font-size: 1.35rem;}
 }

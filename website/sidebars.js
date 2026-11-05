@@ -22,6 +22,17 @@ export default {
         'sobre',
       ]},
   ],
+  curso: [
+    {type: 'doc', id: 'curso/index', label: 'Apresentação'},
+    {type: 'doc', id: 'curso/panorama', label: '1. Panorama'},
+    {type: 'doc', id: 'curso/ambiente', label: '2. Preparar o ambiente'},
+    {type: 'doc', id: 'curso/registros', label: '3. Montar registros FHIR'},
+    {type: 'doc', id: 'curso/autenticar', label: '4. Autenticar'},
+    {type: 'doc', id: 'curso/enviar', label: '5. Enviar e acompanhar'},
+    {type: 'doc', id: 'curso/projeto-final', label: '6. Projeto final'},
+    {type: 'doc', id: 'curso/safira', label: 'Extra: assinar com o Safira'},
+    {type: 'doc', id: 'curso/materiais', label: 'Materiais do curso'},
+  ],
   gestor: [
     {type: 'doc', id: 'gestor/index', label: 'Credenciar a instituição'},
     {type: 'ref', id: 'certificados', label: 'Preparar o certificado digital'},

@@ -1,0 +1,442 @@
+---
+id: autenticar
+title: "Módulo 4: Autenticar"
+slug: /curso/autenticar/
+---
+
+import Details from '@theme/Details';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Video} from '@site/src/components/Video';
+import {Baixar, BaixarPdf} from '@site/src/components/Baixar';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+
+# Módulo 4: Autenticar
+
+Neste módulo, você entende como o seu sistema comprova a identidade perante o HubSaúde e recebe a autorização para enviar registros. Primeiro, você executa cada passo pelo terminal, para ver o que acontece por dentro. Depois, obtém o mesmo resultado com a biblioteca oficial da sua linguagem.
+
+<BaixarPdf arquivo="curso-hubsaude-modulo-4-autenticar.pdf" />
+
+## Objetivos
+
+Ao final deste módulo, você será capaz de:
+
+- explicar por que o HubSaúde não usa usuário e senha;
+- descrever o conteúdo de um `client_assertion` e a sua função;
+- obter um token de acesso no Simulador, pelo terminal e pela biblioteca oficial;
+- explicar o vínculo entre o token e o certificado do sistema;
+- diagnosticar as falhas de autenticação mais comuns.
+
+## Conteúdo
+
+:::info Em poucas palavras
+
+- O HubSaúde **não usa usuário e senha**: o sistema comprova quem é com o **certificado digital**.
+- Em troca, recebe um **token de acesso**, uma autorização temporária que acompanha cada envio.
+- O token fica **vinculado ao certificado**: não serve a quem não tem a chave privada.
+- As **bibliotecas oficiais** cuidam de tudo isso, inclusive da renovação do token.
+
+:::
+
+<Video titulo="Como o sistema obtém o token de acesso" formato="misto" duracao="5 min 47 s" src="/curso/videos/token-acesso.mp4" poster="/curso/videos/token-acesso.jpg" legenda="/curso/videos/token-acesso.vtt">
+
+O que é o certificado digital, de onde vem o `client_id` e como o sistema do integrador obtém o token: descoberta, `client_assertion` assinado, conexão com certificado de cliente e token vinculado ao certificado. Termina com os mesmos comandos da prática, executados no Simulador.
+
+</Video>
+
+### Identidade sem senha
+
+O HubSaúde não usa usuário e senha nem chave de API. O sistema comprova a identidade com o **certificado digital** e, em troca, recebe um **token de acesso**, uma autorização temporária que acompanha cada envio. O processo segue o padrão internacional SMART Backend Services, construído sobre o OAuth 2.0.
+
+A obtenção do token acontece em três passos:
+
+<Cartoes>
+  <Cartao titulo="1. Descoberta">O sistema consulta o endereço `/.well-known/smart-configuration` e obtém o endereço do servidor de autorização, como visto no módulo 1.</Cartao>
+  <Cartao titulo="2. Prova de identidade">O sistema monta um pequeno documento, o `client_assertion`, e o assina com a chave privada. Tecnicamente, é um JWT: um texto em três partes, separadas por ponto, com cabeçalho, conteúdo e assinatura.</Cartao>
+  <Cartao titulo="3. Troca pelo token">O sistema envia o `client_assertion` ao servidor de autorização por uma conexão em que também apresenta o próprio certificado. O servidor confere a assinatura e o certificado e devolve o token.</Cartao>
+</Cartoes>
+
+### O conteúdo do client_assertion
+
+| Campo | Significado |
+| --- | --- |
+| `iss` e `sub` | O `client_id` do sistema |
+| `aud` | O endereço do servidor de autorização, a quem o documento se destina |
+| `iat` e `exp` | O momento da criação e o fim da validade, de poucos minutos |
+| `jti` | Um identificador único. O mesmo `client_assertion` não pode ser usado duas vezes |
+
+### Token vinculado ao certificado
+
+O token emitido pelo HubSaúde fica vinculado ao certificado apresentado na conexão, por meio do campo `cnf`.
+
+:::tip Por que isso importa
+
+Todas as chamadas seguintes precisam apresentar o **mesmo certificado** com que o token foi obtido. Assim, um token interceptado não serve a quem não possui a chave privada correspondente.
+
+:::
+
+### Escopos
+
+O sistema pede o token informando os escopos que pretende usar. O servidor concede no máximo o que foi liberado no cadastro. Um escopo não liberado resulta no erro `invalid_scope`.
+
+### Renovação
+
+O token vale por **poucos minutos**. As bibliotecas oficiais guardam o token e pedem um novo automaticamente quando ele está perto de expirar.
+
+:::note Diante de um 401
+
+Se uma chamada for recusada com `401`, descarte o token guardado e peça um novo uma única vez. Se o `401` se repetir, o problema está na credencial, e não na validade do token.
+
+:::
+
+<Video titulo="Configurando a biblioteca no seu projeto" formato="gravado" duracao="10 a 15 minutos">
+
+Demonstração, em um editor de código, da instalação da biblioteca, da configuração para o Simulador, da obtenção do token e da leitura das mensagens de erro mais comuns.
+
+</Video>
+
+Para aprofundar: [Autenticação SMART on FHIR](../fluxos/autenticacao.mdx).
+
+## Prática
+
+Execute os comandos a partir da pasta `curso-hubsaude`, com o Simulador em funcionamento e o sistema cadastrado, conforme o módulo 2. As variáveis criadas nos passos, como `ASSERTION` e `TOKEN`, existem apenas na janela de terminal em que foram criadas.
+
+<Trilha>
+
+<Etapa id="curso-m4-assertion" marcador="1" titulo="Gerar o client_assertion" resumo="Use o assistente do Simulador para criar e assinar a prova de identidade." ambiente="testes">
+
+**O que você faz:** peça ao Simulador que monte e assine o `client_assertion` com a chave de teste.
+
+```bash
+ASSERTION=$(curl -s --cacert simulador-server.pem -X POST https://localhost:8443/auth/client-assertion \
+  -H 'Content-Type: application/json' \
+  -d "$(jq -n --arg chave "$(cat client-key.pem)" '{client_id: "meu-sistema", private_key_pem: $chave}')" \
+  | jq -r .client_assertion)
+echo "$ASSERTION"
+```
+
+:::warning
+
+**Este assistente existe apenas no Simulador e apenas para fins didáticos.** No ambiente oficial, o `client_assertion` é montado pelo seu próprio sistema, normalmente pela biblioteca oficial, e a chave privada nunca é enviada a nenhum servidor.
+
+:::
+
+</Etapa>
+
+<Etapa id="curso-m4-ler" marcador="2" titulo="Ler o conteúdo do client_assertion" resumo="Decodifique o cabeçalho e o conteúdo e identifique cada campo." ambiente="testes">
+
+**O que você faz:** decodifique as duas primeiras partes do documento. Elas não são criptografadas, apenas codificadas.
+
+```bash
+echo "$ASSERTION" | jq -R 'split(".")[0] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson'
+echo "$ASSERTION" | jq -R 'split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson'
+```
+
+O cabeçalho informa o algoritmo de assinatura, `RS384`. O conteúdo traz os campos da tabela deste módulo:
+
+```json
+{
+  "iss": "meu-sistema",
+  "sub": "meu-sistema",
+  "aud": ["https://localhost:8443/auth/token"],
+  "iat": 1793234321,
+  "exp": 1793234621,
+  "jti": "b39e28bd-17b3-4d44-89f2-b9457bd5e0ad"
+}
+```
+
+</Etapa>
+
+<Etapa id="curso-m4-token" marcador="3" titulo="Trocar pelo token de acesso" resumo="Envie o client_assertion ao servidor de autorização apresentando o certificado de teste." ambiente="testes">
+
+**O que você faz:** envie o pedido de token. As opções `--cert` e `--key` fazem o curl apresentar o certificado de teste na conexão, e `--cacert` faz o curl confiar no Simulador.
+
+```bash
+RESPOSTA=$(curl -s --cacert simulador-server.pem --cert client-cert.pem --key client-key.pem \
+  -X POST https://localhost:8443/auth/token \
+  -d grant_type=client_credentials \
+  -d client_id=meu-sistema \
+  -d client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer \
+  --data-urlencode "client_assertion=$ASSERTION" \
+  -d "scope=system/Patient.c system/Patient.rs system/Task.rs")
+TOKEN=$(echo "$RESPOSTA" | jq -r .access_token)
+echo "$RESPOSTA" | jq 'del(.access_token)'
+```
+
+A resposta informa a validade do token, em segundos, e os escopos concedidos:
+
+```json
+{
+  "expires_in": 300,
+  "scope": "system/Patient.c system/Patient.rs system/Task.rs",
+  "token_type": "Bearer"
+}
+```
+
+O token fica guardado na variável `TOKEN` e será usado no módulo 5. Como ele vale por cinco minutos, repita os passos 1 e 3 sempre que precisar de um novo.
+
+</Etapa>
+
+<Etapa id="curso-m4-vinculo" marcador="4" titulo="Conferir o vínculo com o certificado" resumo="Compare o campo cnf do token com a impressão digital do certificado de teste." ambiente="testes">
+
+**O que você faz:** leia o campo `cnf` do token e calcule a impressão digital do certificado de teste.
+
+```bash
+echo "$TOKEN" | jq -R 'split(".")[1] | gsub("-";"+") | gsub("_";"/") | @base64d | fromjson | .cnf'
+openssl x509 -in client-cert.pem -outform DER | openssl dgst -sha256 -binary | base64 | tr '+/' '-_' | tr -d '='
+```
+
+Os dois valores são iguais. É essa igualdade que o HubSaúde confere em cada chamada: o token só é aceito quando acompanhado do certificado que o originou.
+
+</Etapa>
+
+<Etapa id="curso-m4-erros" marcador="5" titulo="Provocar e diagnosticar falhas" resumo="Repita o pedido em situações de erro e observe as respostas." ambiente="testes">
+
+**O que você faz:** execute cada situação abaixo e compare a resposta com a explicação.
+
+**Reaproveitar o mesmo client_assertion.** Repita o comando do passo 3 sem gerar um novo `client_assertion`. A resposta é `invalid_client` com a mensagem `jti já utilizado`, porque cada documento só pode ser usado uma vez.
+
+**Pedir sem o certificado.** Gere um novo `client_assertion` com o passo 1 e repita o passo 3 sem as opções `--cert` e `--key`. A resposta é `invalid_client` com a mensagem `mTLS client certificate required on this endpoint`.
+
+**Pedir um escopo não liberado.** Gere um novo `client_assertion` e repita o passo 3 com `-d "scope=system/Observation.c"`. A resposta é `invalid_scope`, porque o cadastro não inclui esse escopo.
+
+- Consulte: [Erros comuns da autenticação](../fluxos/autenticacao.mdx#erros-comuns)
+
+</Etapa>
+
+<Etapa id="curso-m4-biblioteca" marcador="6" titulo="Obter o token com a biblioteca oficial" resumo="Repita a obtenção do token a partir de um programa na sua linguagem." ambiente="testes">
+
+**O que você faz:** instale a biblioteca da sua linguagem, salve o programa abaixo na pasta `curso-hubsaude` e execute-o. A biblioteca realiza a descoberta, monta e assina o `client_assertion` e troca pelo token, como você fez nos passos anteriores.
+
+<Tabs groupId="curso-autenticar-linguagem" defaultValue="python">
+
+<TabItem value="python" label="Python">
+
+Instale a biblioteca a partir do código-fonte, como descrito na [página do SDK Python](../sdks/autenticacao/python.mdx#instalação), salve o programa como `token.py` e execute-o com `python token.py`.
+
+```python
+from hubsaude_client.builder import SmartTokenClientBuilder
+
+client = (
+    SmartTokenClientBuilder()
+    .fhir_base("https://localhost:8443")
+    .client_id("meu-sistema")
+    .private_key_pem("client-key.pem")
+    .certificate_pem("client-cert.pem")
+    .server_trust_anchor("simulador-server.pem")
+    .build()
+)
+
+token = client.obtain_token("system/Patient.c system/Patient.rs system/Task.rs")
+print(token[:40])
+client.close()
+```
+
+<Baixar arquivo="python/token.py" />
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+A biblioteca exige o Java 21 e o Maven 3.9 ou mais recente. Enquanto ela não é publicada no Maven Central, a forma mais simples de instalá-la é compilá-la a partir do código-fonte, o que a coloca no repositório Maven local:
+
+```bash
+git clone https://github.com/sesgo-ti/hubsaude-cliente-java.git
+cd hubsaude-cliente-java
+mvn install -DskipTests
+```
+
+A versão instalada aparece ao final da compilação, como `0.4.1-SNAPSHOT`. Em seguida, crie a pasta `java` dentro de `curso-hubsaude`, copie para ela os arquivos `client-key.pem`, `client-cert.pem` e `simulador-server.pem` e salve nela o arquivo `pom.xml` abaixo, ajustando a versão da biblioteca se necessário:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>br.exemplo</groupId>
+    <artifactId>curso-hubsaude</artifactId>
+    <version>1.0</version>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>br.gov.go.saude.hubsaude</groupId>
+            <artifactId>hubsaude-cliente-java</artifactId>
+            <version>0.4.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+<Baixar arquivo="java/pom.xml" />
+
+O `jackson-databind` será usado no módulo 5. Salve o programa abaixo como `src/main/java/ObterToken.java`, dentro da pasta `java`, e execute-o com `mvn -q compile exec:java -Dexec.mainClass=ObterToken`.
+
+```java
+import br.gov.go.saude.hubsaude.client.SmartTokenClient;
+
+import java.nio.file.Path;
+
+public class ObterToken {
+
+    public static void main(String[] args) throws Exception {
+        try (var client = SmartTokenClient.builder()
+                .fhirBase("https://localhost:8443")
+                .clientId("meu-sistema")
+                .privateKeyPem(Path.of("client-key.pem"))
+                .certificatePem(Path.of("client-cert.pem"))
+                .serverTrustAnchor(Path.of("simulador-server.pem"))
+                .build()) {
+
+            String token = client.obtainToken("system/Patient.c system/Patient.rs system/Task.rs");
+            System.out.println(token.substring(0, 40));
+        }
+    }
+}
+```
+
+<Baixar arquivo="java/ObterToken.java" />
+
+O aviso "No SLF4J providers were found", exibido na execução, é inofensivo.
+
+</TabItem>
+
+<TabItem value="typescript" label="TypeScript">
+
+A biblioteca exige o Node.js 22.18 ou mais recente. Prepare o projeto e instale a biblioteca a partir do pacote publicado na versão 0.1.1:
+
+```bash
+npm init -y
+npm pkg set type=module
+npm install https://github.com/sesgo-ti/hubsaude-cliente-ts/releases/download/v0.1.1/hubsaude-cliente-ts-0.1.1.tgz tsx
+```
+
+Salve o programa como `token.ts` e execute-o com `npx tsx token.ts`.
+
+```typescript
+import { createSmartTokenClient } from "hubsaude-cliente-ts";
+
+const client = await createSmartTokenClient({
+  fhirBase: "https://localhost:8443",
+  clientId: "meu-sistema",
+  privateKeyPem: "client-key.pem",
+  certificatePem: "client-cert.pem",
+  serverTrustAnchor: "simulador-server.pem",
+});
+
+const token = await client.obtainToken("system/Patient.c system/Patient.rs system/Task.rs");
+console.log(token.slice(0, 40));
+```
+
+<Baixar arquivo="typescript/token.ts" />
+
+</TabItem>
+
+<TabItem value="csharp" label="C#">
+
+A biblioteca exige o .NET SDK 10. Baixe o arquivo `HubSaude.Cliente.0.4.0.nupkg` da [versão 0.4.0](https://github.com/sesgo-ti/hubsaude-cliente-csharp/releases/tag/v0.4.0) para uma pasta chamada `pacotes`, dentro de `curso-hubsaude`, e crie o projeto:
+
+```bash
+dotnet new console -n CursoHubSaude
+cd CursoHubSaude
+dotnet new nugetconfig
+dotnet nuget add source ../pacotes --name hubsaude-local
+dotnet add package HubSaude.Cliente --version 0.4.0
+```
+
+O comando `dotnet new nugetconfig` mantém a fonte do pacote restrita ao projeto. Substitua o conteúdo de `Program.cs` pelo programa abaixo e execute-o com `dotnet run`. Como o programa é executado a partir da pasta `CursoHubSaude`, copie para ela os arquivos `client-key.pem`, `client-cert.pem` e `simulador-server.pem`.
+
+```csharp
+using HubSaude.Cliente;
+
+await using var client = SmartTokenClient.CreateBuilder()
+    .FhirBase("https://localhost:8443")
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("client-key.pem")
+    .CertificatePem("client-cert.pem")
+    .ServerTrustAnchor("simulador-server.pem")
+    .Build();
+
+string token = await client.ObtainTokenAsync("system/Patient.c system/Patient.rs system/Task.rs");
+Console.WriteLine(token[..40]);
+```
+
+<Baixar arquivo="csharp/token/Program.cs" />
+
+</TabItem>
+
+</Tabs>
+
+O programa exibe o início do token. Guarde este programa: ele é a base do envio no módulo 5 e do projeto final.
+
+- Consulte: [Python](../sdks/autenticacao/python.mdx#testar-com-o-simulador), [Java](../sdks/autenticacao/java.mdx#testar-com-o-simulador), [TypeScript](../sdks/autenticacao/typescript.mdx#testar-com-o-simulador) e [C#](../sdks/autenticacao/csharp.mdx#testar-com-o-simulador)
+
+</Etapa>
+
+</Trilha>
+
+## Verificação
+
+**1. Por que o HubSaúde recusa um `client_assertion` já utilizado?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Porque cada documento tem um identificador único, o `jti`. A recusa impede que alguém que tenha interceptado o documento o reutilize para obter um token.
+
+</Details>
+
+**2. Um token foi obtido com sucesso, mas a primeira chamada com ele foi recusada com `401`. Qual é a causa mais provável?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+A chamada não apresentou o mesmo certificado usado na obtenção do token. Como o token é vinculado ao certificado pelo campo `cnf`, toda chamada precisa usar a mesma conexão com certificado de cliente.
+
+</Details>
+
+**3. O cadastro do sistema libera `system/Patient.c`. O que acontece se o sistema pedir `system/Patient.c system/Observation.c`?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+O pedido é recusado com `invalid_scope`, porque inclui um escopo não liberado. O sistema deve pedir apenas os escopos de que precisa e que foram autorizados.
+
+</Details>
+
+**4. Uma chamada retornou `401` e, depois de descartar o token guardado e obter um novo, retornou `401` novamente. O que fazer?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Interromper as tentativas. O problema não está no token, e sim na credencial: o certificado, a chave ou o `client_id` não correspondem ao cadastro.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+Se a biblioteca da sua linguagem apresentou um erro não descrito neste módulo, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, módulo 4", informando a linguagem e a mensagem recebida.
+
+Próximo módulo: [5. Enviar e acompanhar](enviar.mdx).

@@ -1,0 +1,182 @@
+---
+id: panorama
+title: "Módulo 1: Panorama"
+slug: /curso/panorama/
+---
+
+import Details from '@theme/Details';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Video} from '@site/src/components/Video';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+import {BaixarPdf} from '@site/src/components/Baixar';
+
+# Módulo 1: Panorama
+
+Este módulo apresenta o HubSaúde, as pessoas envolvidas na integração e o caminho que um registro percorre do seu sistema até a plataforma. Os demais módulos detalham cada parte desse caminho.
+
+<BaixarPdf arquivo="curso-hubsaude-modulo-1-panorama.pdf" />
+
+## Objetivos
+
+Ao final deste módulo, você será capaz de:
+
+- explicar o que é o HubSaúde e por que ele existe;
+- distinguir o papel do gestor e o papel do integrador;
+- descrever as etapas da integração, da montagem do registro à confirmação do resultado;
+- diferenciar o ambiente de testes do ambiente oficial.
+
+## Conteúdo
+
+:::info Em poucas palavras
+
+- O HubSaúde é o **ponto de encontro** dos sistemas de saúde de Goiás: cada sistema se conecta uma única vez e segue regras comuns.
+- O **gestor** credencia a instituição; o **integrador**, que é você, prepara o sistema.
+- Todo registro passa por **cinco etapas**: montar, conferir, autenticar, enviar e acompanhar.
+- Tudo pode ser praticado no **Simulador**, sem esperar o credenciamento.
+
+:::
+
+Cada vídeo desta seção é acompanhado de um texto com a mesma explicação. Assista, leia ou faça as duas coisas.
+
+### Por que o HubSaúde existe
+
+<Video titulo="Por que o HubSaúde existe" formato="animacao" duracao="2 min 43 s" src="/curso/videos/por-que-hubsaude.mp4" poster="/curso/videos/por-que-hubsaude.jpg" legenda="/curso/videos/por-que-hubsaude.vtt">
+
+O problema que o HubSaúde resolve na rede de saúde de Goiás e o que muda para o paciente quando os sistemas passam a trocar informações por uma plataforma comum.
+
+</Video>
+
+Um mesmo paciente é atendido em lugares diferentes: na unidade básica do bairro, em um laboratório, em um hospital. Cada lugar usa o próprio sistema, e **sem um meio comum de troca a informação não acompanha o paciente**. O resultado de um exame feito no laboratório não chega ao hospital, e a equipe precisa pedir o exame de novo ou decidir sem ele.
+
+Ligar cada sistema diretamente a cada um dos outros não resolve: cada nova instituição exigiria uma ligação com todas as anteriores, cada uma com formato e regras de segurança próprios.
+
+O HubSaúde substitui essa rede de ligações por um **ponto de encontro**. Cada sistema se conecta uma única vez, e todos seguem as mesmas regras:
+
+<Cartoes>
+  <Cartao titulo="Mesmo padrão">Os registros são escritos no padrão FHIR, seguindo os Guias de Implementação, e são entendidos da mesma forma por quem os recebe.</Cartao>
+  <Cartao titulo="Identidade comprovada">Cada sistema comprova quem é com um certificado digital e recebe apenas o acesso que lhe foi concedido.</Cartao>
+  <Cartao titulo="Operações registradas">Cada envio e cada consulta ficam registrados, de modo que é possível saber quem acessou cada informação.</Cartao>
+</Cartoes>
+
+### Quem participa da integração
+
+<Cartoes>
+  <Cartao titulo="Gestor" href="/gestor/">Responsável pela relação da instituição com o HubSaúde. Solicita o credenciamento no Ganesha e recebe a credencial oficial.</Cartao>
+  <Cartao titulo="Integrador">Quem desenvolve ou mantém o sistema da instituição. Prepara o sistema para se identificar e enviar registros. Este curso é para você.</Cartao>
+  <Cartao titulo="Secretaria de Estado da Saúde">Administra o HubSaúde. Analisa cada pedido de credenciamento e define o nível de acesso da instituição.</Cartao>
+</Cartoes>
+
+:::tip O integrador não precisa esperar
+
+O trabalho do integrador não depende da aprovação do credenciamento. Toda a preparação do sistema é feita no Simulador, enquanto o pedido do gestor é analisado.
+
+:::
+
+### O caminho de um registro
+
+<Video titulo="O caminho de um registro" formato="animacao" duracao="4 min 32 s" src="/curso/videos/caminho-registro.mp4" poster="/curso/videos/caminho-registro.jpg" legenda="/curso/videos/caminho-registro.vtt">
+
+Animação que começa pelo credenciamento no Ganesha e acompanha um registro até a confirmação do HubSaúde, explicando o porquê de cada etapa. Mostra também a diferença entre o Simulador e o ambiente oficial e faz uma leitura guiada das informações públicas do servidor.
+
+</Video>
+
+**Primeiro, o credenciamento.** O gestor solicita o acesso no Ganesha e anexa a parte pública do certificado ICP-Brasil da instituição, um arquivo `.cer`. A chave privada nunca é enviada. A Secretaria de Estado da Saúde analisa o pedido, atribui um nível de acesso (N1, N2 ou N3) e o Ganesha devolve o `client_id`, o identificador do sistema. No Simulador, você mesmo faz esse papel: registra um certificado de teste e escolhe o `client_id`.
+
+**Depois, as cinco etapas.** Com a credencial definida, todo registro percorre o mesmo caminho:
+
+<Cartoes>
+  <Cartao titulo="1. Montar">O sistema transforma a informação que já possui em um registro JSON no padrão FHIR, seguindo o Guia de Implementação do assunto. Módulo 3.</Cartao>
+  <Cartao titulo="2. Conferir">O Validador aponta o que precisa ser corrigido antes do envio, quando corrigir ainda é rápido. Módulo 3.</Cartao>
+  <Cartao titulo="3. Autenticar">O sistema comprova a identidade com o certificado e recebe um token de acesso, uma autorização temporária. Módulo 4.</Cartao>
+  <Cartao titulo="4. Enviar">O HubSaúde confirma o recebimento na hora e devolve um endereço de acompanhamento, como um número de protocolo. Módulo 5.</Cartao>
+  <Cartao titulo="5. Acompanhar">O sistema consulta esse endereço até o resultado: registro aceito ou recusado, com o motivo. Módulo 5.</Cartao>
+</Cartoes>
+
+### Os dois ambientes
+
+O mesmo caminho existe em dois ambientes:
+
+<Cartoes colunas={2}>
+  <Cartao titulo="Ambiente de testes: Simulador">Funciona no seu computador. O cadastro é feito por você, com um certificado de teste, e só aceita dados fictícios, apagados quando o Simulador é reiniciado.</Cartao>
+  <Cartao titulo="Ambiente oficial: produção">É o HubSaúde real. Usa o `client_id` do credenciamento, o certificado ICP-Brasil da instituição e dados reais, limitados ao nível de acesso concedido.</Cartao>
+</Cartoes>
+
+O Simulador exige **as mesmas etapas de segurança** do ambiente oficial. Por isso, um sistema que funciona nele precisa apenas de ajustes de configuração para passar à produção: mudam o endereço do servidor, o `client_id` e o certificado.
+
+Para aprofundar, consulte o [panorama da integração](../fluxos/index.mdx) e a página de [visão geral e requisitos](../fluxos/visao-geral.mdx).
+
+## Prática
+
+Este módulo não exige instalação. O HubSaúde descreve o que oferece em endereços públicos, que qualquer pessoa pode abrir no navegador. A prática consiste em ler essas descrições.
+
+<Trilha>
+
+<Etapa id="curso-m1-descoberta" marcador="1" titulo="Consultar a descoberta do HubSaúde" resumo="Abra no navegador o endereço que informa como a segurança do HubSaúde está configurada." ambiente="oficial">
+
+Abra no navegador o endereço [`https://hub.saude.go.gov.br/.well-known/smart-configuration`](https://hub.saude.go.gov.br/.well-known/smart-configuration). A resposta é um documento JSON que descreve como a segurança do servidor está configurada.
+
+Localize o campo `token_endpoint`. Ele indica o endereço em que o sistema pede o token de acesso. Em seguida, localize o campo `grant_types_supported`, que lista os tipos de autorização aceitos. O valor `client_credentials` corresponde à comunicação entre sistemas, sem a participação de uma pessoa, que é o caso da integração.
+
+As bibliotecas oficiais leem esse documento automaticamente, e o assunto volta no módulo 4. Para saber mais, leia a seção [Descoberta da API](../fluxos/autenticacao.mdx#descoberta-da-api).
+
+</Etapa>
+
+<Etapa id="curso-m1-capacidades" marcador="2" titulo="Consultar as capacidades do servidor" resumo="Veja quais tipos de registro o HubSaúde aceita." ambiente="oficial">
+
+Abra no navegador o endereço [`https://hub.saude.go.gov.br/metadata`](https://hub.saude.go.gov.br/metadata). O documento devolvido é um `CapabilityStatement`, a descrição técnica do que o servidor oferece.
+
+Procure a lista `rest.resource`. Cada item dessa lista corresponde a um tipo de registro aceito pelo servidor. No ambiente oficial, a lista traz tipos como `Bundle`, `Task`, `Provenance` e `Consent`. Os registros clínicos chegam dentro de um `Bundle`, conforme o Guia de Implementação de cada assunto, e a `Task` é o endereço de acompanhamento usado no módulo 5.
+
+Para saber mais, leia a seção [Contrato FHIR](../ferramentas/index.mdx#contrato-fhir).
+
+</Etapa>
+
+<Etapa id="curso-m1-guias" marcador="3" titulo="Conhecer os Guias de Implementação" resumo="Localize as regras do tipo de registro que o seu sistema vai enviar." ambiente="oficial">
+
+Acesse os [Guias de Implementação](https://fhir.saude.go.gov.br) e identifique o guia do tipo de informação que o seu sistema produz, como o cadastro de pacientes ou os resultados de exames.
+
+Cada guia reúne os perfis daquele assunto. Um perfil é o conjunto de regras de preenchimento de um registro: quais campos são obrigatórios, que valores cada campo aceita e como os registros se relacionam. O módulo 3 mostra como o Validador aplica essas regras ao seu registro.
+
+</Etapa>
+
+</Trilha>
+
+## Verificação
+
+**1. O integrador precisa aguardar a aprovação do credenciamento para começar a desenvolver?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Não. Toda a preparação do sistema é feita no Simulador, que dispensa a credencial oficial. O credenciamento é necessário apenas para enviar dados ao ambiente oficial.
+
+</Details>
+
+**2. Quem solicita o credenciamento da instituição?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+O gestor da instituição, no Ganesha. O integrador participa apenas fornecendo a parte pública do certificado digital, se for o responsável por ela.
+
+</Details>
+
+**3. O HubSaúde devolve o resultado do processamento na mesma resposta do envio?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Não. A resposta do envio confirma apenas o recebimento e traz um endereço de acompanhamento. O resultado é obtido consultando esse endereço até o fim do processamento.
+
+</Details>
+
+**4. Por que um sistema que funciona no Simulador precisa de poucos ajustes para ir à produção?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Porque o Simulador exige as mesmas etapas de segurança do ambiente oficial: certificado, token de acesso e envio com acompanhamento. Mudam apenas o endereço do servidor, o `client_id` e o certificado.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+Se algum ponto deste módulo ficou pouco claro, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, módulo 1". O retorno orienta as próximas versões do curso.
+
+Próximo módulo: [2. Preparar o ambiente](ambiente.mdx).

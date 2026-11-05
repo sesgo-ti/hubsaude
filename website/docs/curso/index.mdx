@@ -1,0 +1,87 @@
+---
+id: index
+title: "Curso para integradores"
+slug: /curso/
+pagination_prev: null
+---
+
+import {Video} from '@site/src/components/Video';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+import {Modulos, Modulo} from '@site/src/components/Modulos';
+
+# Curso para integradores
+
+Aprenda a integrar o seu sistema ao HubSaúde em seis módulos guiados, com vídeos curtos, prática no seu computador e verificação ao final de cada etapa. Todo o curso é feito no ambiente de testes, sem credencial oficial.
+
+<Video titulo="Boas-vindas ao curso" formato="animacao" duracao="2 min 51 s" src="/curso/videos/boas-vindas.mp4" poster="/curso/videos/boas-vindas.jpg" legenda="/curso/videos/boas-vindas.vtt">
+
+O objetivo do curso, como os módulos estão organizados e como aproveitar cada um deles.
+
+</Video>
+
+## O que você vai conseguir fazer
+
+Ao final do curso, o seu sistema estará pronto para receber a credencial oficial e enviar registros ao HubSaúde.
+
+<Cartoes colunas={2}>
+  <Cartao titulo="Montar registros">Escrever informações de saúde no padrão FHIR e conferi-las no Validador antes do envio.</Cartao>
+  <Cartao titulo="Autenticar o sistema">Comprovar a identidade do sistema com um certificado digital e obter o token de acesso.</Cartao>
+  <Cartao titulo="Enviar e acompanhar">Enviar um registro, acompanhar o processamento e tratar recusas e falhas de rede.</Cartao>
+  <Cartao titulo="Levar ao seu sistema">Reunir todo o fluxo em um componente do seu sistema, pronto para a produção.</Cartao>
+</Cartoes>
+
+## Módulos
+
+Faça os módulos em ordem: cada um usa o que foi preparado no anterior.
+
+<Modulos>
+  <Modulo numero="1" titulo="Panorama" href="/curso/panorama/" duracao="20 minutos" videos="2 vídeos">O que é o HubSaúde, quem participa da integração e o caminho que um registro percorre até a plataforma.</Modulo>
+  <Modulo numero="2" titulo="Preparar o ambiente" href="/curso/ambiente/" duracao="40 minutos" videos="2 vídeos">Instalar o HubSaúde CLI, iniciar o Simulador e cadastrar nele o seu sistema.</Modulo>
+  <Modulo numero="3" titulo="Montar registros FHIR" href="/curso/registros/" duracao="1 hora" videos="2 vídeos">Escrever um registro no formato FHIR, conferi-lo no Validador e corrigir os erros apontados.</Modulo>
+  <Modulo numero="4" titulo="Autenticar" href="/curso/autenticar/" duracao="1 hora" videos="2 vídeos">Obter um token de acesso no Simulador, pelo terminal e pela biblioteca da sua linguagem.</Modulo>
+  <Modulo numero="5" titulo="Enviar e acompanhar" href="/curso/enviar/" duracao="1 hora" videos="2 vídeos">Enviar um registro, acompanhar o processamento e tratar recusas e falhas de rede.</Modulo>
+  <Modulo numero="6" titulo="Projeto final" href="/curso/projeto-final/" duracao="2 a 3 horas" videos="Desafio prático">Realizar o fluxo completo a partir do seu próprio sistema e comprovar o resultado no Simulador.</Modulo>
+  <Modulo numero="+" titulo="Extra: assinar com o Safira" href="/curso/safira/" duracao="40 minutos" videos="1 vídeo" extra>Assinar um registro e conferir a assinatura. Opcional, para quem utilizar a ferramenta.</Modulo>
+</Modulos>
+
+## Como cada módulo funciona
+
+Todos os módulos seguem a mesma estrutura, em quatro partes.
+
+<Cartoes colunas={2}>
+  <Cartao titulo="1. Objetivos">O que você será capaz de fazer ao final do módulo.</Cartao>
+  <Cartao titulo="2. Conteúdo">Vídeos narrados e um texto com a mesma explicação, para quem preferir a leitura.</Cartao>
+  <Cartao titulo="3. Prática">Passos executados no seu computador. Marque cada passo concluído para acompanhar o progresso.</Cartao>
+  <Cartao titulo="4. Verificação">Perguntas para conferir o aprendizado, com a resposta logo abaixo de cada uma.</Cartao>
+</Cartoes>
+
+## Antes de começar
+
+O curso é para quem desenvolve ou mantém o sistema de um hospital, clínica, laboratório ou unidade básica de saúde.
+
+<Cartoes colunas={2}>
+  <Cartao titulo="O que já basta saber">Programar na linguagem do seu sistema e digitar comandos no terminal. As bibliotecas oficiais estão disponíveis em Python, Java, TypeScript e C#: escolha a sua e siga os exemplos nela.</Cartao>
+  <Cartao titulo="O que você aprende no caminho">O padrão FHIR, a autenticação com certificado digital e o envio de registros ao HubSaúde. Nenhum desses assuntos precisa ser conhecido antes.</Cartao>
+</Cartoes>
+
+:::tip Não é preciso esperar o credenciamento
+
+Toda a prática acontece no Simulador, um ambiente de testes que funciona no seu computador e exige as mesmas etapas de segurança do ambiente oficial. O credenciamento da instituição, conduzido pelo gestor no Ganesha, pode ser analisado enquanto você faz o curso. Ele está descrito na [jornada do gestor](../gestor/index.mdx).
+
+:::
+
+:::warning Use apenas dados fictícios
+
+Nunca utilize informações reais de pacientes no Validador, no Simulador ou nos exercícios.
+
+:::
+
+## Materiais
+
+As ferramentas e os arquivos usados nos exercícios estão reunidos em [Materiais do curso](materiais.mdx), prontos para baixar.
+
+## Dúvidas e sugestões
+
+Ao final de cada módulo, há um espaço para relatar o que foi mais difícil. Esse retorno orienta as próximas versões do curso. Para dúvidas sobre o conteúdo, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br).
+
+**Pronto para começar?** Avance para o [módulo 1: Panorama](panorama.mdx).
