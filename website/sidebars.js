@@ -22,6 +22,9 @@ export default {
         'sobre',
       ]},
   ],
+  curso: [
+    {type: 'doc', id: 'curso/index', label: 'Apresentação'},
+  ],
   gestor: [
     {type: 'doc', id: 'gestor/index', label: 'Credenciar a instituição'},
     {type: 'ref', id: 'certificados', label: 'Preparar o certificado digital'},
