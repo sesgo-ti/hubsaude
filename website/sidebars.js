@@ -25,6 +25,7 @@ export default {
   curso: [
     {type: 'doc', id: 'curso/index', label: 'Apresentação'},
     {type: 'doc', id: 'curso/panorama', label: '1. Panorama'},
+    {type: 'doc', id: 'curso/ambiente', label: '2. Preparar o ambiente'},
   ],
   gestor: [
     {type: 'doc', id: 'gestor/index', label: 'Credenciar a instituição'},
