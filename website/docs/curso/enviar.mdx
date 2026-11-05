@@ -1,0 +1,634 @@
+---
+id: enviar
+title: "Módulo 5: Enviar e acompanhar"
+slug: /curso/enviar/
+---
+
+import Details from '@theme/Details';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Video} from '@site/src/components/Video';
+import {Baixar} from '@site/src/components/Baixar';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+
+# Módulo 5: Enviar e acompanhar
+
+Neste módulo, você envia ao Simulador o registro montado no módulo 3, usando o token obtido no módulo 4, e acompanha o processamento até o resultado. Também aprende a tratar recusas e falhas de rede sem duplicar registros.
+
+## Objetivos
+
+Ao final deste módulo, você será capaz de:
+
+- enviar um registro com os cabeçalhos obrigatórios;
+- explicar o envio em duas etapas e acompanhar o processamento pela `Task`;
+- interpretar um registro aceito e um registro recusado;
+- repetir um envio com segurança usando a `Idempotency-Key`;
+- realizar o envio completo a partir de um programa.
+
+## Conteúdo
+
+:::info Em poucas palavras
+
+- O envio acontece em **duas etapas**: o HubSaúde entrega um **comprovante** na hora e processa o registro depois.
+- O resultado é acompanhado pela **`Task`**, que informa se o registro foi aceito ou recusado.
+- Todo envio leva **cinco cabeçalhos obrigatórios**.
+- A **`Idempotency-Key`** permite repetir um envio sem registrar a informação em duplicidade.
+
+:::
+
+<Video titulo="O envio em duas etapas" formato="misto" duracao="5 min 27 s" src="/curso/videos/envio-duas-etapas.mp4" poster="/curso/videos/envio-duas-etapas.jpg" legenda="/curso/videos/envio-duas-etapas.vtt">
+
+Por que o envio é assíncrono, o papel de cada um dos cinco cabeçalhos, o comprovante `202` e a consulta à `Task` até o resultado. Mostra também a repetição segura com a mesma chave de idempotência, o `409` durante o processamento e um envio real no terminal, executado no Simulador.
+
+</Video>
+
+### Envio em duas etapas
+
+O HubSaúde confirma o recebimento na hora, mas processa o conteúdo depois.
+
+<Cartoes colunas={2}>
+  <Cartao titulo="1. Comprovante">O sistema envia o registro com `POST /fhir/{tipo}`. A resposta é `202`, sem corpo, com o cabeçalho `Content-Location`, que traz o endereço de uma `Task`, e o cabeçalho `Retry-After`, que sugere quanto tempo esperar antes da consulta.</Cartao>
+  <Cartao titulo="2. Resultado">O sistema consulta a `Task` até que o campo `status` deixe de ser `accepted` ou `in-progress`. O valor `completed` indica que o registro foi aceito, e `output` aponta o registro criado. O valor `rejected` indica recusa, e o motivo está no `OperationOutcome` dentro da própria `Task`.</Cartao>
+</Cartoes>
+
+### Cabeçalhos obrigatórios
+
+| Cabeçalho | Valor |
+| --- | --- |
+| `Authorization` | `Bearer` seguido do token de acesso |
+| `Content-Type` | `application/fhir+json` |
+| `Accept` | `application/fhir+json` |
+| `Prefer` | `respond-async` |
+| `Idempotency-Key` | Um identificador único do envio, como um UUID |
+
+A falta de qualquer um deles resulta em `400`.
+
+:::tip Lembre-se
+
+O token é vinculado ao certificado: todas as chamadas precisam apresentar o **certificado de cliente**.
+
+:::
+
+### Repetir sem duplicar
+
+Se a conexão cair e não for possível saber se o envio chegou, repita-o com a **mesma** `Idempotency-Key`. O HubSaúde reconhece a repetição, não registra a informação em duplicidade e devolve o mesmo comprovante, com o cabeçalho `Idempotency-Replayed: true` quando o processamento já terminou. Se a repetição chegar enquanto o envio original ainda está em processamento, a resposta é `409`; nesse caso, aguarde e tente novamente.
+
+:::warning Gere a chave uma única vez
+
+A `Idempotency-Key` deve ser gerada **uma vez por registro** e guardada até a confirmação do resultado. Uma chave nova a cada tentativa faz o HubSaúde tratar a repetição como um envio diferente.
+
+:::
+
+<Video titulo="Envio e acompanhamento pelo terminal" formato="misto" duracao="6 min 25 s" src="/curso/videos/envio-terminal.mp4" poster="/curso/videos/envio-terminal.jpg" legenda="/curso/videos/envio-terminal.vtt">
+
+Envio do registro, consulta da `Task` até a conclusão e leitura do resultado, repetição com a mesma chave e envio de um registro inválido até a recusa. Mostra também como reagir a cada resposta e às falhas `400`, `401` e `403`, com os mesmos comandos da prática.
+
+</Video>
+
+Para aprofundar: [Enviando um recurso FHIR](../fluxos/envio-recurso.mdx).
+
+## Prática
+
+Execute os comandos a partir da pasta `curso-hubsaude`, na mesma janela de terminal em que a variável `TOKEN` foi criada no módulo 4. Se o token tiver expirado, repita os passos 1 e 3 daquele módulo. Para encurtar os comandos, defina antes a variável abaixo, que reúne as opções de certificado:
+
+```bash
+CERTIFICADOS="--cacert simulador-server.pem --cert client-cert.pem --key client-key.pem"
+```
+
+<Trilha>
+
+<Etapa id="curso-m5-enviar" marcador="1" titulo="Enviar o registro" resumo="Envie o paciente corrigido no módulo 3 e guarde o comprovante." ambiente="testes">
+
+**O que você faz:** gere a `Idempotency-Key`, envie o arquivo `paciente.json` e guarde o endereço da `Task`.
+
+```bash
+CHAVE=$(openssl rand -hex 16)
+curl -s $CERTIFICADOS -X POST https://localhost:8443/fhir/Patient \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/fhir+json" \
+  -H "Accept: application/fhir+json" \
+  -H "Prefer: respond-async" \
+  -H "Idempotency-Key: $CHAVE" \
+  --data @paciente.json \
+  -D cabecalhos.txt -o /dev/null -w '%{http_code}\n'
+TASK=$(grep -i '^content-location' cabecalhos.txt | cut -d' ' -f2 | tr -d '\r')
+cat cabecalhos.txt
+```
+
+O código exibido é `202`. O arquivo `cabecalhos.txt` contém o `Content-Location`, com o endereço da `Task`, e o `Retry-After`.
+
+</Etapa>
+
+<Etapa id="curso-m5-acompanhar" marcador="2" titulo="Acompanhar o processamento" resumo="Consulte a Task até o resultado e leia o registro criado." ambiente="testes">
+
+**O que você faz:** consulte a `Task`. Repita o comando até que o `status` seja `completed`, o que leva alguns segundos.
+
+```bash
+curl -s $CERTIFICADOS "$TASK" -H "Authorization: Bearer $TOKEN" | jq '{status, output}'
+```
+
+```json
+{
+  "status": "completed",
+  "output": [
+    {
+      "type": {
+        "text": "Recurso resultante"
+      },
+      "valueReference": {
+        "reference": "Patient/4e584cd0-8eac-4329-aab8-57ed1c792d78"
+      }
+    }
+  ]
+}
+```
+
+Em seguida, leia o registro criado:
+
+```bash
+REGISTRO=$(curl -s $CERTIFICADOS "$TASK" -H "Authorization: Bearer $TOKEN" | jq -r '.output[0].valueReference.reference')
+curl -s $CERTIFICADOS "https://localhost:8443/fhir/$REGISTRO" -H "Authorization: Bearer $TOKEN" -H "Accept: application/fhir+json"
+```
+
+</Etapa>
+
+<Etapa id="curso-m5-repetir" marcador="3" titulo="Repetir o envio com a mesma chave" resumo="Simule uma queda de conexão e confirme que o registro não é duplicado." ambiente="testes">
+
+**O que você faz:** repita o comando de envio do passo 1 **sem** gerar uma nova `CHAVE`, isto é, execute apenas o `curl`, e depois exiba os cabeçalhos.
+
+```bash
+cat cabecalhos.txt
+```
+
+A resposta é novamente `202`, com o **mesmo** endereço de `Task` e o cabeçalho `Idempotency-Replayed: true`. Nenhum novo paciente foi criado.
+
+**E se a repetição chegar durante o processamento?** Gere uma nova chave com `CHAVE=$(openssl rand -hex 16)` e execute o `curl` do passo 1 duas vezes seguidas, sem esperar entre uma execução e outra. O primeiro envio recebe `202`. O segundo chega enquanto o primeiro ainda está em processamento e recebe `409`. Exiba os cabeçalhos da segunda resposta:
+
+```bash
+cat cabecalhos.txt
+```
+
+Os principais cabeçalhos são semelhantes a estes:
+
+```text
+HTTP/1.1 409
+Content-Location: https://localhost:8443/Task/acb2ef23-9538-4080-b826-661efef5f60d
+Retry-After: 5
+Content-Type: application/fhir+json
+```
+
+O `Content-Location` aponta a mesma `Task` do primeiro envio, e o `Retry-After` sugere aguardar 5 segundos. O corpo da resposta é um `OperationOutcome` com o código `duplicate`, informando que já existe um envio com essa chave em processamento. Portanto, o `409` não é uma recusa do registro: aguarde o tempo indicado e repita o envio com a mesma `CHAVE`, ou consulte a `Task`.
+
+</Etapa>
+
+<Etapa id="curso-m5-recusa" marcador="4" titulo="Enviar um registro inválido" resumo="Envie o registro com erros e leia o motivo da recusa." ambiente="testes">
+
+**O que você faz:** salve a versão com erros do módulo 3 como `paciente-com-erros.json`, envie-a com uma nova chave e consulte a `Task`.
+
+```json
+{
+  "resourceType": "Patient",
+  "name": [{"use": "official", "text": "Maria da Silva"}],
+  "gender": "F",
+  "birthDate": "01/01/1990"
+}
+```
+
+<Baixar arquivo="paciente-com-erros.json" />
+
+```bash
+CHAVE=$(openssl rand -hex 16)
+curl -s $CERTIFICADOS -X POST https://localhost:8443/fhir/Patient \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/fhir+json" \
+  -H "Accept: application/fhir+json" \
+  -H "Prefer: respond-async" \
+  -H "Idempotency-Key: $CHAVE" \
+  --data @paciente-com-erros.json \
+  -D cabecalhos.txt -o /dev/null -w '%{http_code}\n'
+TASK=$(grep -i '^content-location' cabecalhos.txt | cut -d' ' -f2 | tr -d '\r')
+curl -s $CERTIFICADOS "$TASK" -H "Authorization: Bearer $TOKEN" | jq '{status, statusReason, contained}'
+```
+
+O envio é aceito com `202`. Logo após o envio, a `Task` ainda está `in-progress`; repita a última linha até o fim do processamento, que leva alguns segundos. A `Task` termina com `status` igual a `rejected`, e o `OperationOutcome` em `contained` explica o motivo:
+
+```text
+HAPI-1821: [element="gender"] Invalid attribute value "F": Unknown AdministrativeGender code 'F'
+```
+
+Observe que o Simulador apontou apenas o problema de `gender`, enquanto o Validador, no módulo 3, apontou também a data. O Simulador confere somente a estrutura do registro; o ambiente oficial aplica as regras completas dos Guias de Implementação. Por isso, valide sempre os registros antes de enviá-los.
+
+</Etapa>
+
+<Etapa id="curso-m5-falhas" marcador="5" titulo="Provocar falhas de requisição" resumo="Observe as respostas quando falta um cabeçalho, o certificado ou a permissão." ambiente="testes">
+
+**O que você faz:** repita o comando de envio do passo 1 em cada situação abaixo e observe o código exibido.
+
+**Sem o cabeçalho `Idempotency-Key`.** A resposta é `400`, com um `OperationOutcome` informando que o cabeçalho é obrigatório.
+
+**Sem o certificado de cliente.** Substitua `$CERTIFICADOS` por `--cacert simulador-server.pem`. A resposta é `401`, porque o token é vinculado ao certificado e a chamada não o apresentou.
+
+**Com um token sem permissão de criação.** Obtenha um novo token como no [módulo 4](autenticar.mdx), com `-d "scope=system/Patient.rs system/Task.rs"`, e repita o envio com ele. A resposta é `403`, porque o token não inclui o escopo `system/Patient.c`, necessário para criar o registro.
+
+- Consulte: [Erros comuns do envio](../fluxos/envio-recurso.mdx#erros-comuns)
+
+</Etapa>
+
+<Etapa id="curso-m5-programa" marcador="6" titulo="Enviar a partir de um programa" resumo="Combine a obtenção do token e o envio em um único programa." ambiente="testes">
+
+**O que você faz:** amplie o programa do módulo 4 para enviar o registro e acompanhar o resultado. As chamadas HTTP de envio são feitas pelo seu próprio código; a biblioteca oficial cuida apenas do token. Em todas as linguagens, o cliente HTTP precisa apresentar o certificado de cliente e confiar no certificado do Simulador.
+
+<Tabs groupId="curso-enviar-linguagem" defaultValue="python">
+
+<TabItem value="python" label="Python">
+
+Instale a biblioteca `httpx` com `pip install httpx`, salve o programa como `enviar.py` e execute-o com `python enviar.py`.
+
+```python
+import json
+import ssl
+import time
+import uuid
+
+import httpx
+from hubsaude_client.builder import SmartTokenClientBuilder
+
+SIMULADOR = "https://localhost:8443"
+
+client = (
+    SmartTokenClientBuilder()
+    .fhir_base(SIMULADOR)
+    .client_id("meu-sistema")
+    .private_key_pem("client-key.pem")
+    .certificate_pem("client-cert.pem")
+    .server_trust_anchor("simulador-server.pem")
+    .build()
+)
+token = client.obtain_token("system/Patient.c system/Patient.rs system/Task.rs")
+
+with open("paciente.json", encoding="utf-8") as arquivo:
+    paciente = json.load(arquivo)
+
+conexao = ssl.create_default_context(cafile="simulador-server.pem")
+conexao.load_cert_chain("client-cert.pem", "client-key.pem")
+
+cabecalhos = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/fhir+json",
+    "Accept": "application/fhir+json",
+    "Prefer": "respond-async",
+    "Idempotency-Key": str(uuid.uuid4()),
+}
+
+with httpx.Client(verify=conexao) as http:
+    resposta = http.post(f"{SIMULADOR}/fhir/Patient", json=paciente, headers=cabecalhos)
+    if resposta.status_code != 202:
+        raise RuntimeError(f"Envio recusado: {resposta.status_code} {resposta.text}")
+    endereco_task = resposta.headers["Content-Location"]
+    print("Comprovante:", endereco_task)
+
+    while True:
+        time.sleep(2)
+        task = http.get(endereco_task, headers={"Authorization": f"Bearer {token}"}).json()
+        if task["status"] not in ("accepted", "in-progress"):
+            break
+
+    if task["status"] == "completed":
+        print("Registro aceito:", task["output"][0]["valueReference"]["reference"])
+    else:
+        print("Registro recusado:", task["statusReason"]["text"])
+        for recurso in task.get("contained", []):
+            for problema in recurso.get("issue", []):
+                print(" ", problema["severity"], problema.get("diagnostics"))
+
+client.close()
+```
+
+<Baixar arquivo="python/enviar.py" />
+
+O certificado de cliente e o certificado do Simulador são informados em um único `ssl.SSLContext`. Na biblioteca `httpx`, informar o certificado do Simulador como texto em `verify` faz o certificado de cliente ser ignorado, e o envio é recusado com `401`.
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+No projeto do módulo 4, copie para a pasta `java` os arquivos `paciente.json` e `paciente-com-erros.json`, salve o programa abaixo como `src/main/java/EnviarPaciente.java` e execute-o com `mvn -q compile exec:java -Dexec.mainClass=EnviarPaciente`. Para enviar outro arquivo, acrescente `-Dexec.args=paciente-com-erros.json`.
+
+```java
+import br.gov.go.saude.hubsaude.client.PemLoader;
+import br.gov.go.saude.hubsaude.client.SmartTokenClient;
+import br.gov.go.saude.hubsaude.client.SslContextFactory;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
+import java.util.UUID;
+
+import javax.net.ssl.SSLContext;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
+public class EnviarPaciente {
+
+    private static final String SIMULADOR = "https://localhost:8443";
+
+    public static void main(String[] args) throws Exception {
+        String arquivo = args.length > 0 ? args[0] : "paciente.json";
+
+        try (var client = SmartTokenClient.builder()
+                .fhirBase(SIMULADOR)
+                .clientId("meu-sistema")
+                .privateKeyPem(Path.of("client-key.pem"))
+                .certificatePem(Path.of("client-cert.pem"))
+                .serverTrustAnchor(Path.of("simulador-server.pem"))
+                .build()) {
+
+            String token = client.obtainToken("system/Patient.c system/Patient.rs system/Task.rs");
+
+            SSLContext conexao = SslContextFactory.buildSslContext(
+                    Path.of("simulador-server.pem"),
+                    SslContextFactory.DEFAULT_TLS_PROTOCOL,
+                    PemLoader.loadPrivateKey(Path.of("client-key.pem")),
+                    PemLoader.loadCertificate(Path.of("client-cert.pem")));
+
+            var mapper = new ObjectMapper();
+
+            try (var http = HttpClient.newBuilder().sslContext(conexao).build()) {
+                var envio = HttpRequest.newBuilder(URI.create(SIMULADOR + "/fhir/Patient"))
+                        .header("Authorization", "Bearer " + token)
+                        .header("Content-Type", "application/fhir+json")
+                        .header("Accept", "application/fhir+json")
+                        .header("Prefer", "respond-async")
+                        .header("Idempotency-Key", UUID.randomUUID().toString())
+                        .POST(HttpRequest.BodyPublishers.ofFile(Path.of(arquivo)))
+                        .build();
+
+                var resposta = http.send(envio, HttpResponse.BodyHandlers.ofString());
+                if (resposta.statusCode() != 202) {
+                    throw new IllegalStateException(
+                            "Envio recusado: " + resposta.statusCode() + " " + resposta.body());
+                }
+                String enderecoTask = resposta.headers().firstValue("Content-Location").orElseThrow();
+                System.out.println("Comprovante: " + enderecoTask);
+
+                JsonNode task;
+                String status;
+                do {
+                    Thread.sleep(2000);
+                    var consulta = HttpRequest.newBuilder(URI.create(enderecoTask))
+                            .header("Authorization", "Bearer " + token)
+                            .header("Accept", "application/fhir+json")
+                            .GET()
+                            .build();
+                    task = mapper.readTree(http.send(consulta, HttpResponse.BodyHandlers.ofString()).body());
+                    status = task.path("status").asString();
+                } while (status.equals("accepted") || status.equals("in-progress"));
+
+                if (status.equals("completed")) {
+                    System.out.println("Registro aceito: "
+                            + task.path("output").path(0).path("valueReference").path("reference").asString());
+                } else {
+                    System.out.println("Registro recusado: " + task.path("statusReason").path("text").asString());
+                    for (JsonNode recurso : task.path("contained")) {
+                        for (JsonNode problema : recurso.path("issue")) {
+                            System.out.println("  " + problema.path("severity").asString()
+                                    + " " + problema.path("diagnostics").asString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+<Baixar arquivo="java/EnviarPaciente.java" />
+
+A biblioteca oferece `PemLoader` e `SslContextFactory`, que montam a conexão com o certificado de cliente e a confiança no Simulador a partir dos arquivos PEM. O programa usa o Jackson 3; versões do Jackson 2 anteriores à 2.22 entram em conflito com a biblioteca.
+
+</TabItem>
+
+<TabItem value="typescript" label="TypeScript">
+
+No projeto do módulo 4, instale a biblioteca `undici` com `npm install undici`, salve o programa como `enviar.ts` e execute-o com `npx tsx enviar.ts`. Para enviar outro arquivo, informe o nome, como em `npx tsx enviar.ts paciente-com-erros.json`.
+
+```typescript
+import { readFile } from "node:fs/promises";
+import { Agent } from "undici";
+import { createSmartTokenClient } from "hubsaude-cliente-ts";
+
+const SIMULADOR = "https://localhost:8443";
+const arquivo = process.argv[2] ?? "paciente.json";
+
+await using client = await createSmartTokenClient({
+  fhirBase: SIMULADOR,
+  clientId: "meu-sistema",
+  privateKeyPem: "client-key.pem",
+  certificatePem: "client-cert.pem",
+  serverTrustAnchor: "simulador-server.pem",
+});
+const token = await client.obtainToken("system/Patient.c system/Patient.rs system/Task.rs");
+
+const paciente = JSON.parse(await readFile(arquivo, "utf-8"));
+
+const conexao = new Agent({
+  connect: {
+    cert: await readFile("client-cert.pem"),
+    key: await readFile("client-key.pem"),
+    ca: await readFile("simulador-server.pem"),
+  },
+});
+
+const resposta = await fetch(`${SIMULADOR}/fhir/Patient`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/fhir+json",
+    Accept: "application/fhir+json",
+    Prefer: "respond-async",
+    "Idempotency-Key": crypto.randomUUID(),
+  },
+  body: JSON.stringify(paciente),
+  dispatcher: conexao,
+});
+if (resposta.status !== 202) {
+  throw new Error(`Envio recusado: ${resposta.status} ${await resposta.text()}`);
+}
+const enderecoTask = resposta.headers.get("Content-Location")!;
+console.log("Comprovante:", enderecoTask);
+
+let task: any;
+do {
+  await new Promise((r) => setTimeout(r, 2000));
+  const respostaTask = await fetch(enderecoTask, {
+    headers: { Authorization: `Bearer ${token}` },
+    dispatcher: conexao,
+  });
+  task = await respostaTask.json();
+} while (task.status === "accepted" || task.status === "in-progress");
+
+if (task.status === "completed") {
+  console.log("Registro aceito:", task.output[0].valueReference.reference);
+} else {
+  console.log("Registro recusado:", task.statusReason?.text);
+  for (const recurso of task.contained ?? []) {
+    for (const problema of recurso.issue ?? []) {
+      console.log(" ", problema.severity, problema.diagnostics);
+    }
+  }
+}
+await conexao.close();
+```
+
+<Baixar arquivo="typescript/enviar.ts" />
+
+O `Agent` da biblioteca `undici` reúne o certificado de cliente, a chave e o certificado do Simulador, e é informado em cada chamada pela opção `dispatcher`.
+
+</TabItem>
+
+<TabItem value="csharp" label="C#">
+
+No projeto do módulo 4, substitua o conteúdo de `Program.cs` pelo programa abaixo e execute-o com `dotnet run`. Para enviar outro arquivo, informe o nome, como em `dotnet run -- paciente-com-erros.json`. Copie para a pasta do projeto os arquivos `paciente.json` e `paciente-com-erros.json`.
+
+```csharp
+using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.Json;
+using HubSaude.Cliente;
+
+const string Simulador = "https://localhost:8443";
+string arquivo = args.Length > 0 ? args[0] : "paciente.json";
+
+await using var client = SmartTokenClient.CreateBuilder()
+    .FhirBase(Simulador)
+    .ClientId("meu-sistema")
+    .PrivateKeyPem("client-key.pem")
+    .CertificatePem("client-cert.pem")
+    .ServerTrustAnchor("simulador-server.pem")
+    .Build();
+string token = await client.ObtainTokenAsync("system/Patient.c system/Patient.rs system/Task.rs");
+
+using var certificadoPem = X509Certificate2.CreateFromPemFile("client-cert.pem", "client-key.pem");
+using var certificadoCliente = X509CertificateLoader.LoadPkcs12(certificadoPem.Export(X509ContentType.Pkcs12), null);
+using var certificadoSimulador = X509CertificateLoader.LoadCertificateFromFile("simulador-server.pem");
+
+var conexao = new SocketsHttpHandler();
+conexao.SslOptions.ClientCertificates = new X509CertificateCollection { certificadoCliente };
+conexao.SslOptions.CertificateChainPolicy = new X509ChainPolicy
+{
+    TrustMode = X509ChainTrustMode.CustomRootTrust,
+    RevocationMode = X509RevocationMode.NoCheck,
+};
+conexao.SslOptions.CertificateChainPolicy.CustomTrustStore.Add(certificadoSimulador);
+using var http = new HttpClient(conexao);
+
+string paciente = await File.ReadAllTextAsync(arquivo);
+using var envio = new HttpRequestMessage(HttpMethod.Post, $"{Simulador}/fhir/Patient")
+{
+    Content = new StringContent(paciente, Encoding.UTF8, "application/fhir+json"),
+};
+envio.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+envio.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/fhir+json"));
+envio.Headers.Add("Prefer", "respond-async");
+envio.Headers.Add("Idempotency-Key", Guid.NewGuid().ToString());
+
+using var resposta = await http.SendAsync(envio);
+if ((int)resposta.StatusCode != 202)
+{
+    throw new InvalidOperationException(
+        $"Envio recusado: {(int)resposta.StatusCode} {await resposta.Content.ReadAsStringAsync()}");
+}
+string enderecoTask = resposta.Content.Headers.ContentLocation!.ToString();
+Console.WriteLine($"Comprovante: {enderecoTask}");
+
+JsonElement task;
+string status;
+do
+{
+    await Task.Delay(2000);
+    using var consulta = new HttpRequestMessage(HttpMethod.Get, enderecoTask);
+    consulta.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    using var respostaTask = await http.SendAsync(consulta);
+    task = JsonDocument.Parse(await respostaTask.Content.ReadAsStringAsync()).RootElement;
+    status = task.GetProperty("status").GetString()!;
+} while (status is "accepted" or "in-progress");
+
+if (status == "completed")
+{
+    string registro = task.GetProperty("output")[0].GetProperty("valueReference").GetProperty("reference").GetString()!;
+    Console.WriteLine($"Registro aceito: {registro}");
+}
+else
+{
+    Console.WriteLine($"Registro recusado: {task.GetProperty("statusReason").GetProperty("text").GetString()}");
+    if (task.TryGetProperty("contained", out var contidos))
+    {
+        foreach (var recurso in contidos.EnumerateArray())
+        {
+            if (!recurso.TryGetProperty("issue", out var problemas)) continue;
+            foreach (var problema in problemas.EnumerateArray())
+            {
+                string diagnostico = problema.TryGetProperty("diagnostics", out var d) ? d.GetString()! : "";
+                Console.WriteLine($"  {problema.GetProperty("severity").GetString()} {diagnostico}");
+            }
+        }
+    }
+}
+```
+
+<Baixar arquivo="csharp/enviar/Program.cs" />
+
+O certificado de cliente é convertido para o formato PKCS#12 antes do uso, o que garante o funcionamento também no Windows. A política `CustomRootTrust` faz o programa confiar apenas no certificado do Simulador.
+
+</TabItem>
+
+</Tabs>
+
+</Etapa>
+
+</Trilha>
+
+## Verificação
+
+**1. O envio retornou `202`. O registro já foi aceito pelo HubSaúde?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Não necessariamente. O `202` confirma apenas o recebimento. A aceitação é conhecida ao consultar a `Task`: `completed` indica aceitação, e `rejected` indica recusa.
+
+</Details>
+
+**2. A conexão caiu logo após o envio, e o sistema não recebeu resposta. O que fazer?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Repetir o envio com a mesma `Idempotency-Key`. Se o registro já tiver chegado, o HubSaúde devolve o mesmo comprovante, sem duplicá-lo.
+
+</Details>
+
+**3. Por que um registro aceito pelo Simulador ainda pode ser recusado no ambiente oficial?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Porque o Simulador confere apenas a estrutura do registro, enquanto o ambiente oficial aplica as regras completas dos Guias de Implementação. A conferência no Validador antes do envio evita essa diferença.
+
+</Details>
+
+**4. Onde está o motivo de uma recusa?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+No `OperationOutcome` incluído em `contained`, dentro da própria `Task`. O campo `statusReason` traz um resumo, e cada item de `issue` descreve um problema.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+Se o envio não funcionou como descrito, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, módulo 5", informando o código de resposta e o conteúdo da `Task`.
+
+Próximo módulo: [6. Projeto final](projeto-final.mdx).

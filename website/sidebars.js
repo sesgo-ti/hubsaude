@@ -28,6 +28,7 @@ export default {
     {type: 'doc', id: 'curso/ambiente', label: '2. Preparar o ambiente'},
     {type: 'doc', id: 'curso/registros', label: '3. Montar registros FHIR'},
     {type: 'doc', id: 'curso/autenticar', label: '4. Autenticar'},
+    {type: 'doc', id: 'curso/enviar', label: '5. Enviar e acompanhar'},
   ],
   gestor: [
     {type: 'doc', id: 'gestor/index', label: 'Credenciar a instituição'},
