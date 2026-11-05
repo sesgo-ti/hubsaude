@@ -1,0 +1,298 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:04.942 line:-1 position:50% align:center size:80%
+Boas-vindas ao Curso para integradores
+
+2
+00:00:04.952 --> 00:00:07.167 line:-1 position:50% align:center size:80%
+do HubSaúde. Neste vídeo,
+
+3
+00:00:07.177 --> 00:00:09.154 line:-1 position:50% align:center size:80%
+você conhece o objetivo do curso,
+
+4
+00:00:09.164 --> 00:00:10.426 line:-1 position:50% align:center size:80%
+como ele está organizado
+
+5
+00:00:10.436 --> 00:00:13.170 line:-1 position:50% align:center size:80%
+e como aproveitar cada módulo.
+
+6
+00:00:13.920 --> 00:00:15.992 line:-1 position:50% align:center size:80%
+O curso foi feito para quem desenvolve
+
+7
+00:00:16.002 --> 00:00:17.754 line:-1 position:50% align:center size:80%
+ou mantém um sistema de saúde,
+
+8
+00:00:17.764 --> 00:00:19.756 line:-1 position:50% align:center size:80%
+como os de hospitais, clínicas,
+
+9
+00:00:19.766 --> 00:00:21.998 line:-1 position:50% align:center size:80%
+laboratórios e unidades básicas,
+
+10
+00:00:22.008 --> 00:00:24.241 line:-1 position:50% align:center size:80%
+e precisa integrá-lo ao HubSaúde,
+
+11
+00:00:24.251 --> 00:00:26.003 line:-1 position:50% align:center size:80%
+a plataforma de interoperabilidade
+
+12
+00:00:26.013 --> 00:00:28.675 line:-1 position:50% align:center size:80%
+em saúde do Estado de Goiás.
+
+13
+00:00:28.685 --> 00:00:30.713 line:-1 position:50% align:center size:80%
+Ao final, o seu sistema será capaz
+
+14
+00:00:30.723 --> 00:00:33.053 line:-1 position:50% align:center size:80%
+de montar um registro no padrão FHIR,
+
+15
+00:00:33.063 --> 00:00:34.941 line:-1 position:50% align:center size:80%
+comprovar a própria identidade,
+
+16
+00:00:34.951 --> 00:00:36.828 line:-1 position:50% align:center size:80%
+enviar o registro e acompanhar
+
+17
+00:00:36.838 --> 00:00:39.830 line:-1 position:50% align:center size:80%
+o resultado, tudo no ambiente de testes.
+
+18
+00:00:39.870 --> 00:00:40.741 line:-1 position:50% align:center size:80%
+Para começar,
+
+19
+00:00:40.751 --> 00:00:42.502 line:-1 position:50% align:center size:80%
+basta programar em uma das linguagens
+
+20
+00:00:42.512 --> 00:00:44.903 line:-1 position:50% align:center size:80%
+com biblioteca oficial, Python,
+
+21
+00:00:44.913 --> 00:00:47.424 line:-1 position:50% align:center size:80%
+Java, TypeScript ou C#,
+
+22
+00:00:47.795 --> 00:00:51.146 line:-1 position:50% align:center size:80%
+fazer requisições HTTP e usar o terminal.
+
+23
+00:00:51.156 --> 00:00:52.347 line:-1 position:50% align:center size:80%
+O padrão FHIR,
+
+24
+00:00:52.357 --> 00:00:54.668 line:-1 position:50% align:center size:80%
+o protocolo OAuth e os certificados
+
+25
+00:00:54.678 --> 00:00:57.750 line:-1 position:50% align:center size:80%
+digitais são explicados ao longo do curso.
+
+26
+00:00:58.500 --> 00:01:00.759 line:-1 position:50% align:center size:80%
+São seis módulos, feitos em ordem,
+
+27
+00:01:00.769 --> 00:01:02.076 line:-1 position:50% align:center size:80%
+porque cada um usa o que foi
+
+28
+00:01:02.086 --> 00:01:03.890 line:-1 position:50% align:center size:80%
+preparado no anterior.
+
+29
+00:01:03.900 --> 00:01:04.891 line:-1 position:50% align:center size:80%
+No módulo 1,
+
+30
+00:01:04.901 --> 00:01:06.971 line:-1 position:50% align:center size:80%
+você conhece o panorama da integração.
+
+31
+00:01:06.981 --> 00:01:09.282 line:-1 position:50% align:center size:80%
+No módulo 2, instala o HubSaúde
+
+32
+00:01:09.292 --> 00:01:11.207 line:-1 position:50% align:center size:80%
+CLI e coloca o Simulador
+
+33
+00:01:11.217 --> 00:01:13.570 line:-1 position:50% align:center size:80%
+em funcionamento no seu computador.
+
+34
+00:01:13.940 --> 00:01:16.029 line:-1 position:50% align:center size:80%
+No módulo 3, monta registros
+
+35
+00:01:16.039 --> 00:01:18.503 line:-1 position:50% align:center size:80%
+FHIR e os confere no Validador.
+
+36
+00:01:18.513 --> 00:01:21.277 line:-1 position:50% align:center size:80%
+No módulo 4, obtém o token de acesso.
+
+37
+00:01:21.287 --> 00:01:23.451 line:-1 position:50% align:center size:80%
+E, no módulo 5, envia um registro
+
+38
+00:01:23.461 --> 00:01:25.610 line:-1 position:50% align:center size:80%
+e acompanha o processamento.
+
+39
+00:01:25.740 --> 00:01:28.018 line:-1 position:50% align:center size:80%
+O módulo 6 é o projeto final,
+
+40
+00:01:28.028 --> 00:01:29.925 line:-1 position:50% align:center size:80%
+em que você leva o fluxo completo
+
+41
+00:01:29.935 --> 00:01:31.450 line:-1 position:50% align:center size:80%
+para o seu próprio sistema.
+
+42
+00:01:31.460 --> 00:01:33.814 line:-1 position:50% align:center size:80%
+Há ainda um módulo extra, opcional, sobre
+
+43
+00:01:33.824 --> 00:01:36.920 line:-1 position:50% align:center size:80%
+a assinatura de registros com o Safira.
+
+44
+00:01:37.670 --> 00:01:40.032 line:-1 position:50% align:center size:80%
+Todos os módulos seguem a mesma estrutura.
+
+45
+00:01:40.042 --> 00:01:42.181 line:-1 position:50% align:center size:80%
+Primeiro, os objetivos: o que você
+
+46
+00:01:42.191 --> 00:01:44.690 line:-1 position:50% align:center size:80%
+será capaz de fazer ao final.
+
+47
+00:01:45.040 --> 00:01:47.611 line:-1 position:50% align:center size:80%
+Depois, o conteúdo, com vídeos como este
+
+48
+00:01:47.621 --> 00:01:49.546 line:-1 position:50% align:center size:80%
+e um texto que traz a mesma explicação,
+
+49
+00:01:49.556 --> 00:01:51.770 line:-1 position:50% align:center size:80%
+para quem preferir a leitura.
+
+50
+00:01:52.160 --> 00:01:53.728 line:-1 position:50% align:center size:80%
+Em seguida, a prática,
+
+51
+00:01:53.738 --> 00:01:56.133 line:-1 position:50% align:center size:80%
+com passos executados no seu computador.
+
+52
+00:01:56.143 --> 00:01:57.862 line:-1 position:50% align:center size:80%
+Você marca cada passo concluído
+
+53
+00:01:57.872 --> 00:01:59.950 line:-1 position:50% align:center size:80%
+e acompanha o seu progresso.
+
+54
+00:02:00.030 --> 00:02:02.457 line:-1 position:50% align:center size:80%
+Por fim, a verificação, com perguntas
+
+55
+00:02:02.467 --> 00:02:03.896 line:-1 position:50% align:center size:80%
+para conferir o que foi aprendido
+
+56
+00:02:03.906 --> 00:02:06.630 line:-1 position:50% align:center size:80%
+e a resposta logo abaixo de cada uma.
+
+57
+00:02:07.380 --> 00:02:10.190 line:-1 position:50% align:center size:80%
+Toda a prática acontece no Simulador,
+
+58
+00:02:10.200 --> 00:02:12.171 line:-1 position:50% align:center size:80%
+um ambiente de testes que funciona
+
+59
+00:02:12.181 --> 00:02:14.534 line:-1 position:50% align:center size:80%
+no seu computador e exige as mesmas
+
+60
+00:02:14.544 --> 00:02:17.354 line:-1 position:50% align:center size:80%
+etapas de segurança do ambiente oficial.
+
+61
+00:02:17.364 --> 00:02:17.963 line:-1 position:50% align:center size:80%
+Por isso,
+
+62
+00:02:17.973 --> 00:02:20.021 line:-1 position:50% align:center size:80%
+não é preciso esperar o credenciamento
+
+63
+00:02:20.031 --> 00:02:22.210 line:-1 position:50% align:center size:80%
+da instituição para começar.
+
+64
+00:02:22.550 --> 00:02:24.765 line:-1 position:50% align:center size:80%
+Durante o curso, use apenas dados
+
+65
+00:02:24.775 --> 00:02:27.212 line:-1 position:50% align:center size:80%
+fictícios: nunca utilize informações
+
+66
+00:02:27.222 --> 00:02:30.390 line:-1 position:50% align:center size:80%
+reais de pacientes no ambiente de testes.
+
+67
+00:02:31.140 --> 00:02:32.688 line:-1 position:50% align:center size:80%
+Ao final de cada módulo,
+
+68
+00:02:32.698 --> 00:02:34.246 line:-1 position:50% align:center size:80%
+há um espaço para contar o que foi
+
+69
+00:02:34.256 --> 00:02:36.324 line:-1 position:50% align:center size:80%
+mais difícil. Esse retorno orienta
+
+70
+00:02:36.334 --> 00:02:38.390 line:-1 position:50% align:center size:80%
+as próximas versões do curso.
+
+71
+00:02:38.430 --> 00:02:40.569 line:-1 position:50% align:center size:80%
+No próximo vídeo, do módulo 1,
+
+72
+00:02:40.579 --> 00:02:43.015 line:-1 position:50% align:center size:80%
+você entende por que o HubSaúde existe
+
+73
+00:02:43.025 --> 00:02:44.942 line:-1 position:50% align:center size:80%
+e o que muda quando os sistemas
+
+74
+00:02:44.952 --> 00:02:47.970 line:-1 position:50% align:center size:80%
+de saúde passam a trocar informações.
