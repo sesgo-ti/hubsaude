@@ -20,3 +20,13 @@ export function Baixar({arquivo, nome, compacto}) {
     </a>
   );
 }
+
+export function BaixarPdf({arquivo, compacto, children}) {
+  const endereco = useBaseUrl(`/curso/pdf/${arquivo}`);
+  return (
+    <a className={compacto ? `${styles.baixar} ${styles.compacto}` : `${styles.baixar} ${styles.pdf}`} href={endereco} download={arquivo} data-pdf={arquivo}>
+      <Icone />
+      {children ?? 'Baixar este módulo em PDF, para ler ou imprimir'}
+    </a>
+  );
+}
