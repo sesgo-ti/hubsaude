@@ -1,0 +1,254 @@
+---
+id: projeto-final
+title: "Módulo 6: Projeto final"
+slug: /curso/projeto-final/
+---
+
+import Details from '@theme/Details';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+
+# Módulo 6: Projeto final
+
+No projeto final, você leva o conteúdo do curso para o seu próprio sistema. O desafio é fazer o sistema montar, conferir, autenticar, enviar e acompanhar um registro no Simulador, de forma automática e com tratamento das falhas mais comuns. Ao final, o sistema estará pronto para receber a credencial oficial.
+
+## Objetivos
+
+Ao final deste módulo, você terá:
+
+- um componente do seu sistema que realiza o fluxo completo de envio ao Simulador;
+- o tratamento das recusas, das falhas de rede e da expiração do token;
+- as evidências, colhidas no Simulador, de que cada parte funciona;
+- a lista do que muda quando o credenciamento for aprovado.
+
+:::info Em poucas palavras
+
+- O projeto final é um **desafio prático**: você implementa o fluxo no seu sistema, na linguagem que ele já usa.
+- Cada critério de conclusão tem uma **evidência objetiva** no Simulador: o estado da `Task`, uma resposta HTTP ou uma linha de log.
+- Os **erros mais comuns** estão explicados no fim da página, com a mensagem exata e a correção.
+- Se a configuração for externa, a passagem para a produção **não exige mudança no código**.
+
+:::
+
+## Como funciona o desafio
+
+<Cartoes>
+  <Cartao titulo="1. Implementar">Desenvolva o componente no seu sistema, seguindo o enunciado abaixo. Os arquivos e comandos dos módulos anteriores servem de ponto de partida.</Cartao>
+  <Cartao titulo="2. Comprovar">Para cada critério de conclusão, execute o componente contra o Simulador e confira a evidência indicada: o estado da `Task`, a resposta ou o log.</Cartao>
+  <Cartao titulo="3. Corrigir">Se algo não sair como esperado, procure a mensagem na seção de erros mais comuns. Cada uma traz a causa e a correção.</Cartao>
+</Cartoes>
+
+## O enunciado
+
+Escolha um tipo de informação que o seu sistema produz, como o cadastro de pacientes, e desenvolva, na linguagem do sistema, um componente que cumpra os itens abaixo. Use apenas dados fictícios.
+
+**O fluxo principal**, que faz o registro chegar ao HubSaúde:
+
+1. **Montar o registro** no formato FHIR a partir dos dados do próprio sistema.
+2. **Conferir o registro** com `hubsaude validate -o json` antes do envio, interrompendo o processo quando houver erros.
+3. **Obter o token** com a biblioteca oficial, reutilizando o mesmo cliente durante toda a execução.
+4. **Enviar o registro** com os cabeçalhos obrigatórios e uma `Idempotency-Key` gerada uma única vez e guardada até a confirmação.
+5. **Acompanhar a `Task`**, respeitando o intervalo sugerido em `Retry-After`, até o resultado.
+
+**A robustez**, que distingue um componente de demonstração de um componente pronto para a produção:
+
+6. **Tratar as recusas**, registrando em log o motivo informado pelo HubSaúde.
+7. **Tratar a expiração do token**: diante de um `401`, descartar o token guardado e tentar novamente uma única vez.
+8. **Tratar as falhas de rede**, repetindo o envio com a mesma `Idempotency-Key`.
+
+<Details summary={<summary>Sugestão de organização do componente</summary>}>
+
+Uma organização que facilita os testes separa o componente em quatro partes: a **montagem**, que converte os dados do sistema em FHIR; a **conferência**, que chama o Validador; o **cliente**, que obtém o token e faz as chamadas HTTP com o certificado de cliente; e o **acompanhamento**, que consulta a `Task` e interpreta o resultado. Cada parte pode ser testada isoladamente com os arquivos dos módulos anteriores.
+
+</Details>
+
+## Como comprovar cada critério
+
+Mantenha um terminal aberto com o log do Simulador durante os testes. Cada envio aceito, cada repetição e cada recusa aparecem nele:
+
+```bash
+hubsaude sim logs -f
+```
+
+A `Task` de um envio é consultada pelo endereço completo devolvido em `Content-Location`. O Simulador não oferece busca de `Task`: uma consulta sem o identificador é recusada.
+
+<Trilha>
+
+<Etapa id="curso-m6-aceito" marcador="1" titulo="Registro aceito" resumo="O componente envia um registro válido e chega ao registro criado." ambiente="testes">
+
+Execute o componente com dados fictícios válidos.
+
+**Evidência:** a `Task` termina com `status` `completed`, o campo `owner` aponta para o seu sistema (`Organization/meu-sistema`) e `output` traz a referência do registro criado, como `Patient/` seguido do identificador. No log aparece uma linha `POST Patient aceito`, com o identificador da `Task` e a `Idempotency-Key` usada.
+
+</Etapa>
+
+<Etapa id="curso-m6-validacao" marcador="2" titulo="Conferência antes do envio" resumo="Um registro com erro é barrado antes de chegar ao Simulador." ambiente="testes">
+
+Altere os dados para produzir um registro inválido, como o sexo informado com o código `F` no lugar de `female`.
+
+**Evidência:** o componente interrompe o processo após a validação e exibe o problema apontado. Nenhuma linha nova de `POST Patient aceito` aparece no log, porque o registro não foi enviado.
+
+</Etapa>
+
+<Etapa id="curso-m6-recusa" marcador="3" titulo="Recusa tratada" resumo="Uma recusa do Simulador é registrada com o motivo." ambiente="testes">
+
+Desative temporariamente a conferência e envie o mesmo registro inválido.
+
+**Evidência:** o envio é aceito para processamento (`202`), mas a `Task` termina com `status` `rejected` e `statusReason` "Falha na validação HAPI FHIR". O detalhe fica no `OperationOutcome` contido na `Task`, como `HAPI-1821: [element="gender"] Invalid attribute value "F"`. O log do seu componente deve registrar esse motivo.
+
+</Etapa>
+
+<Etapa id="curso-m6-repeticao" marcador="4" titulo="Repetição sem duplicidade" resumo="Um envio repetido com a mesma chave não cria um segundo registro." ambiente="testes">
+
+Repita um envio já concluído com a mesma `Idempotency-Key`, por exemplo interrompendo o componente logo após o envio e executando-o novamente.
+
+**Evidência:** a resposta é `202`, com o mesmo endereço de `Task` e o cabeçalho `Idempotency-Replayed: true`. No log aparece `Replay pos-conclusao detectado`. Se a repetição chegar enquanto o envio original ainda está em processamento, a resposta é `409` e o log mostra `Replay concorrente detectado`; o componente deve aguardar e tentar novamente.
+
+</Etapa>
+
+<Etapa id="curso-m6-token" marcador="5" titulo="Expiração do token tratada" resumo="O componente continua funcionando depois que o token expira." ambiente="testes">
+
+Mantenha o componente em execução por mais de cinco minutos, enviando registros periodicamente.
+
+**Evidência:** os envios continuam aceitos depois dos cinco minutos, sem nenhuma resposta `401` no log do componente, porque a biblioteca renova o token automaticamente.
+
+</Etapa>
+
+<Etapa id="curso-m6-configuracao" marcador="6" titulo="Configuração externa" resumo="Endereço, client_id e certificados podem ser trocados sem alterar o código." ambiente="testes">
+
+Troque um dos valores da configuração, como o `client_id`, por um valor inexistente, e execute o componente.
+
+**Evidência:** a obtenção do token falha com `invalid_client`, sem nenhuma alteração no código. Com o valor correto de volta, o componente volta a funcionar. Essa é a condição para passar à produção sem alterar o código.
+
+</Etapa>
+
+</Trilha>
+
+## Erros mais comuns
+
+Cada item traz a mensagem como ela aparece na resposta, a causa e a correção.
+
+<Details summary={<summary><code>400</code>: <code>Header 'Idempotency-Key' é obrigatório</code></summary>}>
+
+**Causa:** o envio foi feito sem o cabeçalho `Idempotency-Key`.
+
+**Correção:** gere uma chave única, como um UUID, antes do primeiro envio de cada registro, guarde-a e envie-a em todas as tentativas desse mesmo registro.
+
+</Details>
+
+<Details summary={<summary><code>401</code>: <code>invalid_token: Token inválido ou expirado</code></summary>}>
+
+**Causa:** o token expirou ou a chamada foi feita sem o certificado de cliente. O token só é aceito quando a conexão usa o mesmo certificado com que ele foi obtido.
+
+**Correção:** confirme que todas as chamadas usam o certificado de cliente. Se o token expirou, descarte-o e obtenha outro, tentando novamente uma única vez. A biblioteca oficial faz essa renovação automaticamente.
+
+</Details>
+
+<Details summary={<summary><code>403</code>: <code>insufficient_scope: Escopos necessários</code></summary>}>
+
+**Causa:** o token não tem o escopo exigido pela operação, como `system/Patient.c` para criar um paciente.
+
+**Correção:** peça o escopo na obtenção do token e confirme que ele está liberado para o seu `client_id` no cadastro do Simulador. Na produção, os escopos são os autorizados no credenciamento.
+
+</Details>
+
+<Details summary={<summary><code>invalid_client</code> na obtenção do token</summary>}>
+
+**Causa:** o servidor de autorização não reconheceu o sistema. Os motivos mais comuns são um `client_id` diferente do cadastrado, um certificado diferente do registrado ou uma asserção assinada reaproveitada, com o mesmo `jti` de uma tentativa anterior.
+
+**Correção:** confira o `client_id` e o certificado no cadastro do Simulador e gere uma nova asserção a cada pedido de token. A biblioteca oficial gera um `jti` novo a cada pedido.
+
+</Details>
+
+<Details summary={<summary><code>invalid_scope</code> na obtenção do token</summary>}>
+
+**Causa:** o pedido de token incluiu um escopo que não está liberado para o `client_id`.
+
+**Correção:** peça apenas os escopos liberados no cadastro do Simulador, escritos exatamente como aparecem nele.
+
+</Details>
+
+<Details summary={<summary><code>Task</code> com <code>status</code> <code>rejected</code></summary>}>
+
+**Causa:** o registro foi recebido, mas recusado no processamento. O motivo está em `statusReason` e no `OperationOutcome` contido na `Task`.
+
+**Correção:** corrija os dados apontados e envie novamente, com uma nova `Idempotency-Key`, porque se trata de um novo registro. Para evitar a recusa, confira o registro com o Validador antes do envio.
+
+</Details>
+
+<Details summary={<summary><code>409</code> ao repetir um envio</summary>}>
+
+**Causa:** a repetição chegou enquanto o envio original, com a mesma `Idempotency-Key`, ainda estava em processamento.
+
+**Correção:** aguarde o intervalo sugerido e tente novamente com a mesma chave. Quando o processamento terminar, a repetição recebe o mesmo `202` do envio original.
+
+</Details>
+
+## Passagem para a produção
+
+O credenciamento é conduzido pelo gestor da instituição, conforme a [jornada do gestor](../gestor/index.mdx). Na passagem para a produção, o integrador cuida de três pontos.
+
+<Cartoes>
+  <Cartao titulo="O que entregar ao gestor">A parte pública do certificado ICP-Brasil da instituição, em arquivo `.cer`, se você for o responsável por ela. A chave privada nunca é entregue.</Cartao>
+  <Cartao titulo="O que confirmar">Que a credencial oficial funciona, com o comando `hubsaude auth verify`, antes de alterar o sistema.</Cartao>
+  <Cartao titulo="O que trocar">Apenas os valores da configuração: endereço, `client_id`, chave e certificado.</Cartao>
+</Cartoes>
+
+A página [Preparar o certificado digital](../certificados.mdx#gerar-o-arquivo-cer-para-o-credenciamento) explica como gerar e conferir o arquivo `.cer`.
+
+O comando [`hubsaude auth verify`](../ferramentas/cli.mdx#hubsaude-auth-verify) pode ser ensaiado agora, contra o Simulador, com o certificado de teste. A opção `--trust` faz o comando confiar no certificado do Simulador:
+
+```bash
+hubsaude auth verify --fhir-base https://localhost:8443 --client-id meu-sistema \
+  --key client-key.pem --cert client-cert.pem --trust simulador-server.pem \
+  --ig hemograma --ig-versao 0.0.1 \
+  --scope "system/Patient.c system/Patient.rs system/Task.rs"
+```
+
+O comando exibe os dados do token obtido e termina com a mensagem `[OK] Credenciamento verificado. Acesso ao HubSaúde está funcionando.` Na produção, o comando é o mesmo, com o endereço oficial, o `client_id` e o certificado da instituição, e sem a opção `--trust`.
+
+| Item | No Simulador | Na produção |
+| --- | --- | --- |
+| Endereço | `https://localhost:8443` | `https://hub.saude.go.gov.br` |
+| `client_id` | `meu-sistema` | O identificador entregue no credenciamento |
+| Chave e certificado | Os de teste | Os da instituição, ICP-Brasil |
+| Confiança no servidor | `simulador-server.pem` | Nenhuma configuração; o certificado do HubSaúde é reconhecido automaticamente |
+| Escopos | Os liberados no cadastro do Simulador | Os autorizados no credenciamento |
+
+:::note Perfis do ambiente oficial
+
+No ambiente oficial, os registros devem seguir os perfis do Guia de Implementação do tipo de informação enviado, e os envios são feitos em um `Bundle` com o perfil indicado no guia.
+
+:::
+
+## Verificação
+
+**1. Por que a `Idempotency-Key` deve ser guardada até a confirmação do resultado, e não gerada a cada tentativa?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Porque é ela que permite ao HubSaúde reconhecer uma repetição. Uma chave nova a cada tentativa faria cada repetição ser tratada como um novo registro, com risco de duplicidade.
+
+</Details>
+
+**2. Um envio recebeu `202`, mas a `Task` terminou como `rejected`. O registro foi criado?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Não. O `202` confirma apenas o recebimento para processamento. O resultado é o da `Task`: com `rejected`, nada foi criado, e o motivo está em `statusReason` e no `OperationOutcome` contido nela.
+
+</Details>
+
+**3. O que precisa mudar no código do componente para passar à produção?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Nada, se a configuração for externa. Mudam apenas os valores: endereço, `client_id`, chave e certificado. A âncora de confiança do Simulador deixa de ser informada.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+O retorno sobre o projeto final é o mais importante para as próximas versões do curso. Escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, projeto final", informando a linguagem utilizada e o ponto que exigiu mais tempo.
+
+Se o seu sistema também precisa assinar registros, continue no módulo [Extra: assinar com o Safira](safira.mdx).
