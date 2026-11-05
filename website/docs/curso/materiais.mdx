@@ -1,0 +1,127 @@
+---
+id: materiais
+title: "Materiais do curso"
+slug: /curso/materiais/
+pagination_prev: null
+pagination_next: null
+---
+
+import {Baixar, BaixarPdf} from '@site/src/components/Baixar';
+
+# Materiais do curso
+
+Esta página reúne as ferramentas e os arquivos usados no curso. Cada arquivo também aparece no módulo em que é usado, com a explicação de cada parte. Os arquivos para baixar têm o mesmo conteúdo dos blocos de código dos módulos.
+
+Salve tudo na pasta `curso-hubsaude`, criada no [módulo 2](ambiente.mdx). Use apenas dados fictícios.
+
+## O curso em PDF
+
+Cada módulo também está disponível em PDF, com o mesmo conteúdo organizado para leitura e impressão. Os exemplos de programa estão em Java. Os códigos QR de cada PDF levam aos vídeos, na página do módulo.
+
+- <BaixarPdf arquivo="curso-hubsaude-modulo-1-panorama.pdf" compacto>Módulo 1</BaixarPdf> Panorama
+- <BaixarPdf arquivo="curso-hubsaude-modulo-2-ambiente.pdf" compacto>Módulo 2</BaixarPdf> Preparar o ambiente
+- <BaixarPdf arquivo="curso-hubsaude-modulo-3-registros.pdf" compacto>Módulo 3</BaixarPdf> Montar registros FHIR
+- <BaixarPdf arquivo="curso-hubsaude-modulo-4-autenticar.pdf" compacto>Módulo 4</BaixarPdf> Autenticar
+- <BaixarPdf arquivo="curso-hubsaude-modulo-5-enviar.pdf" compacto>Módulo 5</BaixarPdf> Enviar e acompanhar
+- <BaixarPdf arquivo="curso-hubsaude-modulo-6-projeto-final.pdf" compacto>Módulo 6</BaixarPdf> Projeto final
+- <BaixarPdf arquivo="curso-hubsaude-modulo-extra-safira.pdf" compacto>Extra</BaixarPdf> Assinar com o Safira
+
+## Ferramentas
+
+| Ferramenta | Para que serve | Onde obter | Módulos |
+| --- | --- | --- | --- |
+| HubSaúde CLI | Instala e controla o Validador e o Simulador | Comandos de instalação abaixo | 2 a 6 |
+| OpenSSL, curl e jq | Gerar o certificado de teste, fazer as chamadas HTTP e ler JSON no terminal | [Módulo 2, passo 1](ambiente.mdx#prática) | 2 a 6 |
+| Java 21 e Maven 3.9 ou mais recente | Programas em Java e programa do Safira | [Adoptium](https://adoptium.net/) e [Apache Maven](https://maven.apache.org/download.cgi) | 4, 5, 6 e Extra |
+| Python, Node.js 22.18 ou .NET SDK 10 | Programas nas demais linguagens, se preferir uma delas | [Python](https://www.python.org/downloads/), [Node.js](https://nodejs.org/) e [.NET](https://dotnet.microsoft.com/download) | 4, 5 e 6 |
+| Programa do Safira | Assinar e conferir assinaturas no modo simulação | Arquivo `hubsaude-safira-X.Y.Z.jar` nas [releases](https://github.com/sesgo-ti/hubsaude/releases) | Extra |
+
+Para instalar o HubSaúde CLI no macOS e no Linux:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash
+```
+
+No Windows, pelo PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
+```
+
+## Bibliotecas oficiais
+
+A biblioteca obtém e renova o token de acesso. Use a da linguagem do seu sistema; os passos de instalação estão no [módulo 4](autenticar.mdx#prática).
+
+| Linguagem | Versão usada no curso | Onde obter |
+| --- | --- | --- |
+| Java | `0.4.1-SNAPSHOT`, compilada a partir do código-fonte | [hubsaude-cliente-java](https://github.com/sesgo-ti/hubsaude-cliente-java) |
+| Python | instalada a partir do código-fonte | [hubsaude-cliente-python](https://github.com/sesgo-ti/hubsaude-cliente-python) |
+| TypeScript | `0.1.1` | [hubsaude-cliente-ts](https://github.com/sesgo-ti/hubsaude-cliente-ts/releases/tag/v0.1.1) |
+| C# | `0.4.0` | [hubsaude-cliente-csharp](https://github.com/sesgo-ti/hubsaude-cliente-csharp/releases/tag/v0.4.0) |
+
+## Arquivos para baixar
+
+### Módulo 3: Montar registros FHIR
+
+- <Baixar arquivo="paciente-com-erros.json" compacto /> Registro de paciente com os dois erros propositais. No módulo 3, salve-o como `paciente.json`, que é o ponto de partida dos exercícios.
+- <Baixar arquivo="paciente.json" compacto /> O mesmo registro, já corrigido.
+- <Baixar arquivo="bundle.json" compacto /> O paciente corrigido dentro de um `Bundle`.
+- <Baixar arquivo="conferir.sh" compacto /> Script que interrompe o processo quando o registro tem erros.
+
+### Módulo 4: Autenticar
+
+- <Baixar arquivo="java/pom.xml" compacto /> Projeto Maven com a biblioteca Java.
+- <Baixar arquivo="java/ObterToken.java" compacto /> Programa que obtém o token, em Java.
+- <Baixar arquivo="python/token.py" compacto /> O mesmo programa, em Python.
+- <Baixar arquivo="typescript/token.ts" compacto /> O mesmo programa, em TypeScript.
+- <Baixar arquivo="csharp/token/Program.cs" compacto /> O mesmo programa, em C#.
+
+### Módulo 5: Enviar e acompanhar
+
+- <Baixar arquivo="java/EnviarPaciente.java" compacto /> Programa que obtém o token, envia o registro e acompanha a `Task`, em Java.
+- <Baixar arquivo="python/enviar.py" compacto /> O mesmo programa, em Python.
+- <Baixar arquivo="typescript/enviar.ts" compacto /> O mesmo programa, em TypeScript.
+- <Baixar arquivo="csharp/enviar/Program.cs" compacto /> O mesmo programa, em C#.
+- <Baixar arquivo="paciente-com-erros.json" compacto /> Registro com erros, usado para provocar a recusa.
+
+### Extra: assinar com o Safira
+
+- <Baixar arquivo="bundle-assinatura.json" compacto /> `Bundle` com um paciente e um resultado de exame.
+- <Baixar arquivo="provenance.json" compacto /> `Provenance` que indica o que é assinado e quem assina.
+
+## Arquivos que você mesmo gera
+
+Alguns arquivos não estão nesta página porque são gerados no seu computador durante a prática do [módulo 2](ambiente.mdx):
+
+| Arquivo | O que é |
+| --- | --- |
+| `client-key.pem` | A chave privada de teste do seu sistema. Ela nunca sai do seu computador. |
+| `client-cert.pem` | O certificado de teste, a parte pública, cadastrado no Simulador. |
+| `simulador-server.pem` | O certificado do Simulador, no qual os comandos e programas confiam. |
+
+## Como organizar a pasta
+
+Ao final do curso, com o projeto em Java, a pasta `curso-hubsaude` fica assim:
+
+```text
+curso-hubsaude/
+├── client-cert.pem
+├── client-key.pem
+├── simulador-server.pem
+├── paciente.json
+├── paciente-com-erros.json
+├── bundle.json
+├── conferir.sh
+├── bundle-assinatura.json
+├── provenance.json
+└── java/
+    ├── pom.xml
+    ├── client-cert.pem
+    ├── client-key.pem
+    ├── simulador-server.pem
+    ├── paciente.json
+    ├── paciente-com-erros.json
+    └── src/main/java/
+        ├── ObterToken.java
+        └── EnviarPaciente.java
+```
