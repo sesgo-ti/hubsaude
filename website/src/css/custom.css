@@ -39,6 +39,9 @@
 .navbar__logo {height: 3rem;}
 .navbar__title {font-size: 1.35rem; letter-spacing: -0.04em;}
 .navbar__link {font-size: 0.9rem;}
+.navbar__link--curso {margin-left: 0.25rem; background: #eaf6ef; border: 1px solid #b9dcc6; border-radius: 999px; color: #036a4c; font-weight: 600;}
+.navbar__link--curso:hover, .navbar__link--curso.navbar__link--active {background: #036a4c; border-color: #036a4c; color: #fff;}
+.navbar-sidebar .navbar__link--curso {margin: 0.25rem 0; border-radius: 0.65rem;}
 .navbar__search-input {width: 15rem; color: #10301f;}
 .navbar__search-input::placeholder {color: #3a5446; opacity: 1;}
 .footer {padding-block: 3rem;}
