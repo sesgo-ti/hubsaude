@@ -1,0 +1,670 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:05.330 line:-1 position:50% align:center size:80%
+No vídeo anterior, o paciente.json
+
+2
+00:00:05.340 --> 00:00:07.666 line:-1 position:50% align:center size:80%
+ficou com dois erros propositais.
+
+3
+00:00:07.676 --> 00:00:09.550 line:-1 position:50% align:center size:80%
+Agora, o Validador os aponta,
+
+4
+00:00:09.560 --> 00:00:11.660 line:-1 position:50% align:center size:80%
+você os corrige no editor e confirma
+
+5
+00:00:11.670 --> 00:00:13.243 line:-1 position:50% align:center size:80%
+a correção antes do envio.
+
+6
+00:00:13.253 --> 00:00:14.674 line:-1 position:50% align:center size:80%
+Primeiro, você aprende a ler
+
+7
+00:00:14.684 --> 00:00:16.634 line:-1 position:50% align:center size:80%
+o resultado da validação; depois,
+
+8
+00:00:16.644 --> 00:00:19.330 line:-1 position:50% align:center size:80%
+faz tudo na prática, no terminal.
+
+9
+00:00:19.980 --> 00:00:21.204 line:-1 position:50% align:center size:80%
+Por que validar antes
+
+10
+00:00:21.214 --> 00:00:23.208 line:-1 position:50% align:center size:80%
+de enviar? No ambiente oficial,
+
+11
+00:00:23.218 --> 00:00:25.675 line:-1 position:50% align:center size:80%
+o HubSaúde aplica as regras completas
+
+12
+00:00:25.685 --> 00:00:28.065 line:-1 position:50% align:center size:80%
+dos Guias de Implementação e recusa
+
+13
+00:00:28.075 --> 00:00:30.378 line:-1 position:50% align:center size:80%
+o registro que não as cumpre. Essas regras
+
+14
+00:00:30.388 --> 00:00:32.614 line:-1 position:50% align:center size:80%
+definem quais campos são obrigatórios
+
+15
+00:00:32.624 --> 00:00:35.210 line:-1 position:50% align:center size:80%
+e quais valores cada campo aceita.
+
+16
+00:00:35.270 --> 00:00:37.277 line:-1 position:50% align:center size:80%
+Se o erro só aparece depois do envio,
+
+17
+00:00:37.287 --> 00:00:39.369 line:-1 position:50% align:center size:80%
+o caminho é longo: a Task termina
+
+18
+00:00:39.379 --> 00:00:41.087 line:-1 position:50% align:center size:80%
+recusada, você lê o motivo,
+
+19
+00:00:41.097 --> 00:00:43.390 line:-1 position:50% align:center size:80%
+corrige e envia de novo.
+
+20
+00:00:43.570 --> 00:00:46.148 line:-1 position:50% align:center size:80%
+O Validador roda na sua máquina e confere
+
+21
+00:00:46.158 --> 00:00:48.422 line:-1 position:50% align:center size:80%
+o registro antes que ele saia: corrigir
+
+22
+00:00:48.432 --> 00:00:50.854 line:-1 position:50% align:center size:80%
+nesse momento é mais rápido e mais barato.
+
+23
+00:00:50.864 --> 00:00:52.657 line:-1 position:50% align:center size:80%
+Durante o curso, use nele apenas
+
+24
+00:00:52.667 --> 00:00:54.932 line:-1 position:50% align:center size:80%
+dados fictícios; na integração real,
+
+25
+00:00:54.942 --> 00:00:57.049 line:-1 position:50% align:center size:80%
+o seu sistema também valida os registros
+
+26
+00:00:57.059 --> 00:00:59.370 line:-1 position:50% align:center size:80%
+verdadeiros antes de enviá-los.
+
+27
+00:01:00.020 --> 00:01:01.581 line:-1 position:50% align:center size:80%
+Para cada problema que encontra,
+
+28
+00:01:01.591 --> 00:01:03.078 line:-1 position:50% align:center size:80%
+o Validador escreve uma linha
+
+29
+00:01:03.088 --> 00:01:04.873 line:-1 position:50% align:center size:80%
+com três partes: a gravidade,
+
+30
+00:01:04.883 --> 00:01:06.968 line:-1 position:50% align:center size:80%
+o caminho do campo e a mensagem.
+
+31
+00:01:06.978 --> 00:01:08.750 line:-1 position:50% align:center size:80%
+Veja cada uma delas.
+
+32
+00:01:08.860 --> 00:01:11.165 line:-1 position:50% align:center size:80%
+O caminho mostra onde está o problema.
+
+33
+00:01:11.175 --> 00:01:12.941 line:-1 position:50% align:center size:80%
+Ele começa pelo tipo do recurso
+
+34
+00:01:12.951 --> 00:01:15.102 line:-1 position:50% align:center size:80%
+e desce até o campo, com as partes
+
+35
+00:01:15.112 --> 00:01:18.806 line:-1 position:50% align:center size:80%
+separadas por ponto: Patient.birthDate
+
+36
+00:01:18.816 --> 00:01:21.250 line:-1 position:50% align:center size:80%
+é a data de nascimento do paciente.
+
+37
+00:01:21.310 --> 00:01:22.958 line:-1 position:50% align:center size:80%
+A gravidade diz o que fazer
+
+38
+00:01:22.968 --> 00:01:24.993 line:-1 position:50% align:center size:80%
+com o problema. Um error indica
+
+39
+00:01:25.003 --> 00:01:26.953 line:-1 position:50% align:center size:80%
+que o registro está fora das regras e será
+
+40
+00:01:26.963 --> 00:01:29.800 line:-1 position:50% align:center size:80%
+recusado: a correção é obrigatória.
+
+41
+00:01:30.170 --> 00:01:32.884 line:-1 position:50% align:center size:80%
+Um warning indica que o registro é aceito,
+
+42
+00:01:32.894 --> 00:01:35.092 line:-1 position:50% align:center size:80%
+mas há uma recomendação a considerar.
+
+43
+00:01:35.102 --> 00:01:37.595 line:-1 position:50% align:center size:80%
+E information é apenas uma observação,
+
+44
+00:01:37.605 --> 00:01:40.090 line:-1 position:50% align:center size:80%
+sem efeito sobre a aceitação.
+
+45
+00:01:40.740 --> 00:01:42.744 line:-1 position:50% align:center size:80%
+Além das mensagens, ao terminar,
+
+46
+00:01:42.754 --> 00:01:44.293 line:-1 position:50% align:center size:80%
+o programa devolve um código
+
+47
+00:01:44.303 --> 00:01:46.539 line:-1 position:50% align:center size:80%
+de saída: um número que scripts
+
+48
+00:01:46.549 --> 00:01:48.398 line:-1 position:50% align:center size:80%
+e outros programas conseguem ler,
+
+49
+00:01:48.408 --> 00:01:50.334 line:-1 position:50% align:center size:80%
+sem precisar interpretar o texto.
+
+50
+00:01:50.344 --> 00:01:52.630 line:-1 position:50% align:center size:80%
+Mais adiante, você verá um exemplo.
+
+51
+00:01:52.670 --> 00:01:55.498 line:-1 position:50% align:center size:80%
+Zero indica que não há problemas; um,
+
+52
+00:01:55.508 --> 00:01:57.186 line:-1 position:50% align:center size:80%
+que há erros; dois,
+
+53
+00:01:57.196 --> 00:01:59.564 line:-1 position:50% align:center size:80%
+que há apenas avisos; e três,
+
+54
+00:01:59.574 --> 00:02:02.580 line:-1 position:50% align:center size:80%
+um erro de uso, como uma opção inválida.
+
+55
+00:02:02.700 --> 00:02:04.995 line:-1 position:50% align:center size:80%
+Assim, um script ou uma pipeline
+
+56
+00:02:05.005 --> 00:02:07.152 line:-1 position:50% align:center size:80%
+de integração contínua, que automatiza
+
+57
+00:02:07.162 --> 00:02:08.787 line:-1 position:50% align:center size:80%
+as conferências do seu sistema,
+
+58
+00:02:08.797 --> 00:02:11.750 line:-1 position:50% align:center size:80%
+interrompe o envio quando o código é 1.
+
+59
+00:02:12.400 --> 00:02:13.688 line:-1 position:50% align:center size:80%
+Agora, na prática,
+
+60
+00:02:13.698 --> 00:02:16.209 line:-1 position:50% align:center size:80%
+na pasta curso-hubsaude, com o mesmo
+
+61
+00:02:16.219 --> 00:02:20.257 line:-1 position:50% align:center size:80%
+paciente.json: o valor F no campo gender,
+
+62
+00:02:20.267 --> 00:02:23.236 line:-1 position:50% align:center size:80%
+e a data com barras no campo birthDate.
+
+63
+00:02:23.246 --> 00:02:24.611 line:-1 position:50% align:center size:80%
+São esses os dois erros
+
+64
+00:02:24.621 --> 00:02:26.880 line:-1 position:50% align:center size:80%
+que o Validador deve encontrar.
+
+65
+00:02:27.210 --> 00:02:29.249 line:-1 position:50% align:center size:80%
+Se quiser, pause o vídeo e execute
+
+66
+00:02:29.259 --> 00:02:31.590 line:-1 position:50% align:center size:80%
+cada comando junto, no seu terminal.
+
+67
+00:02:32.080 --> 00:02:34.809 line:-1 position:50% align:center size:80%
+Execute hubsaude validate,
+
+68
+00:02:34.819 --> 00:02:37.469 line:-1 position:50% align:center size:80%
+seguido do nome do arquivo. Se o Validador
+
+69
+00:02:37.479 --> 00:02:38.956 line:-1 position:50% align:center size:80%
+não estiver em funcionamento,
+
+70
+00:02:38.966 --> 00:02:41.773 line:-1 position:50% align:center size:80%
+o CLI o inicia; na primeira vez,
+
+71
+00:02:41.783 --> 00:02:42.946 line:-1 position:50% align:center size:80%
+também o baixa,
+
+72
+00:02:42.956 --> 00:02:45.137 line:-1 position:50% align:center size:80%
+o que pode levar cerca de um minuto.
+
+73
+00:02:45.147 --> 00:02:46.702 line:-1 position:50% align:center size:80%
+Nas execuções seguintes,
+
+74
+00:02:46.712 --> 00:02:48.940 line:-1 position:50% align:center size:80%
+a resposta é imediata.
+
+75
+00:02:49.420 --> 00:02:51.727 line:-1 position:50% align:center size:80%
+O resultado aparece em poucas linhas.
+
+76
+00:02:51.737 --> 00:02:53.595 line:-1 position:50% align:center size:80%
+A primeira identifica o arquivo
+
+77
+00:02:53.605 --> 00:02:55.912 line:-1 position:50% align:center size:80%
+e traz o resultado geral: error.
+
+78
+00:02:55.922 --> 00:02:57.481 line:-1 position:50% align:center size:80%
+Isso quer dizer que o registro tem
+
+79
+00:02:57.491 --> 00:03:00.560 line:-1 position:50% align:center size:80%
+pelo menos um erro e seria recusado.
+
+80
+00:03:01.010 --> 00:03:03.715 line:-1 position:50% align:center size:80%
+Abaixo, cada linha descreve um problema,
+
+81
+00:03:03.725 --> 00:03:05.073 line:-1 position:50% align:center size:80%
+sempre na mesma ordem:
+
+82
+00:03:05.083 --> 00:03:06.506 line:-1 position:50% align:center size:80%
+primeiro a gravidade,
+
+83
+00:03:06.516 --> 00:03:08.769 line:-1 position:50% align:center size:80%
+depois o caminho do campo e, por fim,
+
+84
+00:03:08.779 --> 00:03:10.260 line:-1 position:50% align:center size:80%
+a mensagem.
+
+85
+00:03:10.710 --> 00:03:12.425 line:-1 position:50% align:center size:80%
+Veja as duas primeiras linhas,
+
+86
+00:03:12.435 --> 00:03:15.275 line:-1 position:50% align:center size:80%
+no caminho Patient.gender. Elas dizem
+
+87
+00:03:15.285 --> 00:03:17.750 line:-1 position:50% align:center size:80%
+que o código F é desconhecido e que não
+
+88
+00:03:17.760 --> 00:03:19.850 line:-1 position:50% align:center size:80%
+pertence ao conjunto de valores aceitos,
+
+89
+00:03:19.860 --> 00:03:22.610 line:-1 position:50% align:center size:80%
+chamado AdministrativeGender.
+
+90
+00:03:23.060 --> 00:03:23.952 line:-1 position:50% align:center size:80%
+A linha seguinte,
+
+91
+00:03:23.962 --> 00:03:26.356 line:-1 position:50% align:center size:80%
+no caminho Patient.birthDate,
+
+92
+00:03:26.366 --> 00:03:30.788 line:-1 position:50% align:center size:80%
+diz que 01/01/1990 não é uma data válida.
+
+93
+00:03:30.798 --> 00:03:33.268 line:-1 position:50% align:center size:80%
+O padrão exige a data na ordem ano,
+
+94
+00:03:33.278 --> 00:03:34.980 line:-1 position:50% align:center size:80%
+mês e dia.
+
+95
+00:03:35.440 --> 00:03:36.960 line:-1 position:50% align:center size:80%
+Por último, há um aviso,
+
+96
+00:03:36.970 --> 00:03:39.801 line:-1 position:50% align:center size:80%
+e não um erro: a regra dom-6 recomenda
+
+97
+00:03:39.811 --> 00:03:41.403 line:-1 position:50% align:center size:80%
+incluir um resumo em texto legível,
+
+98
+00:03:41.413 --> 00:03:43.297 line:-1 position:50% align:center size:80%
+no campo text. Um aviso não
+
+99
+00:03:43.307 --> 00:03:45.770 line:-1 position:50% align:center size:80%
+impede a aceitação do registro.
+
+100
+00:03:46.250 --> 00:03:48.298 line:-1 position:50% align:center size:80%
+Agora, o código de saída.
+
+101
+00:03:48.308 --> 00:03:50.203 line:-1 position:50% align:center size:80%
+Para ver o código do último comando,
+
+102
+00:03:50.213 --> 00:03:51.651 line:-1 position:50% align:center size:80%
+digite echo,
+
+103
+00:03:51.661 --> 00:03:54.014 line:-1 position:50% align:center size:80%
+cifrão e ponto de interrogação.
+
+104
+00:03:54.024 --> 00:03:56.224 line:-1 position:50% align:center size:80%
+O valor 1 confirma o que a primeira
+
+105
+00:03:56.234 --> 00:03:58.870 line:-1 position:50% align:center size:80%
+linha já dizia: há erros.
+
+106
+00:03:59.250 --> 00:04:01.265 line:-1 position:50% align:center size:80%
+Agora, corrija os dois erros.
+
+107
+00:04:01.275 --> 00:04:04.697 line:-1 position:50% align:center size:80%
+Abra o paciente.json no editor de texto.
+
+108
+00:04:04.707 --> 00:04:07.890 line:-1 position:50% align:center size:80%
+Em gender, troque F por female,
+
+109
+00:04:07.900 --> 00:04:10.238 line:-1 position:50% align:center size:80%
+um dos quatro valores aceitos: male,
+
+110
+00:04:10.248 --> 00:04:12.480 line:-1 position:50% align:center size:80%
+female, other e unknown.
+
+111
+00:04:12.560 --> 00:04:13.842 line:-1 position:50% align:center size:80%
+Em birthDate,
+
+112
+00:04:13.852 --> 00:04:16.883 line:-1 position:50% align:center size:80%
+reescreva a data na ordem ano, mês e dia,
+
+113
+00:04:16.893 --> 00:04:21.216 line:-1 position:50% align:center size:80%
+separados por hífen: 1990-01-01.
+
+114
+00:04:21.226 --> 00:04:23.780 line:-1 position:50% align:center size:80%
+Depois, salve o arquivo.
+
+115
+00:04:24.380 --> 00:04:26.704 line:-1 position:50% align:center size:80%
+Valide de novo, com o mesmo comando.
+
+116
+00:04:26.714 --> 00:04:29.113 line:-1 position:50% align:center size:80%
+O resultado geral agora é warning:
+
+117
+00:04:29.123 --> 00:04:30.694 line:-1 position:50% align:center size:80%
+os dois erros desapareceram,
+
+118
+00:04:30.704 --> 00:04:32.878 line:-1 position:50% align:center size:80%
+e resta apenas o aviso dom-6,
+
+119
+00:04:32.888 --> 00:04:35.120 line:-1 position:50% align:center size:80%
+que não impede a aceitação.
+
+120
+00:04:35.270 --> 00:04:37.232 line:-1 position:50% align:center size:80%
+O código de saída agora é 2,
+
+121
+00:04:37.242 --> 00:04:39.280 line:-1 position:50% align:center size:80%
+que significa apenas avisos.
+
+122
+00:04:39.290 --> 00:04:41.251 line:-1 position:50% align:center size:80%
+O registro pode seguir para o envio,
+
+123
+00:04:41.261 --> 00:04:42.844 line:-1 position:50% align:center size:80%
+mas convém avaliar cada aviso
+
+124
+00:04:42.854 --> 00:04:45.100 line:-1 position:50% align:center size:80%
+e decidir se vale atendê-lo.
+
+125
+00:04:45.670 --> 00:04:47.931 line:-1 position:50% align:center size:80%
+Veja um exemplo de script, em que o código
+
+126
+00:04:47.941 --> 00:04:50.202 line:-1 position:50% align:center size:80%
+decide o próximo passo: ele interrompe
+
+127
+00:04:50.212 --> 00:04:51.716 line:-1 position:50% align:center size:80%
+o envio quando o código é 1.
+
+128
+00:04:51.726 --> 00:04:54.743 line:-1 position:50% align:center size:80%
+Com o código 2, ele segue. Assim, nenhum
+
+129
+00:04:54.753 --> 00:04:57.450 line:-1 position:50% align:center size:80%
+registro com erro sai do seu sistema.
+
+130
+00:04:57.790 --> 00:04:59.337 line:-1 position:50% align:center size:80%
+Há ainda o erro de uso.
+
+131
+00:04:59.347 --> 00:05:02.442 line:-1 position:50% align:center size:80%
+Uma opção que não existe, como --formato,
+
+132
+00:05:02.452 --> 00:05:04.592 line:-1 position:50% align:center size:80%
+termina com o código 3: o problema
+
+133
+00:05:04.602 --> 00:05:06.880 line:-1 position:50% align:center size:80%
+está no comando, não no registro.
+
+134
+00:05:07.260 --> 00:05:09.181 line:-1 position:50% align:center size:80%
+Para ver o resultado no navegador,
+
+135
+00:05:09.191 --> 00:05:12.117 line:-1 position:50% align:center size:80%
+acrescente a opção --report:
+
+136
+00:05:12.127 --> 00:05:15.053 line:-1 position:50% align:center size:80%
+o CLI gera um relatório em HTML,
+
+137
+00:05:15.063 --> 00:05:16.211 line:-1 position:50% align:center size:80%
+com a tabela de problemas
+
+138
+00:05:16.221 --> 00:05:18.297 line:-1 position:50% align:center size:80%
+e o OperationOutcome completo.
+
+139
+00:05:18.307 --> 00:05:20.460 line:-1 position:50% align:center size:80%
+O OperationOutcome é o formato
+
+140
+00:05:20.470 --> 00:05:22.624 line:-1 position:50% align:center size:80%
+do FHIR para descrever problemas,
+
+141
+00:05:22.634 --> 00:05:24.478 line:-1 position:50% align:center size:80%
+o mesmo que o HubSaúde devolve
+
+142
+00:05:24.488 --> 00:05:26.460 line:-1 position:50% align:center size:80%
+quando recusa um registro.
+
+143
+00:05:26.660 --> 00:05:27.678 line:-1 position:50% align:center size:80%
+Sem o terminal,
+
+144
+00:05:27.688 --> 00:05:29.442 line:-1 position:50% align:center size:80%
+use a interface web do Validador,
+
+145
+00:05:29.452 --> 00:05:32.674 line:-1 position:50% align:center size:80%
+em localhost:8090: carregue
+
+146
+00:05:32.684 --> 00:05:34.584 line:-1 position:50% align:center size:80%
+o arquivo e clique em Validar.
+
+147
+00:05:34.594 --> 00:05:36.347 line:-1 position:50% align:center size:80%
+Ela mostra os mesmos problemas,
+
+148
+00:05:36.357 --> 00:05:38.470 line:-1 position:50% align:center size:80%
+ao lado do registro.
+
+149
+00:05:40.520 --> 00:05:43.875 line:-1 position:50% align:center size:80%
+Por fim, o comando hubsaude fhirpath
+
+150
+00:05:43.885 --> 00:05:45.674 line:-1 position:50% align:center size:80%
+lê o valor de um campo do registro,
+
+151
+00:05:45.684 --> 00:05:47.630 line:-1 position:50% align:center size:80%
+sem abrir o arquivo no editor.
+
+152
+00:05:47.640 --> 00:05:49.978 line:-1 position:50% align:center size:80%
+FHIRPath é a linguagem do FHIR para
+
+153
+00:05:49.988 --> 00:05:52.012 line:-1 position:50% align:center size:80%
+apontar campos, com a mesma forma
+
+154
+00:05:52.022 --> 00:05:54.046 line:-1 position:50% align:center size:80%
+dos caminhos que você viu no Validador.
+
+155
+00:05:54.056 --> 00:05:56.394 line:-1 position:50% align:center size:80%
+A expressão vai entre aspas simples:
+
+156
+00:05:56.404 --> 00:06:01.558 line:-1 position:50% align:center size:80%
+Patient.birthDate devolve 1990-01-01,
+
+157
+00:06:01.568 --> 00:06:02.966 line:-1 position:50% align:center size:80%
+o que confirma que a correção
+
+158
+00:06:02.976 --> 00:06:04.500 line:-1 position:50% align:center size:80%
+foi salva no arquivo.
+
+159
+00:06:05.150 --> 00:06:08.189 line:-1 position:50% align:center size:80%
+Em resumo: valide antes de enviar, porque
+
+160
+00:06:08.199 --> 00:06:10.247 line:-1 position:50% align:center size:80%
+corrigir na sua máquina é mais barato.
+
+161
+00:06:10.257 --> 00:06:12.533 line:-1 position:50% align:center size:80%
+Leia cada problema pela gravidade,
+
+162
+00:06:12.543 --> 00:06:14.439 line:-1 position:50% align:center size:80%
+pelo caminho e pela mensagem.
+
+163
+00:06:14.449 --> 00:06:16.116 line:-1 position:50% align:center size:80%
+E use o código de saída para
+
+164
+00:06:16.126 --> 00:06:18.000 line:-1 position:50% align:center size:80%
+automatizar a conferência.
+
+165
+00:06:18.040 --> 00:06:20.781 line:-1 position:50% align:center size:80%
+No próximo módulo, Autenticar, você vê
+
+166
+00:06:20.791 --> 00:06:23.309 line:-1 position:50% align:center size:80%
+como o seu sistema prova quem é perante
+
+167
+00:06:23.319 --> 00:06:26.940 line:-1 position:50% align:center size:80%
+o HubSaúde e obtém o token de acesso.
