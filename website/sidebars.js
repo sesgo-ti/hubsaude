@@ -18,7 +18,7 @@ export default {
           }))},
         {type: 'category', label: 'Ferramentas',
           link: {type: 'doc', id: 'ferramentas/index'},
-          items: ['ferramentas/cli', 'ferramentas/validador', 'ferramentas/simulador']},
+          items: ['ferramentas/cli', 'ferramentas/validador', 'ferramentas/simulador', 'ferramentas/safira']},
         'sobre',
       ]},
   ],
