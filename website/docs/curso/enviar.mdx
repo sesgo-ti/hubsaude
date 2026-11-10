@@ -441,7 +441,7 @@ No projeto do módulo 4, instale a biblioteca `undici` com `npm install undici`,
 
 ```typescript
 import { readFile } from "node:fs/promises";
-import { Agent } from "undici";
+import { Agent, fetch } from "undici";
 import { createSmartTokenClient } from "hubsaude-cliente-ts";
 
 const SIMULADOR = "https://localhost:8443";
@@ -514,7 +514,7 @@ await conexao.close();
 
 <Baixar arquivo="typescript/enviar.ts" />
 
-O `Agent` da biblioteca `undici` reúne o certificado de cliente, a chave e o certificado do Simulador, e é informado em cada chamada pela opção `dispatcher`.
+O `Agent` da biblioteca `undici` reúne o certificado de cliente, a chave e o certificado do Simulador, e é informado em cada chamada pela opção `dispatcher`. O `fetch` também vem da biblioteca `undici`, e não do Node.js, para que o `Agent` e o `fetch` sejam da mesma versão.
 
 </TabItem>
 

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { Agent } from "undici";
+import { Agent, fetch } from "undici";
 import { createSmartTokenClient } from "hubsaude-cliente-ts";
 
 const SIMULADOR = "https://localhost:8443";
