@@ -1,5 +1,6 @@
 import json
 import ssl
+import sys
 import time
 import uuid
 
@@ -7,6 +8,7 @@ import httpx
 from hubsaude_client.builder import SmartTokenClientBuilder
 
 SIMULADOR = "https://localhost:8443"
+arquivo = sys.argv[1] if len(sys.argv) > 1 else "paciente.json"
 
 client = (
     SmartTokenClientBuilder()
@@ -19,8 +21,8 @@ client = (
 )
 token = client.obtain_token("system/Patient.c system/Patient.rs system/Task.rs")
 
-with open("paciente.json", encoding="utf-8") as arquivo:
-    paciente = json.load(arquivo)
+with open(arquivo, encoding="utf-8") as conteudo:
+    paciente = json.load(conteudo)
 
 conexao = ssl.create_default_context(cafile="simulador-server.pem")
 conexao.load_cert_chain("client-cert.pem", "client-key.pem")
