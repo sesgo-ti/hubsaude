@@ -29,9 +29,14 @@ async function blocosDeCodigo() {
   return blocos;
 }
 
-async function paginas() {
-  const build = `${site}build/`;
-  return (await readdir(build, {recursive: true})).filter((arquivo) => extname(arquivo) === '.html').map((arquivo) => `${build}${arquivo}`);
+let paginasCarregadas;
+function paginas() {
+  paginasCarregadas ??= (async () => {
+    const build = `${site}build/`;
+    const arquivosHtml = (await readdir(build, {recursive: true})).filter((arquivo) => extname(arquivo) === '.html');
+    return Promise.all(arquivosHtml.map(async (arquivo) => ({pagina: `${build}${arquivo}`, $: load(await readFile(`${build}${arquivo}`, 'utf8'))})));
+  })();
+  return paginasCarregadas;
 }
 
 test('course downloads exist', () => {
@@ -47,8 +52,7 @@ test('each course download matches a code block in the docs', async () => {
 
 test('download links point to existing files and are listed on the materials page', async () => {
   const listados = new Set();
-  for (const pagina of await paginas()) {
-    const $ = load(await readFile(pagina, 'utf8'));
+  for (const {pagina, $} of await paginas()) {
     for (const elemento of $('a[data-arquivo]').toArray()) {
       const link = $(elemento);
       const arquivo = link.attr('data-arquivo');
@@ -61,13 +65,12 @@ test('download links point to existing files and are listed on the materials pag
   assert.deepEqual([...listados].sort(), arquivos, 'the materials page must list every course download');
 });
 
-test('module PDFs are valid, linked from their module page and listed on the materials page', async () => {
+test('module PDFs are valid, linked from their own module page and listed on the materials page', async () => {
   const pdfs = (await readdir(`${site}static/curso/pdf`)).filter((arquivo) => extname(arquivo) === '.pdf').sort();
   assert.ok(pdfs.length > 0, 'static/curso/pdf is empty');
   const listados = new Set();
-  const nosModulos = new Set();
-  for (const pagina of await paginas()) {
-    const $ = load(await readFile(pagina, 'utf8'));
+  const nosModulos = new Map();
+  for (const {pagina, $} of await paginas()) {
     for (const elemento of $('a[data-pdf]').toArray()) {
       const link = $(elemento);
       const arquivo = link.attr('data-pdf');
@@ -76,9 +79,13 @@ test('module PDFs are valid, linked from their module page and listed on the mat
       const conteudo = await readFile(`${site}build/curso/pdf/${arquivo}`);
       assert.equal(conteudo.subarray(0, 5).toString(), '%PDF-', `${arquivo} is not a PDF`);
       if (pagina.endsWith(`curso${sep}materiais${sep}index.html`)) listados.add(arquivo);
-      else nosModulos.add(arquivo);
+      else nosModulos.set(arquivo, [...(nosModulos.get(arquivo) ?? []), relative(`${site}build`, pagina).split(sep).join('/')]);
     }
   }
   assert.deepEqual([...listados].sort(), pdfs, 'the materials page must list every module PDF');
-  assert.deepEqual([...nosModulos].sort(), pdfs, 'every module PDF must be linked from its module page');
+  for (const pdf of pdfs) {
+    const modulo = pdf.match(/^curso-hubsaude-modulo-(?:\d+|extra)-(.+)\.pdf$/)?.[1];
+    assert.ok(modulo, `${pdf}: unexpected file name`);
+    assert.deepEqual(nosModulos.get(pdf), [`curso/${modulo}/index.html`], `${pdf} must be linked only from its own module page`);
+  }
 });
