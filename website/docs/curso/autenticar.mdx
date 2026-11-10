@@ -207,7 +207,7 @@ Os dois valores são iguais. É essa igualdade que o HubSaúde confere em cada c
 
 <TabItem value="python" label="Python">
 
-Instale a biblioteca a partir do código-fonte, como descrito na [página do SDK Python](../sdks/autenticacao/python.mdx#instalação), salve o programa como `token.py` e execute-o com `python token.py`.
+Instale a biblioteca a partir do código-fonte, como descrito na [página do SDK Python](../sdks/autenticacao/python.mdx#instalação), salve o programa como `obter_token.py` e execute-o com `python obter_token.py`. Não use o nome `token.py`, que coincide com um módulo do próprio Python e impede a execução.
 
 ```python
 from hubsaude_client.builder import SmartTokenClientBuilder
@@ -227,7 +227,7 @@ print(token[:40])
 client.close()
 ```
 
-<Baixar arquivo="python/token.py" />
+<Baixar arquivo="python/obter_token.py" />
 
 </TabItem>
 
