@@ -1,19 +1,8 @@
-.reserva,
 .video {
   margin: 1.5rem 0 2rem;
   border: 1px solid #dce9e0;
   border-radius: var(--ifm-global-radius);
   background: #ffffff;
-}
-
-.reserva {
-  padding: 1.1rem 1.25rem;
-  border-style: dashed;
-  border-color: #9cc5ae;
-  background: #f5faf7;
-}
-
-.video {
   overflow: hidden;
 }
 
@@ -35,14 +24,6 @@
   border-top: 1px solid #eef4f0;
 }
 
-.situacao {
-  margin: 0 0 0.25rem;
-  color: var(--ifm-color-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
 
 .titulo {
   margin: 0;
