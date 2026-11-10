@@ -59,16 +59,27 @@ public class EnviarPaciente {
 
                 JsonNode task;
                 String status;
-                do {
+                for (int tentativa = 1; ; tentativa++) {
                     Thread.sleep(2000);
                     var consulta = HttpRequest.newBuilder(URI.create(enderecoTask))
                             .header("Authorization", "Bearer " + token)
                             .header("Accept", "application/fhir+json")
                             .GET()
                             .build();
-                    task = mapper.readTree(http.send(consulta, HttpResponse.BodyHandlers.ofString()).body());
+                    var respostaTask = http.send(consulta, HttpResponse.BodyHandlers.ofString());
+                    if (respostaTask.statusCode() != 200) {
+                        throw new IllegalStateException(
+                                "Consulta da Task recusada: " + respostaTask.statusCode() + " " + respostaTask.body());
+                    }
+                    task = mapper.readTree(respostaTask.body());
                     status = task.path("status").asString();
-                } while (status.equals("accepted") || status.equals("in-progress"));
+                    if (!status.equals("accepted") && !status.equals("in-progress")) {
+                        break;
+                    }
+                    if (tentativa == 30) {
+                        throw new IllegalStateException("A Task não foi concluída em 1 minuto");
+                    }
+                }
 
                 if (status.equals("completed")) {
                     System.out.println("Registro aceito: "

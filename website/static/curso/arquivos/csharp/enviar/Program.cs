@@ -51,15 +51,23 @@ Console.WriteLine($"Comprovante: {enderecoTask}");
 
 JsonElement task;
 string status;
-do
+for (int tentativa = 1; ; tentativa++)
 {
     await Task.Delay(2000);
     using var consulta = new HttpRequestMessage(HttpMethod.Get, enderecoTask);
     consulta.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    consulta.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/fhir+json"));
     using var respostaTask = await http.SendAsync(consulta);
-    task = JsonDocument.Parse(await respostaTask.Content.ReadAsStringAsync()).RootElement;
+    string corpo = await respostaTask.Content.ReadAsStringAsync();
+    if ((int)respostaTask.StatusCode != 200)
+    {
+        throw new InvalidOperationException($"Consulta da Task recusada: {(int)respostaTask.StatusCode} {corpo}");
+    }
+    task = JsonDocument.Parse(corpo).RootElement;
     status = task.GetProperty("status").GetString()!;
-} while (status is "accepted" or "in-progress");
+    if (status is not ("accepted" or "in-progress")) break;
+    if (tentativa == 30) throw new TimeoutException("A Task não foi concluída em 1 minuto");
+}
 
 if (status == "completed")
 {

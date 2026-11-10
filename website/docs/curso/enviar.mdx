@@ -239,7 +239,7 @@ Observe que o Simulador apontou apenas o problema de `gender`, enquanto o Valida
 
 <Etapa id="curso-m5-programa" marcador="6" titulo="Enviar a partir de um programa" resumo="Combine a obtenção do token e o envio em um único programa." ambiente="testes">
 
-**O que você faz:** amplie o programa do módulo 4 para enviar o registro e acompanhar o resultado. As chamadas HTTP de envio são feitas pelo seu próprio código; a biblioteca oficial cuida apenas do token. Em todas as linguagens, o cliente HTTP precisa apresentar o certificado de cliente e confiar no certificado do Simulador.
+**O que você faz:** amplie o programa do módulo 4 para enviar o registro e acompanhar o resultado. As chamadas HTTP de envio são feitas pelo seu próprio código; a biblioteca oficial cuida apenas do token. Em todas as linguagens, o cliente HTTP precisa apresentar o certificado de cliente e confiar no certificado do Simulador. Os programas consultam a `Task` a cada 2 segundos, por até 1 minuto, e são interrompidos se a consulta for recusada.
 
 <Tabs groupId="curso-enviar-linguagem" defaultValue="python">
 
@@ -292,11 +292,19 @@ with httpx.Client(verify=conexao) as http:
     endereco_task = resposta.headers["Content-Location"]
     print("Comprovante:", endereco_task)
 
-    while True:
+    for tentativa in range(30):
         time.sleep(2)
-        task = http.get(endereco_task, headers={"Authorization": f"Bearer {token}"}).json()
+        consulta = http.get(
+            endereco_task,
+            headers={"Authorization": f"Bearer {token}", "Accept": "application/fhir+json"},
+        )
+        if consulta.status_code != 200:
+            raise RuntimeError(f"Consulta da Task recusada: {consulta.status_code} {consulta.text}")
+        task = consulta.json()
         if task["status"] not in ("accepted", "in-progress"):
             break
+    else:
+        raise RuntimeError("A Task não foi concluída em 1 minuto")
 
     if task["status"] == "completed":
         print("Registro aceito:", task["output"][0]["valueReference"]["reference"])
@@ -381,16 +389,27 @@ public class EnviarPaciente {
 
                 JsonNode task;
                 String status;
-                do {
+                for (int tentativa = 1; ; tentativa++) {
                     Thread.sleep(2000);
                     var consulta = HttpRequest.newBuilder(URI.create(enderecoTask))
                             .header("Authorization", "Bearer " + token)
                             .header("Accept", "application/fhir+json")
                             .GET()
                             .build();
-                    task = mapper.readTree(http.send(consulta, HttpResponse.BodyHandlers.ofString()).body());
+                    var respostaTask = http.send(consulta, HttpResponse.BodyHandlers.ofString());
+                    if (respostaTask.statusCode() != 200) {
+                        throw new IllegalStateException(
+                                "Consulta da Task recusada: " + respostaTask.statusCode() + " " + respostaTask.body());
+                    }
+                    task = mapper.readTree(respostaTask.body());
                     status = task.path("status").asString();
-                } while (status.equals("accepted") || status.equals("in-progress"));
+                    if (!status.equals("accepted") && !status.equals("in-progress")) {
+                        break;
+                    }
+                    if (tentativa == 30) {
+                        throw new IllegalStateException("A Task não foi concluída em 1 minuto");
+                    }
+                }
 
                 if (status.equals("completed")) {
                     System.out.println("Registro aceito: "
@@ -466,14 +485,19 @@ const enderecoTask = resposta.headers.get("Content-Location")!;
 console.log("Comprovante:", enderecoTask);
 
 let task: any;
-do {
+for (let tentativa = 1; ; tentativa++) {
   await new Promise((r) => setTimeout(r, 2000));
   const respostaTask = await fetch(enderecoTask, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/fhir+json" },
     dispatcher: conexao,
   });
+  if (respostaTask.status !== 200) {
+    throw new Error(`Consulta da Task recusada: ${respostaTask.status} ${await respostaTask.text()}`);
+  }
   task = await respostaTask.json();
-} while (task.status === "accepted" || task.status === "in-progress");
+  if (task.status !== "accepted" && task.status !== "in-progress") break;
+  if (tentativa === 30) throw new Error("A Task não foi concluída em 1 minuto");
+}
 
 if (task.status === "completed") {
   console.log("Registro aceito:", task.output[0].valueReference.reference);
@@ -552,15 +576,23 @@ Console.WriteLine($"Comprovante: {enderecoTask}");
 
 JsonElement task;
 string status;
-do
+for (int tentativa = 1; ; tentativa++)
 {
     await Task.Delay(2000);
     using var consulta = new HttpRequestMessage(HttpMethod.Get, enderecoTask);
     consulta.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    consulta.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/fhir+json"));
     using var respostaTask = await http.SendAsync(consulta);
-    task = JsonDocument.Parse(await respostaTask.Content.ReadAsStringAsync()).RootElement;
+    string corpo = await respostaTask.Content.ReadAsStringAsync();
+    if ((int)respostaTask.StatusCode != 200)
+    {
+        throw new InvalidOperationException($"Consulta da Task recusada: {(int)respostaTask.StatusCode} {corpo}");
+    }
+    task = JsonDocument.Parse(corpo).RootElement;
     status = task.GetProperty("status").GetString()!;
-} while (status is "accepted" or "in-progress");
+    if (status is not ("accepted" or "in-progress")) break;
+    if (tentativa == 30) throw new TimeoutException("A Task não foi concluída em 1 minuto");
+}
 
 if (status == "completed")
 {

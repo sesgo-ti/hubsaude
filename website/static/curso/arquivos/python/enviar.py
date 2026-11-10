@@ -42,11 +42,19 @@ with httpx.Client(verify=conexao) as http:
     endereco_task = resposta.headers["Content-Location"]
     print("Comprovante:", endereco_task)
 
-    while True:
+    for tentativa in range(30):
         time.sleep(2)
-        task = http.get(endereco_task, headers={"Authorization": f"Bearer {token}"}).json()
+        consulta = http.get(
+            endereco_task,
+            headers={"Authorization": f"Bearer {token}", "Accept": "application/fhir+json"},
+        )
+        if consulta.status_code != 200:
+            raise RuntimeError(f"Consulta da Task recusada: {consulta.status_code} {consulta.text}")
+        task = consulta.json()
         if task["status"] not in ("accepted", "in-progress"):
             break
+    else:
+        raise RuntimeError("A Task não foi concluída em 1 minuto")
 
     if task["status"] == "completed":
         print("Registro aceito:", task["output"][0]["valueReference"]["reference"])

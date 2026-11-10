@@ -43,14 +43,19 @@ const enderecoTask = resposta.headers.get("Content-Location")!;
 console.log("Comprovante:", enderecoTask);
 
 let task: any;
-do {
+for (let tentativa = 1; ; tentativa++) {
   await new Promise((r) => setTimeout(r, 2000));
   const respostaTask = await fetch(enderecoTask, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/fhir+json" },
     dispatcher: conexao,
   });
+  if (respostaTask.status !== 200) {
+    throw new Error(`Consulta da Task recusada: ${respostaTask.status} ${await respostaTask.text()}`);
+  }
   task = await respostaTask.json();
-} while (task.status === "accepted" || task.status === "in-progress");
+  if (task.status !== "accepted" && task.status !== "in-progress") break;
+  if (tentativa === 30) throw new Error("A Task não foi concluída em 1 minuto");
+}
 
 if (task.status === "completed") {
   console.log("Registro aceito:", task.output[0].valueReference.reference);
