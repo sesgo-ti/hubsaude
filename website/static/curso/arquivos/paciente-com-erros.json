@@ -1,0 +1,6 @@
+{
+  "resourceType": "Patient",
+  "name": [{"use": "official", "text": "Maria da Silva"}],
+  "gender": "F",
+  "birthDate": "01/01/1990"
+}

@@ -1,0 +1,538 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:03.541 line:-1 position:50% align:center size:80%
+No vídeo anterior,
+
+2
+00:00:03.551 --> 00:00:05.854 line:-1 position:50% align:center size:80%
+o seu sistema obteve o token de acesso.
+
+3
+00:00:05.864 --> 00:00:07.661 line:-1 position:50% align:center size:80%
+Agora, ele usa esse token para
+
+4
+00:00:07.671 --> 00:00:09.900 line:-1 position:50% align:center size:80%
+enviar um registro ao HubSaúde.
+
+5
+00:00:10.450 --> 00:00:12.040 line:-1 position:50% align:center size:80%
+Neste vídeo, você entende por
+
+6
+00:00:12.050 --> 00:00:14.076 line:-1 position:50% align:center size:80%
+que o envio acontece em duas etapas,
+
+7
+00:00:14.086 --> 00:00:16.184 line:-1 position:50% align:center size:80%
+para que serve cada cabeçalho e como
+
+8
+00:00:16.194 --> 00:00:19.380 line:-1 position:50% align:center size:80%
+repetir um envio sem duplicar o registro.
+
+9
+00:00:19.930 --> 00:00:21.273 line:-1 position:50% align:center size:80%
+Em muitas APIs,
+
+10
+00:00:21.283 --> 00:00:23.904 line:-1 position:50% align:center size:80%
+a resposta ao envio já traz o resultado.
+
+11
+00:00:23.914 --> 00:00:24.956 line:-1 position:50% align:center size:80%
+No HubSaúde,
+
+12
+00:00:24.966 --> 00:00:26.985 line:-1 position:50% align:center size:80%
+o recebimento é confirmado na hora,
+
+13
+00:00:26.995 --> 00:00:29.600 line:-1 position:50% align:center size:80%
+e o conteúdo é processado depois.
+
+14
+00:00:29.850 --> 00:00:32.106 line:-1 position:50% align:center size:80%
+Por isso, o envio tem duas etapas.
+
+15
+00:00:32.116 --> 00:00:33.994 line:-1 position:50% align:center size:80%
+Na primeira, o seu sistema envia
+
+16
+00:00:34.004 --> 00:00:36.033 line:-1 position:50% align:center size:80%
+o registro e recebe um comprovante.
+
+17
+00:00:36.043 --> 00:00:38.148 line:-1 position:50% align:center size:80%
+Na segunda, consulta o comprovante
+
+18
+00:00:38.158 --> 00:00:40.170 line:-1 position:50% align:center size:80%
+até o processamento terminar.
+
+19
+00:00:40.200 --> 00:00:42.292 line:-1 position:50% align:center size:80%
+Assim, o seu sistema não mantém a conexão
+
+20
+00:00:42.302 --> 00:00:44.900 line:-1 position:50% align:center size:80%
+aberta enquanto o conteúdo é conferido.
+
+21
+00:00:45.450 --> 00:00:47.343 line:-1 position:50% align:center size:80%
+Na primeira etapa, o seu sistema faz
+
+22
+00:00:47.353 --> 00:00:50.565 line:-1 position:50% align:center size:80%
+um POST em /fhir/Patient, com o registro
+
+23
+00:00:50.575 --> 00:00:53.560 line:-1 position:50% align:center size:80%
+no corpo e cinco cabeçalhos obrigatórios.
+
+24
+00:00:53.920 --> 00:00:55.570 line:-1 position:50% align:center size:80%
+Authorization leva a palavra
+
+25
+00:00:55.580 --> 00:00:57.467 line:-1 position:50% align:center size:80%
+Bearer e o token de acesso.
+
+26
+00:00:57.477 --> 00:00:59.731 line:-1 position:50% align:center size:80%
+Como o token é vinculado ao certificado,
+
+27
+00:00:59.741 --> 00:01:01.241 line:-1 position:50% align:center size:80%
+a chamada também apresenta
+
+28
+00:01:01.251 --> 00:01:03.110 line:-1 position:50% align:center size:80%
+o certificado de cliente.
+
+29
+00:01:03.430 --> 00:01:05.709 line:-1 position:50% align:center size:80%
+Content-Type informa que o corpo
+
+30
+00:01:05.719 --> 00:01:07.849 line:-1 position:50% align:center size:80%
+é um registro FHIR em JSON,
+
+31
+00:01:07.859 --> 00:01:11.310 line:-1 position:50% align:center size:80%
+e Accept pede a resposta no mesmo formato.
+
+32
+00:01:11.880 --> 00:01:14.697 line:-1 position:50% align:center size:80%
+Prefer: respond-async pede o processamento
+
+33
+00:01:14.707 --> 00:01:16.870 line:-1 position:50% align:center size:80%
+assíncrono, em duas etapas.
+
+34
+00:01:17.400 --> 00:01:20.250 line:-1 position:50% align:center size:80%
+Idempotency-Key é um identificador único
+
+35
+00:01:20.260 --> 00:01:22.609 line:-1 position:50% align:center size:80%
+do envio, gerado pelo seu sistema.
+
+36
+00:01:22.619 --> 00:01:25.400 line:-1 position:50% align:center size:80%
+Mais adiante, você vê para que ele serve.
+
+37
+00:01:26.000 --> 00:01:27.456 line:-1 position:50% align:center size:80%
+A falta de qualquer um desses
+
+38
+00:01:27.466 --> 00:01:29.969 line:-1 position:50% align:center size:80%
+cabeçalhos resulta na resposta 400,
+
+39
+00:01:29.979 --> 00:01:31.295 line:-1 position:50% align:center size:80%
+com um OperationOutcome
+
+40
+00:01:31.305 --> 00:01:33.330 line:-1 position:50% align:center size:80%
+que aponta o problema.
+
+41
+00:01:33.930 --> 00:01:35.570 line:-1 position:50% align:center size:80%
+Quando o envio é recebido,
+
+42
+00:01:35.580 --> 00:01:39.084 line:-1 position:50% align:center size:80%
+a resposta é 202, sem corpo: o equivalente
+
+43
+00:01:39.094 --> 00:01:42.170 line:-1 position:50% align:center size:80%
+a dizer recebi e vou processar.
+
+44
+00:01:42.770 --> 00:01:44.757 line:-1 position:50% align:center size:80%
+O cabeçalho Content-Location
+
+45
+00:01:44.767 --> 00:01:46.384 line:-1 position:50% align:center size:80%
+traz o endereço de uma Task,
+
+46
+00:01:46.394 --> 00:01:48.011 line:-1 position:50% align:center size:80%
+um recurso FHIR próprio para
+
+47
+00:01:48.021 --> 00:01:50.590 line:-1 position:50% align:center size:80%
+acompanhar pedidos em andamento.
+
+48
+00:01:51.140 --> 00:01:53.725 line:-1 position:50% align:center size:80%
+Já o cabeçalho Retry-After sugere,
+
+49
+00:01:53.735 --> 00:01:54.467 line:-1 position:50% align:center size:80%
+em segundos,
+
+50
+00:01:54.477 --> 00:01:57.200 line:-1 position:50% align:center size:80%
+quanto tempo esperar antes da consulta.
+
+51
+00:01:57.800 --> 00:01:59.475 line:-1 position:50% align:center size:80%
+Na segunda etapa, o seu sistema
+
+52
+00:01:59.485 --> 00:02:01.527 line:-1 position:50% align:center size:80%
+consulta a Task nesse endereço.
+
+53
+00:02:01.537 --> 00:02:03.286 line:-1 position:50% align:center size:80%
+Enquanto o processamento não termina,
+
+54
+00:02:03.296 --> 00:02:05.631 line:-1 position:50% align:center size:80%
+o status é accepted ou in-progress,
+
+55
+00:02:05.641 --> 00:02:07.750 line:-1 position:50% align:center size:80%
+e a consulta se repete.
+
+56
+00:02:08.350 --> 00:02:10.102 line:-1 position:50% align:center size:80%
+O status completed indica
+
+57
+00:02:10.112 --> 00:02:11.570 line:-1 position:50% align:center size:80%
+que o registro foi aceito.
+
+58
+00:02:11.580 --> 00:02:14.866 line:-1 position:50% align:center size:80%
+O campo output aponta o registro criado.
+
+59
+00:02:15.380 --> 00:02:18.300 line:-1 position:50% align:center size:80%
+O status rejected indica recusa.
+
+60
+00:02:18.310 --> 00:02:20.629 line:-1 position:50% align:center size:80%
+O motivo fica dentro da própria Task:
+
+61
+00:02:20.639 --> 00:02:22.808 line:-1 position:50% align:center size:80%
+o campo statusReason traz um resumo,
+
+62
+00:02:22.818 --> 00:02:25.287 line:-1 position:50% align:center size:80%
+e o OperationOutcome, em contained,
+
+63
+00:02:25.297 --> 00:02:27.300 line:-1 position:50% align:center size:80%
+descreve cada problema.
+
+64
+00:02:27.850 --> 00:02:30.050 line:-1 position:50% align:center size:80%
+Agora, um exemplo do porquê.
+
+65
+00:02:30.060 --> 00:02:31.956 line:-1 position:50% align:center size:80%
+Imagine que a conexão caia logo
+
+66
+00:02:31.966 --> 00:02:33.785 line:-1 position:50% align:center size:80%
+depois do envio, e o seu sistema
+
+67
+00:02:33.795 --> 00:02:36.040 line:-1 position:50% align:center size:80%
+não saiba se o registro chegou.
+
+68
+00:02:36.050 --> 00:02:37.914 line:-1 position:50% align:center size:80%
+Com uma chave nova, o HubSaúde
+
+69
+00:02:37.924 --> 00:02:39.788 line:-1 position:50% align:center size:80%
+trataria o envio como outro registro,
+
+70
+00:02:39.798 --> 00:02:42.670 line:-1 position:50% align:center size:80%
+e a informação poderia ficar duplicada.
+
+71
+00:02:42.740 --> 00:02:44.919 line:-1 position:50% align:center size:80%
+Por isso, o sistema repete o envio
+
+72
+00:02:44.929 --> 00:02:46.873 line:-1 position:50% align:center size:80%
+com a mesma Idempotency-Key,
+
+73
+00:02:46.883 --> 00:02:49.890 line:-1 position:50% align:center size:80%
+e o HubSaúde reconhece a repetição.
+
+74
+00:02:50.030 --> 00:02:51.816 line:-1 position:50% align:center size:80%
+Se o processamento já terminou,
+
+75
+00:02:51.826 --> 00:02:54.136 line:-1 position:50% align:center size:80%
+a resposta é novamente 202,
+
+76
+00:02:54.146 --> 00:02:55.633 line:-1 position:50% align:center size:80%
+com o mesmo endereço de Task
+
+77
+00:02:55.643 --> 00:02:59.029 line:-1 position:50% align:center size:80%
+e o cabeçalho Idempotency-Replayed: true.
+
+78
+00:02:59.039 --> 00:03:01.560 line:-1 position:50% align:center size:80%
+Nenhum registro novo é criado.
+
+79
+00:03:01.710 --> 00:03:03.974 line:-1 position:50% align:center size:80%
+Se a repetição chega enquanto o original
+
+80
+00:03:03.984 --> 00:03:06.012 line:-1 position:50% align:center size:80%
+ainda está em processamento, a resposta
+
+81
+00:03:06.022 --> 00:03:09.900 line:-1 position:50% align:center size:80%
+é 409: aguarde e tente novamente.
+
+82
+00:03:10.030 --> 00:03:11.937 line:-1 position:50% align:center size:80%
+A chave deve ser gerada uma vez
+
+83
+00:03:11.947 --> 00:03:13.144 line:-1 position:50% align:center size:80%
+por registro e guardada
+
+84
+00:03:13.154 --> 00:03:15.350 line:-1 position:50% align:center size:80%
+até a confirmação do resultado.
+
+85
+00:03:15.900 --> 00:03:17.781 line:-1 position:50% align:center size:80%
+Agora, veja um envio no terminal,
+
+86
+00:03:17.791 --> 00:03:19.599 line:-1 position:50% align:center size:80%
+com o Simulador em funcionamento.
+
+87
+00:03:19.609 --> 00:03:21.126 line:-1 position:50% align:center size:80%
+Se quiser, pause o vídeo
+
+88
+00:03:21.136 --> 00:03:23.440 line:-1 position:50% align:center size:80%
+e execute cada comando junto.
+
+89
+00:03:23.450 --> 00:03:25.281 line:-1 position:50% align:center size:80%
+Antes do comando principal,
+
+90
+00:03:25.291 --> 00:03:27.763 line:-1 position:50% align:center size:80%
+o terminal prepara algumas variáveis:
+
+91
+00:03:27.773 --> 00:03:29.525 line:-1 position:50% align:center size:80%
+nomes que guardam valores,
+
+92
+00:03:29.535 --> 00:03:30.966 line:-1 position:50% align:center size:80%
+para que o comando não precise
+
+93
+00:03:30.976 --> 00:03:32.807 line:-1 position:50% align:center size:80%
+repetir textos longos.
+
+94
+00:03:32.817 --> 00:03:35.224 line:-1 position:50% align:center size:80%
+A variável TOKEN, criada no módulo 4,
+
+95
+00:03:35.234 --> 00:03:37.170 line:-1 position:50% align:center size:80%
+guarda o token de acesso.
+
+96
+00:03:50.150 --> 00:03:52.602 line:-1 position:50% align:center size:80%
+Veja as outras duas: a variável
+
+97
+00:03:52.612 --> 00:03:54.680 line:-1 position:50% align:center size:80%
+CERTIFICADOS guarda as opções
+
+98
+00:03:54.690 --> 00:03:57.710 line:-1 position:50% align:center size:80%
+de certificado, e a variável CHAVE guarda
+
+99
+00:03:57.720 --> 00:04:01.840 line:-1 position:50% align:center size:80%
+a Idempotency-Key, gerada com o openssl.
+
+100
+00:04:02.110 --> 00:04:03.756 line:-1 position:50% align:center size:80%
+Com as variáveis prontas,
+
+101
+00:04:03.766 --> 00:04:06.436 line:-1 position:50% align:center size:80%
+vem o comando principal: o curl envia
+
+102
+00:04:06.446 --> 00:04:09.353 line:-1 position:50% align:center size:80%
+o paciente.json com os cinco cabeçalhos,
+
+103
+00:04:09.363 --> 00:04:11.876 line:-1 position:50% align:center size:80%
+usando as variáveis no lugar dos valores,
+
+104
+00:04:11.886 --> 00:04:13.216 line:-1 position:50% align:center size:80%
+e grava os cabeçalhos
+
+105
+00:04:13.226 --> 00:04:16.730 line:-1 position:50% align:center size:80%
+da resposta em cabecalhos.txt.
+
+106
+00:04:17.020 --> 00:04:19.072 line:-1 position:50% align:center size:80%
+O código exibido é 202:
+
+107
+00:04:19.082 --> 00:04:20.670 line:-1 position:50% align:center size:80%
+o envio foi recebido.
+
+108
+00:04:20.820 --> 00:04:22.384 line:-1 position:50% align:center size:80%
+A linha seguinte cria mais
+
+109
+00:04:22.394 --> 00:04:25.007 line:-1 position:50% align:center size:80%
+uma variável de apoio: TASK guarda
+
+110
+00:04:25.017 --> 00:04:26.881 line:-1 position:50% align:center size:80%
+o endereço do Content-Location,
+
+111
+00:04:26.891 --> 00:04:28.590 line:-1 position:50% align:center size:80%
+para usar na consulta.
+
+112
+00:04:28.810 --> 00:04:31.228 line:-1 position:50% align:center size:80%
+Os cabeçalhos mostram o Content-Location,
+
+113
+00:04:31.238 --> 00:04:32.478 line:-1 position:50% align:center size:80%
+com o endereço da Task,
+
+114
+00:04:32.488 --> 00:04:35.560 line:-1 position:50% align:center size:80%
+e o Retry-After, de 30 segundos.
+
+115
+00:04:35.710 --> 00:04:38.020 line:-1 position:50% align:center size:80%
+Agora, o sistema consulta a Task,
+
+116
+00:04:38.030 --> 00:04:41.500 line:-1 position:50% align:center size:80%
+usando a variável TASK. O jq é um programa
+
+117
+00:04:41.510 --> 00:04:44.439 line:-1 position:50% align:center size:80%
+que filtra a resposta em JSON: aqui, ele
+
+118
+00:04:44.449 --> 00:04:47.960 line:-1 position:50% align:center size:80%
+exibe apenas os campos status e output.
+
+119
+00:04:47.970 --> 00:04:49.152 line:-1 position:50% align:center size:80%
+Logo depois do envio,
+
+120
+00:04:49.162 --> 00:04:50.976 line:-1 position:50% align:center size:80%
+o status ainda é in-progress,
+
+121
+00:04:50.986 --> 00:04:53.160 line:-1 position:50% align:center size:80%
+e o output está vazio.
+
+122
+00:04:53.620 --> 00:04:55.128 line:-1 position:50% align:center size:80%
+Alguns segundos depois,
+
+123
+00:04:55.138 --> 00:04:57.444 line:-1 position:50% align:center size:80%
+a mesma consulta mostra completed,
+
+124
+00:04:57.454 --> 00:05:00.280 line:-1 position:50% align:center size:80%
+e o output aponta o paciente criado.
+
+125
+00:05:00.530 --> 00:05:03.899 line:-1 position:50% align:center size:80%
+Em resumo: o 202 confirma apenas
+
+126
+00:05:03.909 --> 00:05:07.048 line:-1 position:50% align:center size:80%
+o recebimento, e o resultado está na Task.
+
+127
+00:05:07.058 --> 00:05:09.582 line:-1 position:50% align:center size:80%
+Os cinco cabeçalhos são obrigatórios.
+
+128
+00:05:09.592 --> 00:05:11.886 line:-1 position:50% align:center size:80%
+E a mesma Idempotency-Key
+
+129
+00:05:11.896 --> 00:05:14.550 line:-1 position:50% align:center size:80%
+evita registros duplicados.
+
+130
+00:05:15.150 --> 00:05:16.311 line:-1 position:50% align:center size:80%
+No próximo vídeo,
+
+131
+00:05:16.321 --> 00:05:18.434 line:-1 position:50% align:center size:80%
+Envio e acompanhamento pelo terminal,
+
+132
+00:05:18.444 --> 00:05:20.191 line:-1 position:50% align:center size:80%
+você faz o fluxo completo,
+
+133
+00:05:20.201 --> 00:05:22.020 line:-1 position:50% align:center size:80%
+repete o envio com a mesma chave
+
+134
+00:05:22.030 --> 00:05:24.430 line:-1 position:50% align:center size:80%
+e vê um registro recusado.

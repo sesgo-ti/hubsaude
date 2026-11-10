@@ -1,0 +1,311 @@
+---
+id: ambiente
+title: "Módulo 2: Preparar o ambiente"
+slug: /curso/ambiente/
+---
+
+import Details from '@theme/Details';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Video} from '@site/src/components/Video';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+import {BaixarPdf} from '@site/src/components/Baixar';
+
+# Módulo 2: Preparar o ambiente
+
+Neste módulo, você instala as ferramentas de teste, inicia o Simulador e cadastra nele o seu sistema. Ao final, o seu computador terá um ambiente completo para os exercícios dos próximos módulos.
+
+<BaixarPdf arquivo="curso-hubsaude-modulo-2-ambiente.pdf" />
+
+## Objetivos
+
+Ao final deste módulo, você será capaz de:
+
+- instalar o HubSaúde CLI e conferir as versões das ferramentas;
+- iniciar, consultar e encerrar o Simulador;
+- gerar um certificado de teste e explicar a diferença entre a parte pública e a chave privada;
+- cadastrar o seu sistema no Simulador com as permissões necessárias.
+
+## Conteúdo
+
+:::info Em poucas palavras
+
+- O **HubSaúde CLI** instala e controla as ferramentas de teste: o **Validador** e o **Simulador**.
+- O Simulador é uma **cópia do HubSaúde no seu computador**, com as mesmas exigências de segurança do ambiente oficial.
+- O seu sistema se identifica com um **certificado de teste**: a parte pública vai para o cadastro, a chave privada fica com você.
+- O cadastro no Simulador faz o papel do **credenciamento**: define o `client_id` e as permissões do sistema.
+
+:::
+
+### As ferramentas do ambiente de testes
+
+O **HubSaúde CLI** é o programa que instala e controla as demais ferramentas. Ele é usado por meio de comandos digitados no terminal e não exige permissão de administrador.
+
+<Cartoes>
+  <Cartao titulo="HubSaúde CLI">O programa de linha de comando que instala, atualiza e controla as ferramentas. Tudo começa por ele.</Cartao>
+  <Cartao titulo="Validador">Confere se um registro segue as regras dos Guias de Implementação e aponta o que precisa ser corrigido, antes de qualquer envio.</Cartao>
+  <Cartao titulo="Simulador">Uma cópia do HubSaúde que funciona no seu computador, com as mesmas exigências de segurança do ambiente oficial.</Cartao>
+</Cartoes>
+
+### O certificado de teste
+
+Um certificado digital tem duas partes, com papéis diferentes:
+
+<Cartoes colunas={2}>
+  <Cartao titulo="Parte pública">O certificado propriamente dito. Pode ser compartilhada e é a parte enviada no cadastro. Quem recebe um pedido assinado confere a assinatura com ela.</Cartao>
+  <Cartao titulo="Chave privada">Fica apenas com o dono do certificado e é usada para assinar os pedidos. **Nunca é enviada a ninguém.**</Cartao>
+</Cartoes>
+
+No ambiente oficial, a instituição usa um certificado ICP-Brasil. No Simulador, você cria um certificado de teste, sem valor fora do seu computador.
+
+:::warning Use apenas o certificado de teste
+
+Nunca use o certificado ICP-Brasil da instituição nos exercícios do curso.
+
+:::
+
+### Permissões
+
+Cada sistema cadastrado tem uma lista de permissões, chamadas de **escopos**, que indicam o que ele pode fazer. Os exercícios do curso usam três:
+
+| Escopo | Permite |
+| --- | --- |
+| `system/Patient.c` | Criar registros de paciente |
+| `system/Patient.rs` | Ler e pesquisar registros de paciente |
+| `system/Task.rs` | Consultar o andamento de um envio |
+
+No ambiente oficial, as permissões de cada instituição são definidas no credenciamento.
+
+<Video titulo="Instalação e primeiro uso do HubSaúde CLI" formato="misto" duracao="4 min 54 s" src="/curso/videos/cli-primeiro-uso.mp4" poster="/curso/videos/cli-primeiro-uso.jpg" legenda="/curso/videos/cli-primeiro-uso.vtt">
+
+O que é o HubSaúde CLI, o papel do Validador e do Simulador e por que testar no computador antes do ambiente oficial. Em seguida, a instalação, a conferência das versões e o início do Simulador, com os mesmos comandos da prática abaixo.
+
+</Video>
+
+<Video titulo="Conhecendo a interface do Simulador" formato="tela-terminal" duracao="5 min 49 s" src="/curso/videos/simulador-interface.mp4" poster="/curso/videos/simulador-interface.jpg" legenda="/curso/videos/simulador-interface.vtt">
+
+Como o cadastro no Simulador corresponde ao que o Ganesha faz no ambiente oficial, o que são escopos e por que o curso usa três. Em seguida, um percurso pela página do Simulador e os comandos que geram o certificado e registram o sistema.
+
+</Video>
+
+## Prática
+
+Os comandos desta prática e dos próximos módulos usam a sintaxe do terminal bash. No Windows, instale o HubSaúde CLI pelo PowerShell e execute os demais comandos no **Git Bash**, instalado com o Git for Windows, que já inclui o OpenSSL e o curl.
+
+<Trilha>
+
+<Etapa id="curso-m2-apoio" marcador="1" titulo="Instalar os programas de apoio" resumo="Garanta que o OpenSSL, o curl e o jq estejam disponíveis no terminal." ambiente="testes">
+
+**O que você faz:** instale os programas usados nos exercícios. O OpenSSL gera o certificado de teste, o curl faz requisições pelo terminal e o jq lê respostas em JSON.
+
+<Tabs groupId="curso-ambiente-apoio-so" defaultValue="linux">
+
+<TabItem value="linux" label="Linux">
+
+Em distribuições derivadas do Debian, como o Ubuntu:
+
+```bash
+sudo apt update && sudo apt install openssl curl jq
+```
+
+Para outras distribuições, veja [Instalar o OpenSSL](../certificados.mdx#instalar-o-openssl) e use o mesmo gerenciador de pacotes para o curl e o jq.
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+
+No PowerShell, instale o Git for Windows, que inclui o Git Bash, o OpenSSL e o curl, e o jq:
+
+```powershell
+winget install --id Git.Git -e --source winget
+winget install --id jqlang.jq -e --source winget
+```
+
+Feche e abra novamente o Git Bash depois da instalação.
+
+</TabItem>
+
+<TabItem value="macos" label="macOS">
+
+Com o [Homebrew](https://brew.sh) instalado:
+
+```bash
+brew install openssl jq
+```
+
+O curl já acompanha o macOS.
+
+</TabItem>
+
+</Tabs>
+
+**Para conferir:** os comandos abaixo devem exibir as versões dos três programas.
+
+```bash
+openssl version
+curl --version
+jq --version
+```
+
+</Etapa>
+
+<Etapa id="curso-m2-cli" marcador="2" titulo="Instalar o HubSaúde CLI" resumo="Instale o programa que controla o Validador e o Simulador." ambiente="testes">
+
+**O que você faz:** execute o comando de instalação do seu sistema operacional.
+
+<Tabs groupId="curso-ambiente-cli-so" defaultValue="unix">
+
+<TabItem value="unix" label="macOS e Linux">
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.sh | bash
+```
+
+</TabItem>
+
+<TabItem value="win" label="Windows">
+
+No PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/sesgo-ti/hubsaude/main/install.ps1 | iex
+```
+
+</TabItem>
+
+</Tabs>
+
+O instalador confere a integridade do programa antes de instalá-lo. Se ele avisar que a pasta de instalação não está no `PATH`, siga a orientação exibida e abra um novo terminal.
+
+**Para conferir:** o comando abaixo exibe a versão do programa e das ferramentas.
+
+```bash
+hubsaude version
+```
+
+Na primeira vez, as ferramentas aparecem como "não provisionado". Elas são baixadas automaticamente no primeiro uso.
+
+- Consulte: [HubSaúde CLI](../ferramentas/cli.mdx)
+
+</Etapa>
+
+<Etapa id="curso-m2-simulador" marcador="3" titulo="Iniciar o Simulador" resumo="Coloque o Simulador em funcionamento e abra a sua página no navegador." ambiente="testes">
+
+**O que você faz:** inicie o Simulador. Na primeira vez, o programa baixa os arquivos necessários, o que pode levar alguns minutos.
+
+```bash
+hubsaude sim start
+```
+
+Ao final, o terminal exibe a mensagem `simulador pronto em https://127.0.0.1:8443`. Para consultar a situação a qualquer momento, use `hubsaude sim status`.
+
+Abra [`https://localhost:8443`](https://localhost:8443) no navegador. Na primeira visita, o navegador alerta que o certificado não é reconhecido. O alerta é esperado, porque o Simulador usa um certificado próprio. Aceite-o para continuar.
+
+:::warning O Simulador guarda os dados apenas na memória
+
+Ao ser encerrado com `hubsaude sim stop` ou ao reiniciar o computador, ele apaga os registros e os sistemas cadastrados. Nesse caso, repita as etapas 5 e 6.
+
+:::
+
+- Consulte: [Simulador](../ferramentas/simulador.mdx) e [Usar a interface do Simulador](../ferramentas/simulador.mdx#usar-a-interface-do-simulador)
+
+</Etapa>
+
+<Etapa id="curso-m2-pasta" marcador="4" titulo="Criar a pasta de trabalho" resumo="Reúna em uma pasta os arquivos produzidos durante o curso." ambiente="testes">
+
+**O que você faz:** crie uma pasta para o curso e entre nela. Todos os comandos dos próximos módulos devem ser executados a partir dessa pasta.
+
+```bash
+mkdir curso-hubsaude
+cd curso-hubsaude
+```
+
+</Etapa>
+
+<Etapa id="curso-m2-certificado" marcador="5" titulo="Gerar o certificado de teste" resumo="Crie a chave privada e o certificado que identificam o seu sistema no Simulador." ambiente="testes">
+
+**O que você faz:** gere o par de chave e certificado de teste.
+
+```bash
+openssl req -x509 -newkey rsa:2048 -keyout client-key.pem \
+  -out client-cert.pem -days 365 -nodes \
+  -subj "/CN=meu-sistema/O=MinhaInstituicao/C=BR"
+```
+
+O comando cria dois arquivos: `client-cert.pem`, a parte pública, e `client-key.pem`, a chave privada.
+
+**Para conferir:** o comando abaixo exibe o titular e a validade do certificado.
+
+```bash
+openssl x509 -in client-cert.pem -noout -subject -enddate
+```
+
+</Etapa>
+
+<Etapa id="curso-m2-cadastro" marcador="6" titulo="Cadastrar o sistema no Simulador" resumo="Registre o seu sistema com o certificado de teste e as permissões do curso." ambiente="testes">
+
+**O que você faz:** cadastre o sistema com o identificador `meu-sistema`, o certificado de teste e as três permissões usadas no curso.
+
+```bash
+curl -k -X POST https://localhost:8443/clients/register \
+  -F "client_id=meu-sistema" \
+  -F "certificate=@client-cert.pem" \
+  -F "allowed_scopes=system/Patient.rs system/Patient.c system/Task.rs"
+```
+
+A opção `-k` aceita o certificado próprio do Simulador. A resposta repete os dados do cadastro, como no trecho abaixo:
+
+```json
+{"client_id":"meu-sistema","allowed_scopes":["system/Patient.rs","system/Patient.c","system/Task.rs"],"certificate":{"subject":"C=BR,O=MinhaInstituicao,CN=meu-sistema"}}
+```
+
+O identificador `meu-sistema` faz o papel do `client_id` que, no ambiente oficial, é entregue pelo credenciamento. Somente a parte pública do certificado é enviada; a chave privada permanece no seu computador.
+
+</Etapa>
+
+<Etapa id="curso-m2-confianca" marcador="7" titulo="Baixar o certificado do Simulador" resumo="Obtenha o arquivo que permite ao seu sistema confiar no Simulador." ambiente="testes">
+
+**O que você faz:** baixe o certificado do Simulador. Ele será usado para que os seus programas aceitem a conexão sem a opção `-k`.
+
+```bash
+curl -k https://localhost:8443/certs/simulador-server.pem -o simulador-server.pem
+```
+
+**Para conferir:** a pasta `curso-hubsaude` deve conter três arquivos: `client-cert.pem`, `client-key.pem` e `simulador-server.pem`.
+
+</Etapa>
+
+</Trilha>
+
+## Verificação
+
+**1. Qual arquivo é enviado ao Simulador no cadastro do sistema: `client-cert.pem` ou `client-key.pem`?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+O `client-cert.pem`, que é a parte pública. A chave privada, `client-key.pem`, nunca é enviada a ninguém.
+
+</Details>
+
+**2. Você reiniciou o computador e o Simulador deixou de reconhecer o seu sistema. O que aconteceu?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+O Simulador guarda os dados apenas na memória e apagou o cadastro ao ser encerrado. Inicie-o novamente com `hubsaude sim start` e repita o cadastro.
+
+</Details>
+
+**3. Por que o cadastro inclui a permissão `system/Task.rs`?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Porque o envio de registros é acompanhado pela consulta de uma `Task`, o recurso que informa o andamento do processamento. Sem essa permissão, o sistema consegue enviar, mas não consegue saber o resultado.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+Se alguma etapa deste módulo não funcionou no seu computador, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, módulo 2", informando o sistema operacional e a mensagem exibida.
+
+Próximo módulo: [3. Montar registros FHIR](registros.mdx).
