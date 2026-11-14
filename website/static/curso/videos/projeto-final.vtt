@@ -1,0 +1,850 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:04.900 line:-1 position:50% align:center size:80%
+Chegamos ao último vídeo do curso.
+
+2
+00:00:04.910 --> 00:00:06.230 line:-1 position:50% align:center size:80%
+Nos módulos anteriores,
+
+3
+00:00:06.240 --> 00:00:07.638 line:-1 position:50% align:center size:80%
+você preparou o ambiente,
+
+4
+00:00:07.648 --> 00:00:09.593 line:-1 position:50% align:center size:80%
+montou e validou registros,
+
+5
+00:00:09.603 --> 00:00:11.940 line:-1 position:50% align:center size:80%
+obteve o token e enviou um registro
+
+6
+00:00:11.950 --> 00:00:14.715 line:-1 position:50% align:center size:80%
+ao Simulador, sempre passo a passo.
+
+7
+00:00:14.725 --> 00:00:16.721 line:-1 position:50% align:center size:80%
+Agora, o desafio é reunir tudo isso
+
+8
+00:00:16.731 --> 00:00:18.355 line:-1 position:50% align:center size:80%
+dentro do seu próprio sistema,
+
+9
+00:00:18.365 --> 00:00:19.469 line:-1 position:50% align:center size:80%
+de forma automática,
+
+10
+00:00:19.479 --> 00:00:20.880 line:-1 position:50% align:center size:80%
+e comprovar que ele está pronto
+
+11
+00:00:20.890 --> 00:00:23.320 line:-1 position:50% align:center size:80%
+para receber a credencial oficial.
+
+12
+00:00:23.970 --> 00:00:25.755 line:-1 position:50% align:center size:80%
+O projeto final não tem um passo
+
+13
+00:00:25.765 --> 00:00:27.848 line:-1 position:50% align:center size:80%
+a passo pronto. Você escolhe um tipo
+
+14
+00:00:27.858 --> 00:00:30.091 line:-1 position:50% align:center size:80%
+de informação que o seu sistema já produz,
+
+15
+00:00:30.101 --> 00:00:31.886 line:-1 position:50% align:center size:80%
+como o cadastro de pacientes,
+
+16
+00:00:31.896 --> 00:00:33.307 line:-1 position:50% align:center size:80%
+e desenvolve um componente
+
+17
+00:00:33.317 --> 00:00:35.910 line:-1 position:50% align:center size:80%
+na linguagem que o sistema já usa.
+
+18
+00:00:36.320 --> 00:00:38.480 line:-1 position:50% align:center size:80%
+Esse componente cumpre oito itens,
+
+19
+00:00:38.490 --> 00:00:40.520 line:-1 position:50% align:center size:80%
+divididos em dois grupos.
+
+20
+00:00:40.670 --> 00:00:43.305 line:-1 position:50% align:center size:80%
+O primeiro grupo é o fluxo principal:
+
+21
+00:00:43.315 --> 00:00:45.172 line:-1 position:50% align:center size:80%
+montar o registro em FHIR,
+
+22
+00:00:45.182 --> 00:00:47.039 line:-1 position:50% align:center size:80%
+conferi-lo com o Validador,
+
+23
+00:00:47.049 --> 00:00:49.918 line:-1 position:50% align:center size:80%
+obter o token com a biblioteca oficial,
+
+24
+00:00:49.928 --> 00:00:52.407 line:-1 position:50% align:center size:80%
+enviar com os cabeçalhos obrigatórios
+
+25
+00:00:52.417 --> 00:00:55.490 line:-1 position:50% align:center size:80%
+e acompanhar a Task até o resultado.
+
+26
+00:00:55.540 --> 00:00:57.591 line:-1 position:50% align:center size:80%
+O segundo grupo é a robustez,
+
+27
+00:00:57.601 --> 00:00:59.270 line:-1 position:50% align:center size:80%
+que distingue uma demonstração
+
+28
+00:00:59.280 --> 00:01:00.949 line:-1 position:50% align:center size:80%
+de um componente pronto para uso
+
+29
+00:01:00.959 --> 00:01:03.096 line:-1 position:50% align:center size:80%
+em produção: tratar as recusas,
+
+30
+00:01:03.106 --> 00:01:06.280 line:-1 position:50% align:center size:80%
+a expiração do token e as falhas de rede.
+
+31
+00:01:06.780 --> 00:01:09.156 line:-1 position:50% align:center size:80%
+Uma organização que facilita os testes
+
+32
+00:01:09.166 --> 00:01:11.825 line:-1 position:50% align:center size:80%
+separa o componente em quatro partes.
+
+33
+00:01:11.925 --> 00:01:13.918 line:-1 position:50% align:center size:80%
+A montagem converte os dados
+
+34
+00:01:13.928 --> 00:01:16.537 line:-1 position:50% align:center size:80%
+do sistema em FHIR. A conferência
+
+35
+00:01:16.547 --> 00:01:18.463 line:-1 position:50% align:center size:80%
+chama o Validador e interrompe
+
+36
+00:01:18.473 --> 00:01:20.585 line:-1 position:50% align:center size:80%
+o processo quando encontra erros.
+
+37
+00:01:20.595 --> 00:01:23.342 line:-1 position:50% align:center size:80%
+O cliente obtém o token e faz as chamadas
+
+38
+00:01:23.352 --> 00:01:26.176 line:-1 position:50% align:center size:80%
+HTTP com o certificado de cliente.
+
+39
+00:01:26.186 --> 00:01:28.244 line:-1 position:50% align:center size:80%
+Por fim, o acompanhamento consulta
+
+40
+00:01:28.254 --> 00:01:30.825 line:-1 position:50% align:center size:80%
+a Task e interpreta o resultado.
+
+41
+00:01:31.005 --> 00:01:33.404 line:-1 position:50% align:center size:80%
+Cada parte pode ser testada isoladamente,
+
+42
+00:01:33.414 --> 00:01:34.683 line:-1 position:50% align:center size:80%
+com os arquivos que você já
+
+43
+00:01:34.693 --> 00:01:36.925 line:-1 position:50% align:center size:80%
+usou nos módulos anteriores.
+
+44
+00:01:37.575 --> 00:01:40.223 line:-1 position:50% align:center size:80%
+Agora, a robustez. Um componente
+
+45
+00:01:40.233 --> 00:01:42.881 line:-1 position:50% align:center size:80%
+em produção precisa reagir sozinho a três
+
+46
+00:01:42.891 --> 00:01:45.619 line:-1 position:50% align:center size:80%
+situações comuns: a recusa de um registro,
+
+47
+00:01:45.629 --> 00:01:48.841 line:-1 position:50% align:center size:80%
+a expiração do token e a falha de rede.
+
+48
+00:01:48.851 --> 00:01:51.338 line:-1 position:50% align:center size:80%
+Para cada uma, veja como reconhecer a
+
+49
+00:01:51.348 --> 00:01:54.195 line:-1 position:50% align:center size:80%
+situação e o que o componente deve fazer.
+
+50
+00:01:54.515 --> 00:01:56.678 line:-1 position:50% align:center size:80%
+Primeira situação: a recusa.
+
+51
+00:01:56.688 --> 00:01:59.869 line:-1 position:50% align:center size:80%
+O envio recebe 202, o que indica apenas
+
+52
+00:01:59.879 --> 00:02:02.508 line:-1 position:50% align:center size:80%
+que o registro foi recebido. O conteúdo é
+
+53
+00:02:02.518 --> 00:02:04.836 line:-1 position:50% align:center size:80%
+conferido depois e, se houver um problema,
+
+54
+00:02:04.846 --> 00:02:07.397 line:-1 position:50% align:center size:80%
+a Task termina no estado rejected.
+
+55
+00:02:07.407 --> 00:02:10.085 line:-1 position:50% align:center size:80%
+Nesse caso, nenhum registro é criado.
+
+56
+00:02:10.165 --> 00:02:11.766 line:-1 position:50% align:center size:80%
+Para reconhecer a recusa,
+
+57
+00:02:11.776 --> 00:02:13.530 line:-1 position:50% align:center size:80%
+o componente consulta a Task
+
+58
+00:02:13.540 --> 00:02:15.832 line:-1 position:50% align:center size:80%
+e encontra o estado rejected.
+
+59
+00:02:15.842 --> 00:02:18.210 line:-1 position:50% align:center size:80%
+O motivo aparece em dois lugares:
+
+60
+00:02:18.220 --> 00:02:20.435 line:-1 position:50% align:center size:80%
+em statusReason, com um resumo,
+
+61
+00:02:20.445 --> 00:02:23.350 line:-1 position:50% align:center size:80%
+e no OperationOutcome contido na Task,
+
+62
+00:02:23.360 --> 00:02:26.165 line:-1 position:50% align:center size:80%
+com o campo e o valor recusados.
+
+63
+00:02:26.515 --> 00:02:29.523 line:-1 position:50% align:center size:80%
+O que fazer: registrar esse motivo em log
+
+64
+00:02:29.533 --> 00:02:31.731 line:-1 position:50% align:center size:80%
+e não repetir o envio do mesmo conteúdo,
+
+65
+00:02:31.741 --> 00:02:33.718 line:-1 position:50% align:center size:80%
+porque ele seria recusado outra vez.
+
+66
+00:02:33.728 --> 00:02:35.190 line:-1 position:50% align:center size:80%
+A correção está nos dados
+
+67
+00:02:35.200 --> 00:02:37.685 line:-1 position:50% align:center size:80%
+ou na montagem do registro.
+
+68
+00:02:38.255 --> 00:02:41.338 line:-1 position:50% align:center size:80%
+Segunda situação: a expiração do token.
+
+69
+00:02:41.348 --> 00:02:43.148 line:-1 position:50% align:center size:80%
+O token vale por tempo limitado;
+
+70
+00:02:43.158 --> 00:02:45.562 line:-1 position:50% align:center size:80%
+no Simulador, cinco minutos. Um componente
+
+71
+00:02:45.572 --> 00:02:47.750 line:-1 position:50% align:center size:80%
+que fica em execução por horas vai,
+
+72
+00:02:47.760 --> 00:02:50.675 line:-1 position:50% align:center size:80%
+em algum momento, usar um token vencido.
+
+73
+00:02:51.135 --> 00:02:52.887 line:-1 position:50% align:center size:80%
+Para reconhecer a expiração,
+
+74
+00:02:52.897 --> 00:02:55.090 line:-1 position:50% align:center size:80%
+observe a resposta: a chamada volta
+
+75
+00:02:55.100 --> 00:02:57.439 line:-1 position:50% align:center size:80%
+com 401, e a mensagem informa
+
+76
+00:02:57.449 --> 00:03:00.075 line:-1 position:50% align:center size:80%
+que o token é inválido ou expirou.
+
+77
+00:03:00.545 --> 00:03:03.521 line:-1 position:50% align:center size:80%
+O que fazer: descartar o token guardado,
+
+78
+00:03:03.531 --> 00:03:05.129 line:-1 position:50% align:center size:80%
+obter um novo e repetir
+
+79
+00:03:05.139 --> 00:03:06.967 line:-1 position:50% align:center size:80%
+a chamada uma única vez.
+
+80
+00:03:06.977 --> 00:03:09.341 line:-1 position:50% align:center size:80%
+A biblioteca oficial já renova o token
+
+81
+00:03:09.351 --> 00:03:11.408 line:-1 position:50% align:center size:80%
+automaticamente; ainda assim, o componente
+
+82
+00:03:11.418 --> 00:03:14.065 line:-1 position:50% align:center size:80%
+deve estar preparado para o 401.
+
+83
+00:03:14.505 --> 00:03:17.442 line:-1 position:50% align:center size:80%
+Se o 401 se repetir com o token novo,
+
+84
+00:03:17.452 --> 00:03:19.256 line:-1 position:50% align:center size:80%
+o problema não é a validade do token,
+
+85
+00:03:19.266 --> 00:03:21.599 line:-1 position:50% align:center size:80%
+e sim a credencial ou o certificado.
+
+86
+00:03:21.609 --> 00:03:24.547 line:-1 position:50% align:center size:80%
+Repetir não resolve: o componente
+
+87
+00:03:24.557 --> 00:03:27.325 line:-1 position:50% align:center size:80%
+interrompe o envio e registra o erro.
+
+88
+00:03:27.775 --> 00:03:30.427 line:-1 position:50% align:center size:80%
+Terceira situação: a falha de rede.
+
+89
+00:03:30.437 --> 00:03:32.855 line:-1 position:50% align:center size:80%
+O envio sai, mas a resposta não chega,
+
+90
+00:03:32.865 --> 00:03:34.891 line:-1 position:50% align:center size:80%
+por exemplo por uma queda de conexão.
+
+91
+00:03:34.901 --> 00:03:36.379 line:-1 position:50% align:center size:80%
+O componente não tem como saber
+
+92
+00:03:36.389 --> 00:03:38.775 line:-1 position:50% align:center size:80%
+se o registro chegou ao HubSaúde.
+
+93
+00:03:39.115 --> 00:03:41.319 line:-1 position:50% align:center size:80%
+O que fazer: repetir o envio
+
+94
+00:03:41.329 --> 00:03:43.457 line:-1 position:50% align:center size:80%
+com a mesma Idempotency-Key.
+
+95
+00:03:43.467 --> 00:03:45.137 line:-1 position:50% align:center size:80%
+Se o primeiro envio não chegou,
+
+96
+00:03:45.147 --> 00:03:47.581 line:-1 position:50% align:center size:80%
+este é processado normalmente. Se chegou,
+
+97
+00:03:47.591 --> 00:03:50.559 line:-1 position:50% align:center size:80%
+o HubSaúde reconhece a repetição e devolve
+
+98
+00:03:50.569 --> 00:03:53.515 line:-1 position:50% align:center size:80%
+a mesma Task, sem duplicar o registro.
+
+99
+00:03:53.825 --> 00:03:55.641 line:-1 position:50% align:center size:80%
+Se a repetição chegar enquanto o primeiro
+
+100
+00:03:55.651 --> 00:03:57.467 line:-1 position:50% align:center size:80%
+envio ainda está em processamento,
+
+101
+00:03:57.477 --> 00:04:00.053 line:-1 position:50% align:center size:80%
+a resposta é 409. Nesse caso,
+
+102
+00:04:00.063 --> 00:04:01.575 line:-1 position:50% align:center size:80%
+o componente aguarda alguns segundos
+
+103
+00:04:01.585 --> 00:04:04.065 line:-1 position:50% align:center size:80%
+e tenta novamente, com a mesma chave.
+
+104
+00:04:04.255 --> 00:04:05.902 line:-1 position:50% align:center size:80%
+Por isso, a chave é gerada
+
+105
+00:04:05.912 --> 00:04:07.936 line:-1 position:50% align:center size:80%
+uma única vez para cada registro,
+
+106
+00:04:07.946 --> 00:04:09.141 line:-1 position:50% align:center size:80%
+antes do primeiro envio,
+
+107
+00:04:09.151 --> 00:04:11.778 line:-1 position:50% align:center size:80%
+e guardada até a confirmação do resultado.
+
+108
+00:04:11.788 --> 00:04:13.586 line:-1 position:50% align:center size:80%
+Uma chave nova a cada tentativa
+
+109
+00:04:13.596 --> 00:04:16.055 line:-1 position:50% align:center size:80%
+criaria registros duplicados.
+
+110
+00:04:16.705 --> 00:04:19.036 line:-1 position:50% align:center size:80%
+Cada critério tem uma evidência objetiva
+
+111
+00:04:19.046 --> 00:04:21.230 line:-1 position:50% align:center size:80%
+no Simulador: o estado da Task,
+
+112
+00:04:21.240 --> 00:04:24.955 line:-1 position:50% align:center size:80%
+uma resposta HTTP ou uma linha de log.
+
+113
+00:04:25.305 --> 00:04:27.046 line:-1 position:50% align:center size:80%
+Para acompanhar os testes, mantenha
+
+114
+00:04:27.056 --> 00:04:29.161 line:-1 position:50% align:center size:80%
+um terminal aberto com o log do Simulador,
+
+115
+00:04:29.171 --> 00:04:33.095 line:-1 position:50% align:center size:80%
+usando hubsaude sim logs -f.
+
+116
+00:04:33.205 --> 00:04:36.273 line:-1 position:50% align:center size:80%
+Veja um envio aceito: o log registra
+
+117
+00:04:36.283 --> 00:04:38.623 line:-1 position:50% align:center size:80%
+o envio, com o identificador da Task,
+
+118
+00:04:38.633 --> 00:04:40.891 line:-1 position:50% align:center size:80%
+e a consulta termina como completed,
+
+119
+00:04:40.901 --> 00:04:43.195 line:-1 position:50% align:center size:80%
+com o endereço do paciente criado.
+
+120
+00:04:43.395 --> 00:04:45.890 line:-1 position:50% align:center size:80%
+Agora, uma repetição com a mesma chave:
+
+121
+00:04:45.900 --> 00:04:48.167 line:-1 position:50% align:center size:80%
+o Simulador devolve o mesmo comprovante,
+
+122
+00:04:48.177 --> 00:04:50.217 line:-1 position:50% align:center size:80%
+e o log indica a repetição,
+
+123
+00:04:50.227 --> 00:04:52.095 line:-1 position:50% align:center size:80%
+sem um segundo registro.
+
+124
+00:04:52.695 --> 00:04:56.335 line:-1 position:50% align:center size:80%
+E uma recusa: o envio também recebe 202,
+
+125
+00:04:56.345 --> 00:04:58.587 line:-1 position:50% align:center size:80%
+mas a Task termina como rejected,
+
+126
+00:04:58.597 --> 00:05:00.762 line:-1 position:50% align:center size:80%
+e o motivo fica em statusReason
+
+127
+00:05:00.772 --> 00:05:02.675 line:-1 position:50% align:center size:80%
+e no OperationOutcome.
+
+128
+00:05:03.135 --> 00:05:04.881 line:-1 position:50% align:center size:80%
+Se algo não sair como esperado,
+
+129
+00:05:04.891 --> 00:05:06.867 line:-1 position:50% align:center size:80%
+procure a mensagem na seção de erros
+
+130
+00:05:06.877 --> 00:05:08.776 line:-1 position:50% align:center size:80%
+mais comuns da página do módulo.
+
+131
+00:05:08.786 --> 00:05:11.885 line:-1 position:50% align:center size:80%
+Cada uma traz a causa e a correção.
+
+132
+00:05:12.535 --> 00:05:14.270 line:-1 position:50% align:center size:80%
+Quando o seu sistema cumprir todos
+
+133
+00:05:14.280 --> 00:05:16.331 line:-1 position:50% align:center size:80%
+os critérios no Simulador, ele estará
+
+134
+00:05:16.341 --> 00:05:18.393 line:-1 position:50% align:center size:80%
+pronto para o ambiente de produção.
+
+135
+00:05:18.403 --> 00:05:20.534 line:-1 position:50% align:center size:80%
+Essa passagem tem duas partes:
+
+136
+00:05:20.544 --> 00:05:23.151 line:-1 position:50% align:center size:80%
+o credenciamento da instituição e a troca
+
+137
+00:05:23.161 --> 00:05:25.335 line:-1 position:50% align:center size:80%
+da configuração do seu sistema.
+
+138
+00:05:25.695 --> 00:05:27.570 line:-1 position:50% align:center size:80%
+O credenciamento é conduzido pelo
+
+139
+00:05:27.580 --> 00:05:29.605 line:-1 position:50% align:center size:80%
+gestor da instituição, no Ganêsha.
+
+140
+00:05:29.615 --> 00:05:31.264 line:-1 position:50% align:center size:80%
+Quando a solicitação é aprovada,
+
+141
+00:05:31.274 --> 00:05:34.129 line:-1 position:50% align:center size:80%
+o Ganêsha devolve o client_id oficial,
+
+142
+00:05:34.139 --> 00:05:35.109 line:-1 position:50% align:center size:80%
+o identificador do seu
+
+143
+00:05:35.119 --> 00:05:36.675 line:-1 position:50% align:center size:80%
+sistema em produção.
+
+144
+00:05:36.865 --> 00:05:37.624 line:-1 position:50% align:center size:80%
+Nesse processo,
+
+145
+00:05:37.634 --> 00:05:40.009 line:-1 position:50% align:center size:80%
+cabem ao integrador três pontos.
+
+146
+00:05:40.019 --> 00:05:42.239 line:-1 position:50% align:center size:80%
+O primeiro é entregar ao gestor a parte
+
+147
+00:05:42.249 --> 00:05:44.239 line:-1 position:50% align:center size:80%
+pública do certificado ICP-Brasil
+
+148
+00:05:44.249 --> 00:05:46.777 line:-1 position:50% align:center size:80%
+da instituição, o arquivo .cer.
+
+149
+00:05:46.787 --> 00:05:49.085 line:-1 position:50% align:center size:80%
+O gestor anexa esse arquivo no Ganêsha,
+
+150
+00:05:49.095 --> 00:05:50.700 line:-1 position:50% align:center size:80%
+e é por ele que o HubSaúde
+
+151
+00:05:50.710 --> 00:05:52.675 line:-1 position:50% align:center size:80%
+reconhece o seu sistema.
+
+152
+00:05:52.715 --> 00:05:53.854 line:-1 position:50% align:center size:80%
+A chave privada,
+
+153
+00:05:53.864 --> 00:05:55.693 line:-1 position:50% align:center size:80%
+que forma par com esse certificado,
+
+154
+00:05:55.703 --> 00:05:58.069 line:-1 position:50% align:center size:80%
+fica apenas no servidor do seu sistema.
+
+155
+00:05:58.079 --> 00:05:59.755 line:-1 position:50% align:center size:80%
+Ela nunca é entregue a ninguém,
+
+156
+00:05:59.765 --> 00:06:01.699 line:-1 position:50% align:center size:80%
+nem ao gestor, nem ao Ganêsha,
+
+157
+00:06:01.709 --> 00:06:03.745 line:-1 position:50% align:center size:80%
+nem ao HubSaúde.
+
+158
+00:06:04.005 --> 00:06:05.573 line:-1 position:50% align:center size:80%
+O segundo ponto é confirmar
+
+159
+00:06:05.583 --> 00:06:07.624 line:-1 position:50% align:center size:80%
+que a credencial oficial funciona
+
+160
+00:06:07.634 --> 00:06:09.675 line:-1 position:50% align:center size:80%
+antes de alterar o sistema. Para isso,
+
+161
+00:06:09.685 --> 00:06:12.357 line:-1 position:50% align:center size:80%
+use o comando hubsaude auth verify,
+
+162
+00:06:12.367 --> 00:06:14.566 line:-1 position:50% align:center size:80%
+que obtém um token com a credencial
+
+163
+00:06:14.576 --> 00:06:16.425 line:-1 position:50% align:center size:80%
+e mostra o resultado.
+
+164
+00:06:16.785 --> 00:06:18.612 line:-1 position:50% align:center size:80%
+Esse comando pode ser ensaiado agora,
+
+165
+00:06:18.622 --> 00:06:20.449 line:-1 position:50% align:center size:80%
+contra o Simulador, com o certificado
+
+166
+00:06:20.459 --> 00:06:23.129 line:-1 position:50% align:center size:80%
+de teste e a opção --trust,
+
+167
+00:06:23.139 --> 00:06:25.042 line:-1 position:50% align:center size:80%
+que faz o comando confiar no certificado
+
+168
+00:06:25.052 --> 00:06:27.415 line:-1 position:50% align:center size:80%
+do Simulador. Veja a saída: o comando
+
+169
+00:06:27.425 --> 00:06:29.099 line:-1 position:50% align:center size:80%
+mostra a configuração usada,
+
+170
+00:06:29.109 --> 00:06:31.702 line:-1 position:50% align:center size:80%
+obtém o token e termina com a confirmação
+
+171
+00:06:31.712 --> 00:06:34.435 line:-1 position:50% align:center size:80%
+de que o credenciamento foi verificado.
+
+172
+00:06:34.875 --> 00:06:37.085 line:-1 position:50% align:center size:80%
+Em produção, o comando é o mesmo,
+
+173
+00:06:37.095 --> 00:06:38.615 line:-1 position:50% align:center size:80%
+com o endereço oficial,
+
+174
+00:06:38.625 --> 00:06:41.370 line:-1 position:50% align:center size:80%
+o client_id recebido no credenciamento
+
+175
+00:06:41.380 --> 00:06:43.513 line:-1 position:50% align:center size:80%
+e o certificado da instituição.
+
+176
+00:06:43.523 --> 00:06:46.575 line:-1 position:50% align:center size:80%
+A opção --trust deixa de ser usada,
+
+177
+00:06:46.585 --> 00:06:48.412 line:-1 position:50% align:center size:80%
+porque o certificado do HubSaúde
+
+178
+00:06:48.422 --> 00:06:50.685 line:-1 position:50% align:center size:80%
+é reconhecido automaticamente.
+
+179
+00:06:51.285 --> 00:06:53.200 line:-1 position:50% align:center size:80%
+O terceiro ponto é trocar
+
+180
+00:06:53.210 --> 00:06:54.971 line:-1 position:50% align:center size:80%
+os valores da configuração.
+
+181
+00:06:54.981 --> 00:06:56.665 line:-1 position:50% align:center size:80%
+Veja o que muda de um ambiente para
+
+182
+00:06:56.675 --> 00:06:59.745 line:-1 position:50% align:center size:80%
+o outro: o endereço, o client_id,
+
+183
+00:06:59.755 --> 00:07:02.748 line:-1 position:50% align:center size:80%
+a chave e o certificado. A confiança
+
+184
+00:07:02.758 --> 00:07:05.495 line:-1 position:50% align:center size:80%
+no servidor deixa de ser configurada.
+
+185
+00:07:05.925 --> 00:07:08.225 line:-1 position:50% align:center size:80%
+Se esses valores ficarem fora do código,
+
+186
+00:07:08.235 --> 00:07:09.641 line:-1 position:50% align:center size:80%
+em um arquivo de configuração
+
+187
+00:07:09.651 --> 00:07:11.355 line:-1 position:50% align:center size:80%
+ou em variáveis de ambiente,
+
+188
+00:07:11.365 --> 00:07:13.292 line:-1 position:50% align:center size:80%
+a troca não exige nenhuma alteração
+
+189
+00:07:13.302 --> 00:07:15.304 line:-1 position:50% align:center size:80%
+no código. É isso que o sexto
+
+190
+00:07:15.314 --> 00:07:17.825 line:-1 position:50% align:center size:80%
+critério do projeto final confere.
+
+191
+00:07:18.475 --> 00:07:19.720 line:-1 position:50% align:center size:80%
+Recapitulando o que você
+
+192
+00:07:19.730 --> 00:07:21.575 line:-1 position:50% align:center size:80%
+construiu ao longo do curso.
+
+193
+00:07:21.585 --> 00:07:23.937 line:-1 position:50% align:center size:80%
+Você entendeu por que o HubSaúde
+
+194
+00:07:23.947 --> 00:07:26.299 line:-1 position:50% align:center size:80%
+existe e o caminho de um registro,
+
+195
+00:07:26.309 --> 00:07:28.346 line:-1 position:50% align:center size:80%
+preparou o ambiente de testes,
+
+196
+00:07:28.356 --> 00:07:30.944 line:-1 position:50% align:center size:80%
+montou e validou registros FHIR,
+
+197
+00:07:30.954 --> 00:07:33.621 line:-1 position:50% align:center size:80%
+autenticou o seu sistema com o certificado
+
+198
+00:07:33.631 --> 00:07:36.140 line:-1 position:50% align:center size:80%
+e enviou e acompanhou registros,
+
+199
+00:07:36.150 --> 00:07:38.075 line:-1 position:50% align:center size:80%
+tratando as falhas.
+
+200
+00:07:38.485 --> 00:07:40.137 line:-1 position:50% align:center size:80%
+Com o projeto final, tudo isso
+
+201
+00:07:40.147 --> 00:07:42.415 line:-1 position:50% align:center size:80%
+passa a fazer parte do seu sistema.
+
+202
+00:07:42.935 --> 00:07:44.538 line:-1 position:50% align:center size:80%
+Se o seu sistema também precisa
+
+203
+00:07:44.548 --> 00:07:46.711 line:-1 position:50% align:center size:80%
+assinar registros, o módulo extra
+
+204
+00:07:46.721 --> 00:07:49.525 line:-1 position:50% align:center size:80%
+apresenta a assinatura com o Safira.
+
+205
+00:07:50.015 --> 00:07:51.513 line:-1 position:50% align:center size:80%
+O seu retorno é muito importante
+
+206
+00:07:51.523 --> 00:07:53.094 line:-1 position:50% align:center size:80%
+para as próximas versões do curso.
+
+207
+00:07:53.104 --> 00:07:54.602 line:-1 position:50% align:center size:80%
+Conte o que foi mais difícil pelo
+
+208
+00:07:54.612 --> 00:07:57.045 line:-1 position:50% align:center size:80%
+canal indicado na página do módulo.
+
+209
+00:07:57.495 --> 00:07:59.025 line:-1 position:50% align:center size:80%
+Obrigado por acompanhar o curso
+
+210
+00:07:59.035 --> 00:08:00.874 line:-1 position:50% align:center size:80%
+para integradores do HubSaúde.
+
+211
+00:08:00.884 --> 00:08:02.645 line:-1 position:50% align:center size:80%
+Bom trabalho na integração do seu
+
+212
+00:08:02.655 --> 00:08:05.085 line:-1 position:50% align:center size:80%
+sistema à rede de saúde de Goiás.
