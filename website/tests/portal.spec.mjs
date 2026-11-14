@@ -186,6 +186,35 @@ test('integration trail opens with the keyboard and keeps progress after reload'
   await expect(page.locator('main li[id^="etapa-"] details[open]')).toHaveCount(0);
 });
 
+test('course overview shows module progress and resumes at the next pending step', async ({page}, testInfo) => {
+  await visit(page, 'curso/');
+  const overall = page.getByRole('progressbar', {name: 'Progresso no curso'});
+  await expect(overall).toHaveAttribute('aria-valuenow', '0');
+  const start = page.getByRole('link', {name: /^Comece pelo Módulo 1$/});
+  await expect(start).toHaveAttribute('href', '/hubsaude/curso/panorama/');
+  await start.click();
+  await expect(page).toHaveURL(/\/hubsaude\/curso\/panorama\/$/);
+  const steps = trailSteps(page);
+  await expect(steps.nth(1)).toBeVisible();
+  const total = await steps.count();
+  const first = steps.first();
+  await openStep(page, first);
+  await first.getByRole('checkbox').check();
+  const nextId = await steps.nth(1).getAttribute('id');
+  await visit(page, 'curso/');
+  await expect(overall).toHaveAttribute('aria-valuenow', '1');
+  const module = page.getByRole('progressbar', {name: /^Progresso em Módulo 1:/});
+  await expect(module).toHaveAttribute('aria-valuenow', '1');
+  await expect(module).toHaveAttribute('aria-valuemax', String(total));
+  await expect(page.locator('main')).toContainText(`1 de ${total} etapas concluídas`);
+  const resume = page.getByRole('link', {name: 'Continuar de onde parou'});
+  await expect(resume).toHaveAttribute('href', `/hubsaude/curso/panorama/#${nextId}`);
+  await screenshot(page, testInfo, 'curso-progresso');
+  await resume.click();
+  await expect(page).toHaveURL(new RegExp(`/hubsaude/curso/panorama/#${nextId}$`));
+  await expect(page.locator(`#${nextId} details`)).toHaveAttribute('open');
+});
+
 test('reference category opens with the keyboard and reaches a representative SDK', async ({page}, testInfo) => {
   await visit(page, 'fluxos/');
   const mobile = testInfo.project.name === 'mobile';
@@ -254,6 +283,8 @@ test('blocked localStorage does not break content or tab selection', async ({pag
   await openStep(page, step);
   await step.getByRole('checkbox').check();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1');
+  await visit(page, 'curso/');
+  await expect(page.getByRole('progressbar', {name: 'Progresso no curso'})).toHaveAttribute('aria-valuenow', '0');
 });
 
 test('a manager detail opens and closes with the keyboard and loads its accessible image', async ({page}, testInfo) => {
@@ -325,6 +356,9 @@ test.describe('progressive enhancement', () => {
     await openStep(page, trailSteps(page).last());
     await expect(page.getByRole('progressbar')).toHaveCount(0);
     await expect(page.getByRole('checkbox')).toHaveCount(0);
+    await visit(page, 'curso/');
+    await expect(page.locator('main a[href="/hubsaude/curso/panorama/"]').first()).toBeVisible();
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
     await visit(page, 'fluxos/autenticacao/');
     await expect(panel(page, 0)).toBeVisible();
     expect(renderedCode(await panel(page, 0).locator('pre').innerHTML()).trim()).not.toBe('');
