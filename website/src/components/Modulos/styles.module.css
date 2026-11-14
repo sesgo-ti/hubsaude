@@ -119,3 +119,77 @@
 :global(.theme-doc-markdown) .detalhes li {
   margin: 0;
 }
+
+.resumo {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid #b9dcc6;
+  border-left: 4px solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  background: #f5faf7;
+}
+
+:global(.theme-doc-markdown) .resumo p {
+  margin: 0;
+}
+
+.resumoTitulo {
+  color: #10301f;
+}
+
+.barra {
+  display: block;
+  height: 0.45rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dce9e0;
+}
+
+.barra > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ifm-color-primary);
+  transition: width 0.3s ease;
+}
+
+.acao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.9rem;
+  color: #3a5446;
+  font-size: 0.9rem;
+}
+
+:global(.theme-doc-markdown) .resumo a.continuar {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+:global(.theme-doc-markdown) .resumo a.continuar:hover {
+  background: #035a41;
+  color: #ffffff;
+}
+
+.progresso {
+  display: grid;
+  grid-template-columns: minmax(4rem, 10rem) auto;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+  color: #4c6356;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.concluido .numero {
+  background: var(--ifm-color-primary);
+  color: #ffffff;
+}

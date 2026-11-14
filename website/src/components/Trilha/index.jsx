@@ -1,8 +1,8 @@
 import React, {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import clsx from 'clsx';
+import {lerProgresso, salvarProgresso} from './progresso';
 import styles from './styles.module.css';
 
-const storageKey = 'hubsaude-trilha-integracao';
 const TrilhaContext = createContext(null);
 
 const ambientes = {
@@ -10,21 +10,6 @@ const ambientes = {
   testes: 'No seu computador',
   oficial: 'Ambiente oficial',
 };
-
-function lerProgresso() {
-  try {
-    const salvo = JSON.parse(window.localStorage.getItem(storageKey));
-    return Array.isArray(salvo) ? salvo.filter((item) => typeof item === 'string') : [];
-  } catch {
-    return [];
-  }
-}
-
-function salvarProgresso(ids) {
-  try {
-    window.localStorage.setItem(storageKey, JSON.stringify(ids));
-  } catch {}
-}
 
 export function Trilha({children}) {
   const lista = useRef(null);
