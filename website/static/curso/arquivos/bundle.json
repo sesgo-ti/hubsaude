@@ -1,0 +1,15 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:5b2c7c1e-6f1a-4c3e-9d2a-1f0e8a7b6c5d",
+      "resource": {
+        "resourceType": "Patient",
+        "name": [{"use": "official", "text": "Maria da Silva"}],
+        "gender": "female",
+        "birthDate": "1990-01-01"
+      }
+    }
+  ]
+}

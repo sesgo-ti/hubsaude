@@ -1,0 +1,121 @@
+.lista {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.modulo {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin: 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid #dce9e0;
+  border-radius: var(--ifm-global-radius);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(16 48 31 / 6%);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modulo:hover,
+.modulo:focus-within {
+  border-color: #9cc5ae;
+  box-shadow: 0 4px 14px rgb(16 48 31 / 10%);
+}
+
+.extra {
+  border-style: dashed;
+  background: #f5faf7;
+}
+
+.numero {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px solid var(--ifm-color-primary);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+}
+
+.modulo:hover .numero {
+  background: var(--ifm-color-primary);
+  color: #ffffff;
+}
+
+.texto {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.titulo {
+  color: var(--ifm-heading-color);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+:global(.theme-doc-markdown) .modulo a.titulo {
+  text-decoration: none;
+}
+
+.titulo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.modulo:hover .titulo {
+  color: var(--ifm-color-primary);
+}
+
+.descricao {
+  margin: 0;
+  color: #3a5446;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.detalhes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detalhes li {
+  margin: 0;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: #eaf6ef;
+  color: #035a41;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .modulo {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .numero {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+  }
+}
+
+:global(.theme-doc-markdown) .modulo,
+:global(.theme-doc-markdown) .modulo p,
+:global(.theme-doc-markdown) .detalhes li {
+  margin: 0;
+}

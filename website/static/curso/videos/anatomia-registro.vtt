@@ -1,0 +1,462 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:04.371 line:-1 position:50% align:center size:80%
+Neste vídeo, você conhece as partes
+
+2
+00:00:04.381 --> 00:00:06.730 line:-1 position:50% align:center size:80%
+de um registro FHIR: recurso,
+
+3
+00:00:06.740 --> 00:00:09.089 line:-1 position:50% align:center size:80%
+tipos de dado, conjuntos de valores,
+
+4
+00:00:09.099 --> 00:00:11.829 line:-1 position:50% align:center size:80%
+perfil e Bundle. Conhecê-las ajuda
+
+5
+00:00:11.839 --> 00:00:14.265 line:-1 position:50% align:center size:80%
+a montar registros corretos e a entender
+
+6
+00:00:14.275 --> 00:00:17.060 line:-1 position:50% align:center size:80%
+os erros apontados pelo Validador.
+
+7
+00:00:17.810 --> 00:00:19.788 line:-1 position:50% align:center size:80%
+O FHIR é um padrão internacional para
+
+8
+00:00:19.798 --> 00:00:22.071 line:-1 position:50% align:center size:80%
+a troca de informações de saúde: com ele,
+
+9
+00:00:22.081 --> 00:00:23.691 line:-1 position:50% align:center size:80%
+sistemas diferentes descrevem
+
+10
+00:00:23.701 --> 00:00:26.260 line:-1 position:50% align:center size:80%
+a mesma informação da mesma forma.
+
+11
+00:00:26.500 --> 00:00:27.336 line:-1 position:50% align:center size:80%
+No FHIR,
+
+12
+00:00:27.346 --> 00:00:29.644 line:-1 position:50% align:center size:80%
+cada unidade de informação é um recurso.
+
+13
+00:00:29.654 --> 00:00:31.336 line:-1 position:50% align:center size:80%
+Um paciente é um recurso do tipo
+
+14
+00:00:31.346 --> 00:00:33.567 line:-1 position:50% align:center size:80%
+Patient; um resultado de exame é
+
+15
+00:00:33.577 --> 00:00:35.850 line:-1 position:50% align:center size:80%
+um recurso do tipo Observation.
+
+16
+00:00:36.190 --> 00:00:37.313 line:-1 position:50% align:center size:80%
+No HubSaúde,
+
+17
+00:00:37.323 --> 00:00:39.353 line:-1 position:50% align:center size:80%
+os recursos são escritos em JSON.
+
+18
+00:00:39.363 --> 00:00:41.393 line:-1 position:50% align:center size:80%
+Veja na tela um exemplo de paciente:
+
+19
+00:00:41.403 --> 00:00:43.962 line:-1 position:50% align:center size:80%
+o campo resourceType informa o tipo,
+
+20
+00:00:43.972 --> 00:00:45.851 line:-1 position:50% align:center size:80%
+e é por ele que quem recebe
+
+21
+00:00:45.861 --> 00:00:48.100 line:-1 position:50% align:center size:80%
+sabe quais campos esperar.
+
+22
+00:00:48.400 --> 00:00:50.285 line:-1 position:50% align:center size:80%
+Os demais campos trazem o nome,
+
+23
+00:00:50.295 --> 00:00:52.786 line:-1 position:50% align:center size:80%
+o gênero e a data de nascimento. O nome
+
+24
+00:00:52.796 --> 00:00:55.059 line:-1 position:50% align:center size:80%
+fica entre colchetes porque é uma lista:
+
+25
+00:00:55.069 --> 00:00:57.390 line:-1 position:50% align:center size:80%
+uma pessoa pode ter mais de um nome.
+
+26
+00:00:58.040 --> 00:00:59.929 line:-1 position:50% align:center size:80%
+Cada campo tem um tipo de dado,
+
+27
+00:00:59.939 --> 00:01:01.901 line:-1 position:50% align:center size:80%
+que define como o valor é escrito.
+
+28
+00:01:01.911 --> 00:01:03.946 line:-1 position:50% align:center size:80%
+Uma data segue o formato ano,
+
+29
+00:01:03.956 --> 00:01:06.570 line:-1 position:50% align:center size:80%
+mês e dia, separados por hífen.
+
+30
+00:01:06.660 --> 00:01:10.595 line:-1 position:50% align:center size:80%
+Por quê? Uma data como 01/02 pode ser
+
+31
+00:01:10.605 --> 00:01:13.199 line:-1 position:50% align:center size:80%
+primeiro de fevereiro ou dois de janeiro,
+
+32
+00:01:13.209 --> 00:01:15.645 line:-1 position:50% align:center size:80%
+conforme o país; o formato ano,
+
+33
+00:01:15.655 --> 00:01:17.854 line:-1 position:50% align:center size:80%
+mês e dia tem uma única leitura.
+
+34
+00:01:17.864 --> 00:01:22.790 line:-1 position:50% align:center size:80%
+Por isso, 01/01/1990 é recusado.
+
+35
+00:01:22.840 --> 00:01:24.524 line:-1 position:50% align:center size:80%
+Alguns campos aceitam apenas
+
+36
+00:01:24.534 --> 00:01:26.295 line:-1 position:50% align:center size:80%
+valores de uma lista fechada,
+
+37
+00:01:26.305 --> 00:01:29.222 line:-1 position:50% align:center size:80%
+o conjunto de valores. O campo gender usa
+
+38
+00:01:29.232 --> 00:01:31.917 line:-1 position:50% align:center size:80%
+o conjunto AdministrativeGender: male,
+
+39
+00:01:31.927 --> 00:01:34.510 line:-1 position:50% align:center size:80%
+female, other e unknown.
+
+40
+00:01:34.650 --> 00:01:36.462 line:-1 position:50% align:center size:80%
+A lista fechada garante que todos
+
+41
+00:01:36.472 --> 00:01:37.920 line:-1 position:50% align:center size:80%
+os sistemas entendam o valor
+
+42
+00:01:37.930 --> 00:01:39.451 line:-1 position:50% align:center size:80%
+do mesmo modo. Por isso,
+
+43
+00:01:39.461 --> 00:01:42.800 line:-1 position:50% align:center size:80%
+uma abreviação como a letra F é recusada.
+
+44
+00:01:43.450 --> 00:01:45.686 line:-1 position:50% align:center size:80%
+O padrão FHIR define a estrutura geral
+
+45
+00:01:45.696 --> 00:01:48.077 line:-1 position:50% align:center size:80%
+de cada recurso, para uso no mundo todo.
+
+46
+00:01:48.087 --> 00:01:51.190 line:-1 position:50% align:center size:80%
+As regras de cada uso ficam nos perfis.
+
+47
+00:01:51.310 --> 00:01:53.626 line:-1 position:50% align:center size:80%
+Um perfil acrescenta regras ao recurso,
+
+48
+00:01:53.636 --> 00:01:55.576 line:-1 position:50% align:center size:80%
+como campos obrigatórios e valores
+
+49
+00:01:55.586 --> 00:01:58.174 line:-1 position:50% align:center size:80%
+permitidos. Os perfis do HubSaúde estão
+
+50
+00:01:58.184 --> 00:02:01.010 line:-1 position:50% align:center size:80%
+publicados nos Guias de Implementação.
+
+51
+00:02:01.130 --> 00:02:03.463 line:-1 position:50% align:center size:80%
+O registro declara o perfil que segue
+
+52
+00:02:03.473 --> 00:02:06.508 line:-1 position:50% align:center size:80%
+no campo meta.profile. O Validador
+
+53
+00:02:06.518 --> 00:02:08.461 line:-1 position:50% align:center size:80%
+confere o registro contra as regras
+
+54
+00:02:08.471 --> 00:02:11.710 line:-1 position:50% align:center size:80%
+do padrão FHIR e dos perfis declarados.
+
+55
+00:02:12.360 --> 00:02:13.951 line:-1 position:50% align:center size:80%
+Falta o Bundle.
+
+56
+00:02:13.961 --> 00:02:16.771 line:-1 position:50% align:center size:80%
+Um exemplo: o pedido de um exame e os seus
+
+57
+00:02:16.781 --> 00:02:19.134 line:-1 position:50% align:center size:80%
+resultados são recursos diferentes,
+
+58
+00:02:19.144 --> 00:02:21.400 line:-1 position:50% align:center size:80%
+mas precisam chegar juntos.
+
+59
+00:02:21.540 --> 00:02:24.351 line:-1 position:50% align:center size:80%
+O Bundle agrupa esses recursos em um único
+
+60
+00:02:24.361 --> 00:02:26.333 line:-1 position:50% align:center size:80%
+registro. No ambiente oficial,
+
+61
+00:02:26.343 --> 00:02:27.629 line:-1 position:50% align:center size:80%
+os registros são enviados
+
+62
+00:02:27.639 --> 00:02:30.190 line:-1 position:50% align:center size:80%
+ao HubSaúde dentro de um Bundle.
+
+63
+00:02:30.200 --> 00:02:33.160 line:-1 position:50% align:center size:80%
+Cada item da lista entry traz o recurso,
+
+64
+00:02:33.170 --> 00:02:35.583 line:-1 position:50% align:center size:80%
+no campo resource, e um identificador,
+
+65
+00:02:35.593 --> 00:02:37.694 line:-1 position:50% align:center size:80%
+no campo fullUrl: aqui,
+
+66
+00:02:37.704 --> 00:02:41.180 line:-1 position:50% align:center size:80%
+um código único no formato urn:uuid.
+
+67
+00:02:41.320 --> 00:02:42.596 line:-1 position:50% align:center size:80%
+Com esse identificador,
+
+68
+00:02:42.606 --> 00:02:44.383 line:-1 position:50% align:center size:80%
+um recurso aponta para outro do mesmo
+
+69
+00:02:44.393 --> 00:02:46.456 line:-1 position:50% align:center size:80%
+Bundle: um resultado de exame indica
+
+70
+00:02:46.466 --> 00:02:49.460 line:-1 position:50% align:center size:80%
+o seu paciente pelo fullUrl dele.
+
+71
+00:02:50.210 --> 00:02:52.920 line:-1 position:50% align:center size:80%
+Agora, na prática. Se quiser, pause
+
+72
+00:02:52.930 --> 00:02:55.166 line:-1 position:50% align:center size:80%
+o vídeo e execute cada comando junto.
+
+73
+00:02:55.176 --> 00:02:57.954 line:-1 position:50% align:center size:80%
+Você vai usar o jq, um programa de linha
+
+74
+00:02:57.964 --> 00:03:00.045 line:-1 position:50% align:center size:80%
+de comando que lê arquivos JSON.
+
+75
+00:03:00.055 --> 00:03:03.143 line:-1 position:50% align:center size:80%
+Na pasta do curso, salve o paciente.json
+
+76
+00:03:03.153 --> 00:03:04.924 line:-1 position:50% align:center size:80%
+da primeira etapa da prática: ele
+
+77
+00:03:04.934 --> 00:03:07.530 line:-1 position:50% align:center size:80%
+contém dois erros propositais.
+
+78
+00:03:07.800 --> 00:03:09.215 line:-1 position:50% align:center size:80%
+O comando jq,
+
+79
+00:03:09.225 --> 00:03:11.690 line:-1 position:50% align:center size:80%
+seguido de um ponto e do nome do arquivo,
+
+80
+00:03:11.700 --> 00:03:13.190 line:-1 position:50% align:center size:80%
+mostra o registro inteiro.
+
+81
+00:03:13.200 --> 00:03:15.140 line:-1 position:50% align:center size:80%
+O jq lê o arquivo sem erro:
+
+82
+00:03:15.150 --> 00:03:17.450 line:-1 position:50% align:center size:80%
+o JSON está bem formado.
+
+83
+00:03:17.780 --> 00:03:18.764 line:-1 position:50% align:center size:80%
+Para ler um campo,
+
+84
+00:03:18.774 --> 00:03:20.651 line:-1 position:50% align:center size:80%
+escreva o nome dele depois do ponto:
+
+85
+00:03:20.661 --> 00:03:23.810 line:-1 position:50% align:center size:80%
+.resourceType devolve Patient.
+
+86
+00:03:24.120 --> 00:03:24.918 line:-1 position:50% align:center size:80%
+Em uma lista,
+
+87
+00:03:24.928 --> 00:03:26.829 line:-1 position:50% align:center size:80%
+indique a posição entre colchetes,
+
+88
+00:03:26.839 --> 00:03:29.916 line:-1 position:50% align:center size:80%
+a partir de zero: .name[0].text
+
+89
+00:03:29.926 --> 00:03:32.040 line:-1 position:50% align:center size:80%
+devolve Maria da Silva.
+
+90
+00:03:32.180 --> 00:03:32.554 line:-1 position:50% align:center size:80%
+Agora,
+
+91
+00:03:32.564 --> 00:03:37.316 line:-1 position:50% align:center size:80%
+a data e o gênero: a data é 01/01/1990,
+
+92
+00:03:37.326 --> 00:03:39.774 line:-1 position:50% align:center size:80%
+e o gênero é a letra F. Você já
+
+93
+00:03:39.784 --> 00:03:41.900 line:-1 position:50% align:center size:80%
+sabe por que os dois estão errados.
+
+94
+00:03:42.150 --> 00:03:44.517 line:-1 position:50% align:center size:80%
+O jq não aponta esses erros, porque,
+
+95
+00:03:44.527 --> 00:03:46.893 line:-1 position:50% align:center size:80%
+para ele, os valores são apenas texto.
+
+96
+00:03:46.903 --> 00:03:48.657 line:-1 position:50% align:center size:80%
+Quem conhece as regras do FHIR
+
+97
+00:03:48.667 --> 00:03:51.010 line:-1 position:50% align:center size:80%
+e dos perfis é o Validador.
+
+98
+00:03:51.260 --> 00:03:54.207 line:-1 position:50% align:center size:80%
+Por fim, o bundle.json, da quinta etapa,
+
+99
+00:03:54.217 --> 00:03:56.255 line:-1 position:50% align:center size:80%
+traz o mesmo paciente, corrigido.
+
+100
+00:03:56.265 --> 00:03:59.970 line:-1 position:50% align:center size:80%
+A expressão .entry[0].fullUrl
+
+101
+00:03:59.980 --> 00:04:02.150 line:-1 position:50% align:center size:80%
+devolve o identificador dele.
+
+102
+00:04:02.360 --> 00:04:06.450 line:-1 position:50% align:center size:80%
+E .entry[0].resource.resourceType devolve
+
+103
+00:04:06.460 --> 00:04:08.281 line:-1 position:50% align:center size:80%
+Patient: é o caminho que o Validador
+
+104
+00:04:08.291 --> 00:04:11.130 line:-1 position:50% align:center size:80%
+indica nos problemas dentro do Bundle.
+
+105
+00:04:11.880 --> 00:04:14.775 line:-1 position:50% align:center size:80%
+Em resumo: cada registro é um recurso,
+
+106
+00:04:14.785 --> 00:04:16.686 line:-1 position:50% align:center size:80%
+identificado pelo resourceType.
+
+107
+00:04:16.696 --> 00:04:18.674 line:-1 position:50% align:center size:80%
+Cada campo segue um tipo de dado e,
+
+108
+00:04:18.684 --> 00:04:20.585 line:-1 position:50% align:center size:80%
+às vezes, um conjunto de valores,
+
+109
+00:04:20.595 --> 00:04:22.879 line:-1 position:50% align:center size:80%
+além das regras do perfil. E o Bundle
+
+110
+00:04:22.889 --> 00:04:24.866 line:-1 position:50% align:center size:80%
+reúne os recursos que chegam juntos,
+
+111
+00:04:24.876 --> 00:04:27.520 line:-1 position:50% align:center size:80%
+cada um com o seu fullUrl.
+
+112
+00:04:28.110 --> 00:04:29.250 line:-1 position:50% align:center size:80%
+No próximo vídeo,
+
+113
+00:04:29.260 --> 00:04:31.046 line:-1 position:50% align:center size:80%
+Validar e corrigir um registro,
+
+114
+00:04:31.056 --> 00:04:33.201 line:-1 position:50% align:center size:80%
+o Validador aponta os dois erros deste
+
+115
+00:04:33.211 --> 00:04:36.220 line:-1 position:50% align:center size:80%
+paciente.json, e você os corrige.

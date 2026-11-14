@@ -1,0 +1,25 @@
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "resource": {
+        "resourceType": "Patient",
+        "name": [{ "family": "Souza", "given": ["Maria"] }],
+        "gender": "female",
+        "birthDate": "1985-04-12"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9b2b8c1e-2f4a-4d5b-8c6d-7e8f9a0b1c2d",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "code": { "coding": [{ "system": "http://loinc.org", "code": "718-7", "display": "Hemoglobina" }] },
+        "subject": { "reference": "urn:uuid:3fa85f64-5717-4562-b3fc-2c963f66afa6" },
+        "valueQuantity": { "value": 13.50, "unit": "g/dL", "system": "http://unitsofmeasure.org", "code": "g/dL" }
+      }
+    }
+  ]
+}

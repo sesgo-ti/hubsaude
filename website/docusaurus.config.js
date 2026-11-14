@@ -54,6 +54,7 @@ export default {
       items: [
         {type: 'docSidebar', sidebarId: 'gestor', label: 'Gestores', position: 'left'},
         {type: 'docSidebar', sidebarId: 'integrador', label: 'Integradores', position: 'left'},
+        {type: 'docSidebar', sidebarId: 'curso', label: 'Curso', position: 'left', className: 'navbar__link--curso'},
         {type: 'search', position: 'right'},
       ],
     },

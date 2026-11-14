@@ -1,0 +1,337 @@
+---
+id: registros
+title: "Módulo 3: Montar registros FHIR"
+slug: /curso/registros/
+---
+
+import Details from '@theme/Details';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Video} from '@site/src/components/Video';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+import {Baixar, BaixarPdf} from '@site/src/components/Baixar';
+
+# Módulo 3: Montar registros FHIR
+
+Neste módulo, você aprende como um registro de saúde é escrito no padrão FHIR, como o Validador confere esse registro e como interpretar e corrigir os problemas que ele aponta.
+
+<BaixarPdf arquivo="curso-hubsaude-modulo-3-registros.pdf" />
+
+## Objetivos
+
+Ao final deste módulo, você será capaz de:
+
+- reconhecer a estrutura de um recurso FHIR em JSON;
+- explicar o que são perfis e Guias de Implementação;
+- validar um registro com o HubSaúde CLI e interpretar o resultado;
+- corrigir erros de formato e de valores aceitos;
+- consultar campos de um registro com FHIRPath.
+
+## Conteúdo
+
+:::info Em poucas palavras
+
+- No padrão FHIR, cada informação é um **recurso**, escrito em JSON, como `Patient` para um paciente.
+- Cada campo tem um **tipo de dado** e, às vezes, uma **lista fechada de valores**: é aí que estão a maioria dos erros.
+- Os **perfis**, publicados nos Guias de Implementação, acrescentam as regras de cada uso.
+- O **Validador** confere o registro antes do envio e diz exatamente o que corrigir.
+
+:::
+
+<Video titulo="Anatomia de um registro FHIR" formato="misto" duracao="4 min 39 s" src="/curso/videos/anatomia-registro.mp4" poster="/curso/videos/anatomia-registro.jpg" legenda="/curso/videos/anatomia-registro.vtt">
+
+As partes de um registro FHIR e o porquê de cada uma: recurso, tipos de dado, conjuntos de valores, perfil e Guia de Implementação, e o `Bundle` que reúne vários registros. Termina com consultas ao `paciente.json` e ao `bundle.json` no terminal.
+
+</Video>
+
+### Recursos
+
+No padrão FHIR, cada unidade de informação é um **recurso**. Um paciente é um recurso do tipo `Patient`; um resultado de exame é um recurso do tipo `Observation`. No HubSaúde, os recursos são escritos em JSON, e o campo `resourceType` informa o tipo:
+
+```json
+{
+  "resourceType": "Patient",
+  "name": [{"use": "official", "text": "Maria da Silva"}],
+  "gender": "female",
+  "birthDate": "1990-01-01"
+}
+```
+
+Dois cuidados evitam a maior parte dos erros:
+
+<Cartoes colunas={2}>
+  <Cartao titulo="Cada campo tem um tipo de dado">Datas, por exemplo, seguem o formato `AAAA-MM-DD`. O valor `01/01/1990` é recusado; o correto é `1990-01-01`.</Cartao>
+  <Cartao titulo="Alguns campos têm lista fechada">Essa lista se chama conjunto de valores. O campo `gender` aceita somente `male`, `female`, `other` e `unknown`; o valor `F` é recusado.</Cartao>
+</Cartoes>
+
+### Perfis e Guias de Implementação
+
+O padrão FHIR define a estrutura geral de cada recurso. Os **perfis** acrescentam regras próprias de cada uso, como campos obrigatórios e valores permitidos. Os perfis do HubSaúde estão publicados nos [Guias de Implementação](https://fhir.saude.go.gov.br).
+
+Um registro declara o perfil que segue no campo `meta.profile`. O Validador confere o registro contra as regras do padrão FHIR e dos perfis declarados.
+
+### Bundle
+
+Um **Bundle** agrupa vários recursos em um único registro, como o pedido de um exame e os seus resultados. No ambiente oficial, os registros são enviados ao HubSaúde dentro de um Bundle, com o perfil indicado no Guia de Implementação correspondente. Os exercícios deste módulo começam com um recurso isolado e terminam com um Bundle simples.
+
+### O resultado da validação
+
+O Validador classifica cada problema encontrado em três níveis:
+
+<Cartoes>
+  <Cartao titulo="error">O registro não está de acordo com as regras e **será recusado**. Precisa ser corrigido antes do envio.</Cartao>
+  <Cartao titulo="warning">O registro é aceito, mas há uma recomendação a considerar.</Cartao>
+  <Cartao titulo="information">Observação, sem efeito sobre a aceitação.</Cartao>
+</Cartoes>
+
+Cada problema indica o caminho do campo, como `Patient.birthDate`. O programa também termina com um código que permite automatizar a conferência:
+
+| Código de saída | Significado |
+| --- | --- |
+| `0` | Nenhum problema |
+| `1` | Há erros: o registro não deve ser enviado |
+| `2` | Há apenas avisos: o registro pode ser enviado |
+| `3` | Erro de uso, como uma opção inválida: o problema está no comando, e não no registro |
+
+<Video titulo="Validar e corrigir um registro" formato="misto" duracao="6 min 30 s" src="/curso/videos/validar-corrigir.mp4" poster="/curso/videos/validar-corrigir.jpg" legenda="/curso/videos/validar-corrigir.vtt">
+
+Por que validar antes de enviar, como ler um erro e um aviso e como usar os códigos de saída em scripts. Em seguida, a validação do registro com erros, a correção, a nova validação, o relatório, a interface web do Validador e a consulta FHIRPath, com os mesmos arquivos da prática.
+
+</Video>
+
+Para aprofundar: [Validador](../ferramentas/validador.mdx) e [Códigos de saída](../ferramentas/cli.mdx#códigos-de-saída).
+
+## Prática
+
+Execute os comandos a partir da pasta `curso-hubsaude`, criada no módulo 2.
+
+<Trilha>
+
+<Etapa id="curso-m3-arquivo" marcador="1" titulo="Criar um registro com erros" resumo="Salve um registro de paciente que contém dois erros propositais." ambiente="testes">
+
+**O que você faz:** crie o arquivo `paciente.json` com o conteúdo abaixo. Ele contém dois erros propositais.
+
+```json
+{
+  "resourceType": "Patient",
+  "name": [{"use": "official", "text": "Maria da Silva"}],
+  "gender": "F",
+  "birthDate": "01/01/1990"
+}
+```
+
+<Baixar arquivo="paciente-com-erros.json" nome="paciente.json" />
+
+Antes de continuar, tente identificar os erros com base no conteúdo deste módulo.
+
+Para ler o arquivo no terminal, use o `jq`, instalado no módulo 2. O primeiro comando exibe o registro inteiro, formatado; os demais leem um campo de cada vez:
+
+```bash
+jq . paciente.json
+jq .resourceType paciente.json
+jq '.name[0].text' paciente.json
+jq .birthDate paciente.json
+jq .gender paciente.json
+```
+
+O `jq` apenas lê o arquivo e não conhece as regras do FHIR: ele exibe `"F"` e `"01/01/1990"` sem apontar nenhum problema. Quem confere as regras é o Validador, no próximo passo.
+
+</Etapa>
+
+<Etapa id="curso-m3-validar" marcador="2" titulo="Validar o registro" resumo="Confira o registro com o Validador e leia os problemas apontados." ambiente="testes">
+
+**O que você faz:** valide o arquivo e consulte o código de saída.
+
+```bash
+hubsaude validate paciente.json
+echo $?
+```
+
+Na primeira execução, o Validador é baixado e iniciado, o que pode levar cerca de um minuto. O resultado, com as mensagens longas abreviadas, é semelhante a este:
+
+```text
+/home/usuario/curso-hubsaude/paciente.json	error
+  error    Patient.gender     Unknown code 'http://hl7.org/fhir/administrative-gender#F'
+  error    Patient.gender     O valor fornecido ('F') não foi encontrado no conjunto de valores 'AdministrativeGender' (…)
+  error    Patient.birthDate  Não é uma data válida (01/01/1990)
+  warning  Patient            A restrição falhou: dom-6 (definido em A resource should have narrative for robust management) (Best Practice Recommendation)
+1
+```
+
+O erro em `gender` aparece em duas linhas: uma informa que o código é desconhecido, e a outra, que ele não pertence ao conjunto de valores aceito. O código `1` indica que há erros.
+
+</Etapa>
+
+<Etapa id="curso-m3-corrigir" marcador="3" titulo="Corrigir e validar novamente" resumo="Ajuste os dois campos e confirme que os erros desapareceram." ambiente="testes">
+
+**O que você faz:** corrija os campos `gender` e `birthDate` no arquivo e valide novamente.
+
+<Details summary={<summary>Ver a correção</summary>}>
+
+```json
+{
+  "resourceType": "Patient",
+  "name": [{"use": "official", "text": "Maria da Silva"}],
+  "gender": "female",
+  "birthDate": "1990-01-01"
+}
+```
+
+<Baixar arquivo="paciente.json" />
+
+</Details>
+
+```bash
+hubsaude validate paciente.json
+echo $?
+```
+
+Os erros desaparecem e resta apenas o aviso `dom-6`, com o código de saída `2`. Esse aviso recomenda que o recurso traga um resumo em texto legível, no campo `text`. Ele não impede a aceitação do registro e pode ser mantido nos exercícios.
+
+</Etapa>
+
+<Etapa id="curso-m3-fhirpath" marcador="4" titulo="Consultar um campo com FHIRPath" resumo="Leia o valor de um campo sem abrir o arquivo." ambiente="testes">
+
+**O que você faz:** use uma expressão FHIRPath para ler a data de nascimento.
+
+```bash
+hubsaude fhirpath 'Patient.birthDate' paciente.json
+```
+
+O resultado é `1990-01-01`. Experimente também `'Patient.name.text'` e `'Patient.gender'`. Escreva a expressão sempre entre aspas simples.
+
+- Consulte: [Extrair informações com FHIRPath](../ferramentas/cli.mdx#extrair-informações-com-fhirpath)
+
+</Etapa>
+
+<Etapa id="curso-m3-bundle" marcador="5" titulo="Agrupar o registro em um Bundle" resumo="Coloque o paciente dentro de um Bundle e valide o conjunto." ambiente="testes">
+
+**O que você faz:** crie o arquivo `bundle.json` com o conteúdo abaixo e valide-o.
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "collection",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:5b2c7c1e-6f1a-4c3e-9d2a-1f0e8a7b6c5d",
+      "resource": {
+        "resourceType": "Patient",
+        "name": [{"use": "official", "text": "Maria da Silva"}],
+        "gender": "female",
+        "birthDate": "1990-01-01"
+      }
+    }
+  ]
+}
+```
+
+<Baixar arquivo="bundle.json" />
+
+```bash
+hubsaude validate bundle.json
+```
+
+Cada item de `entry` traz um recurso e um identificador, o `fullUrl`. O resultado indica o caminho do recurso dentro do Bundle, como `Bundle.entry[0].resource`.
+
+Para percorrer o Bundle com o `jq`, indique a posição do item entre colchetes, a partir de zero:
+
+```bash
+jq '.entry[0].fullUrl' bundle.json
+jq '.entry[0].resource.resourceType' bundle.json
+```
+
+O primeiro comando devolve o identificador do item, `"urn:uuid:5b2c7c1e-6f1a-4c3e-9d2a-1f0e8a7b6c5d"`, e o segundo, `"Patient"`. É o mesmo caminho que o Validador indica para os problemas encontrados dentro do Bundle.
+
+</Etapa>
+
+<Etapa id="curso-m3-script" marcador="6" titulo="Usar o código de saída em um script" resumo="Interrompa um processo automaticamente quando o registro tiver erros." ambiente="testes">
+
+**O que você faz:** salve o script abaixo como `conferir.sh`. Ele valida o arquivo informado sem exibir as mensagens e lê o código de saída: quando o código não é `0` nem `2`, interrompe o processo.
+
+```bash
+#!/bin/bash
+hubsaude validate "$1" > /dev/null
+codigo=$?
+if [ $codigo -ne 0 ] && [ $codigo -ne 2 ]; then
+  echo "Envio interrompido (código $codigo)"
+  exit 1
+fi
+echo "Registro sem erros: pode seguir para o envio"
+```
+
+<Baixar arquivo="conferir.sh" />
+
+Execute o script com o registro corrigido:
+
+```bash
+bash conferir.sh paciente.json
+```
+
+O resultado é `Registro sem erros: pode seguir para o envio`, porque o código de saída foi `2`, apenas avisos. Com um registro que contenha erros, o código seria `1`, e o script exibiria `Envio interrompido (código 1)`.
+
+Veja também o código `3`, de erro de uso. Execute o Validador com uma opção que não existe:
+
+```bash
+hubsaude validate paciente.json --formato json
+echo $?
+```
+
+O CLI responde `Erro: flag desconhecida: --formato` e termina com o código `3`: o problema está no comando, não no registro. Para obter o resultado em JSON, a opção correta é `-o json`.
+
+</Etapa>
+
+<Etapa id="curso-m3-relatorio" marcador="7" titulo="Opcional: usar o relatório e a interface web" resumo="Conheça as outras formas de ler o resultado da validação." ambiente="testes">
+
+**O que você faz:** gere um relatório em HTML, aberto automaticamente no navegador:
+
+```bash
+hubsaude validate paciente.json --report
+```
+
+Se preferir validar sem o terminal, abra a interface web do Validador em [`http://localhost:8090/index.html`](http://localhost:8090/index.html), cole o conteúdo do arquivo e clique em **Validar**.
+
+- Consulte: [Passo a passo na interface web](../ferramentas/validador.mdx#passo-a-passo-na-interface-web)
+
+</Etapa>
+
+</Trilha>
+
+## Verificação
+
+**1. O Validador apontou `error` em `Patient.birthDate` para o valor `29-02-2024`. Qual é o problema?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+O formato. Datas no FHIR seguem o padrão `AAAA-MM-DD`; o valor correto seria `2024-02-29`.
+
+</Details>
+
+**2. Um registro foi validado e o programa terminou com o código `2`. O registro pode ser enviado?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Sim. O código `2` indica que há apenas avisos, que não impedem a aceitação. Ainda assim, convém avaliar cada aviso.
+
+</Details>
+
+**3. Qual a diferença entre o padrão FHIR e um perfil?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+O padrão FHIR define a estrutura geral de cada recurso. O perfil acrescenta regras de um uso específico, como campos obrigatórios e valores permitidos, e é publicado nos Guias de Implementação.
+
+</Details>
+
+**4. Como uma automação pode impedir o envio de um registro com erros?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Executando `hubsaude validate` antes do envio e interrompendo o processo quando o código de saída for `1`. A opção `-o json` fornece o resultado em formato legível por programas.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+Se alguma mensagem do Validador ficou difícil de entender, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, módulo 3" e copie a mensagem recebida.
+
+Próximo módulo: [4. Autenticar](autenticar.mdx).

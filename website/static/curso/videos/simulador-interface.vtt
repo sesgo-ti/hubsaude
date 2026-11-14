@@ -1,0 +1,582 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:03.215 line:-1 position:50% align:center size:80%
+Neste vídeo,
+
+2
+00:00:03.225 --> 00:00:05.464 line:-1 position:50% align:center size:80%
+você conhece a interface do Simulador
+
+3
+00:00:05.474 --> 00:00:07.188 line:-1 position:50% align:center size:80%
+e registra nele o seu sistema,
+
+4
+00:00:07.198 --> 00:00:09.437 line:-1 position:50% align:center size:80%
+como o Ganesha faz no ambiente oficial.
+
+5
+00:00:09.447 --> 00:00:11.612 line:-1 position:50% align:center size:80%
+Primeiro, o que é o cadastro; depois,
+
+6
+00:00:11.622 --> 00:00:13.336 line:-1 position:50% align:center size:80%
+a interface; por fim,
+
+7
+00:00:13.346 --> 00:00:16.470 line:-1 position:50% align:center size:80%
+o cadastro feito por você no terminal.
+
+8
+00:00:17.220 --> 00:00:19.394 line:-1 position:50% align:center size:80%
+O HubSaúde só aceita pedidos
+
+9
+00:00:19.404 --> 00:00:21.500 line:-1 position:50% align:center size:80%
+de um sistema cadastrado. O cadastro
+
+10
+00:00:21.510 --> 00:00:23.840 line:-1 position:50% align:center size:80%
+reúne a parte pública do certificado,
+
+11
+00:00:23.850 --> 00:00:26.530 line:-1 position:50% align:center size:80%
+o client_id e as permissões.
+
+12
+00:00:26.540 --> 00:00:27.681 line:-1 position:50% align:center size:80%
+No ambiente oficial,
+
+13
+00:00:27.691 --> 00:00:30.060 line:-1 position:50% align:center size:80%
+o gestor da instituição solicita o acesso
+
+14
+00:00:30.070 --> 00:00:33.490 line:-1 position:50% align:center size:80%
+no Ganesha e anexa somente o arquivo .cer.
+
+15
+00:00:33.640 --> 00:00:34.900 line:-1 position:50% align:center size:80%
+Aprovado o pedido pela
+
+16
+00:00:34.910 --> 00:00:36.468 line:-1 position:50% align:center size:80%
+Secretaria de Estado da Saúde,
+
+17
+00:00:36.478 --> 00:00:38.559 line:-1 position:50% align:center size:80%
+o Ganesha cadastra a chave pública,
+
+18
+00:00:38.569 --> 00:00:39.903 line:-1 position:50% align:center size:80%
+com os acessos do serviço,
+
+19
+00:00:39.913 --> 00:00:42.130 line:-1 position:50% align:center size:80%
+e devolve o client_id.
+
+20
+00:00:42.330 --> 00:00:45.243 line:-1 position:50% align:center size:80%
+No Simulador, você mesmo faz esse papel.
+
+21
+00:00:45.253 --> 00:00:47.474 line:-1 position:50% align:center size:80%
+Primeiro, gera um certificado de teste,
+
+22
+00:00:47.484 --> 00:00:50.450 line:-1 position:50% align:center size:80%
+com a chave privada e a parte pública.
+
+23
+00:00:50.640 --> 00:00:51.242 line:-1 position:50% align:center size:80%
+Depois,
+
+24
+00:00:51.252 --> 00:00:53.996 line:-1 position:50% align:center size:80%
+registra o sistema: envia a parte pública,
+
+25
+00:00:54.006 --> 00:00:55.450 line:-1 position:50% align:center size:80%
+escolhe o client_id,
+
+26
+00:00:55.460 --> 00:00:57.057 line:-1 position:50% align:center size:80%
+que no curso é meu-sistema,
+
+27
+00:00:57.067 --> 00:00:59.100 line:-1 position:50% align:center size:80%
+e informa as permissões.
+
+28
+00:00:59.160 --> 00:01:01.897 line:-1 position:50% align:center size:80%
+A chave privada nunca é enviada: fica
+
+29
+00:01:01.907 --> 00:01:04.468 line:-1 position:50% align:center size:80%
+no seu computador e, no módulo 4,
+
+30
+00:01:04.478 --> 00:01:07.180 line:-1 position:50% align:center size:80%
+comprova a identidade do sistema.
+
+31
+00:01:07.930 --> 00:01:10.845 line:-1 position:50% align:center size:80%
+As permissões são chamadas de escopos.
+
+32
+00:01:10.855 --> 00:01:13.170 line:-1 position:50% align:center size:80%
+Cada escopo indica um tipo de registro
+
+33
+00:01:13.180 --> 00:01:15.780 line:-1 position:50% align:center size:80%
+e as operações permitidas sobre ele.
+
+34
+00:01:16.070 --> 00:01:18.174 line:-1 position:50% align:center size:80%
+Veja um exemplo de escopo:
+
+35
+00:01:18.184 --> 00:01:22.480 line:-1 position:50% align:center size:80%
+system/Patient.c. A primeira parte,
+
+36
+00:01:22.490 --> 00:01:24.907 line:-1 position:50% align:center size:80%
+system, indica que o acesso é feito por
+
+37
+00:01:24.917 --> 00:01:27.334 line:-1 position:50% align:center size:80%
+um sistema, sem uma pessoa conectada.
+
+38
+00:01:27.344 --> 00:01:29.683 line:-1 position:50% align:center size:80%
+Patient é o registro de paciente,
+
+39
+00:01:29.693 --> 00:01:31.954 line:-1 position:50% align:center size:80%
+e a letra c, depois do ponto,
+
+40
+00:01:31.964 --> 00:01:35.712 line:-1 position:50% align:center size:80%
+significa criar. Em Patient.rs,
+
+41
+00:01:35.722 --> 00:01:37.748 line:-1 position:50% align:center size:80%
+a letra r significa ler,
+
+42
+00:01:37.758 --> 00:01:40.300 line:-1 position:50% align:center size:80%
+e a letra s, pesquisar.
+
+43
+00:01:40.490 --> 00:01:42.478 line:-1 position:50% align:center size:80%
+O curso usa três escopos.
+
+44
+00:01:42.488 --> 00:01:45.091 line:-1 position:50% align:center size:80%
+Com Patient.c, o seu sistema cria
+
+45
+00:01:45.101 --> 00:01:48.395 line:-1 position:50% align:center size:80%
+registros de paciente; com Patient.rs,
+
+46
+00:01:48.405 --> 00:01:50.830 line:-1 position:50% align:center size:80%
+lê e pesquisa esses registros.
+
+47
+00:01:50.930 --> 00:01:54.723 line:-1 position:50% align:center size:80%
+Com Task.rs, acompanha o envio:
+
+48
+00:01:54.733 --> 00:01:56.508 line:-1 position:50% align:center size:80%
+o processamento é assíncrono,
+
+49
+00:01:56.518 --> 00:01:59.973 line:-1 position:50% align:center size:80%
+e a Task informa o andamento.
+
+50
+00:02:03.746 --> 00:02:06.142 line:-1 position:50% align:center size:80%
+Sem esse escopo, o sistema envia,
+
+51
+00:02:06.152 --> 00:02:08.210 line:-1 position:50% align:center size:80%
+mas não sabe o resultado.
+
+52
+00:02:08.410 --> 00:02:09.606 line:-1 position:50% align:center size:80%
+Como o sistema obtém
+
+53
+00:02:09.616 --> 00:02:11.265 line:-1 position:50% align:center size:80%
+esses escopos? Primeiro,
+
+54
+00:02:11.275 --> 00:02:13.678 line:-1 position:50% align:center size:80%
+eles precisam estar liberados no cadastro.
+
+55
+00:02:13.688 --> 00:02:15.110 line:-1 position:50% align:center size:80%
+No Simulador, você mesmo
+
+56
+00:02:15.120 --> 00:02:16.995 line:-1 position:50% align:center size:80%
+os informa ao registrar o sistema,
+
+57
+00:02:17.005 --> 00:02:19.240 line:-1 position:50% align:center size:80%
+como verá adiante no terminal.
+
+58
+00:02:19.350 --> 00:02:22.070 line:-1 position:50% align:center size:80%
+Depois, a cada pedido de token, o sistema
+
+59
+00:02:22.080 --> 00:02:24.019 line:-1 position:50% align:center size:80%
+informa os escopos de que precisa,
+
+60
+00:02:24.029 --> 00:02:25.735 line:-1 position:50% align:center size:80%
+e o servidor concede apenas
+
+61
+00:02:25.745 --> 00:02:28.075 line:-1 position:50% align:center size:80%
+os que estão liberados no cadastro.
+
+62
+00:02:28.085 --> 00:02:29.401 line:-1 position:50% align:center size:80%
+No ambiente oficial,
+
+63
+00:02:29.411 --> 00:02:31.584 line:-1 position:50% align:center size:80%
+eles são definidos no credenciamento,
+
+64
+00:02:31.594 --> 00:02:34.050 line:-1 position:50% align:center size:80%
+conforme o serviço da instituição.
+
+65
+00:02:34.090 --> 00:02:35.858 line:-1 position:50% align:center size:80%
+Um escopo não liberado faz
+
+66
+00:02:35.868 --> 00:02:37.859 line:-1 position:50% align:center size:80%
+o pedido de token ser recusado.
+
+67
+00:02:37.869 --> 00:02:40.304 line:-1 position:50% align:center size:80%
+E, se o token não tiver o escopo exigido,
+
+68
+00:02:40.314 --> 00:02:42.590 line:-1 position:50% align:center size:80%
+a operação é recusada.
+
+69
+00:02:43.340 --> 00:02:45.983 line:-1 position:50% align:center size:80%
+Agora, um percurso pela interface.
+
+70
+00:02:45.993 --> 00:02:47.777 line:-1 position:50% align:center size:80%
+Com o Simulador em funcionamento,
+
+71
+00:02:47.787 --> 00:02:50.351 line:-1 position:50% align:center size:80%
+abra no navegador o endereço localhost,
+
+72
+00:02:50.361 --> 00:02:53.130 line:-1 position:50% align:center size:80%
+porta 8443.
+
+73
+00:02:53.260 --> 00:02:55.089 line:-1 position:50% align:center size:80%
+No alto, o indicador mostra
+
+74
+00:02:55.099 --> 00:02:56.708 line:-1 position:50% align:center size:80%
+que o Simulador está em execução,
+
+75
+00:02:56.718 --> 00:02:59.790 line:-1 position:50% align:center size:80%
+no ambiente de testes e de homologação.
+
+76
+00:02:59.920 --> 00:03:01.953 line:-1 position:50% align:center size:80%
+O aviso no início da página confirma
+
+77
+00:03:01.963 --> 00:03:03.777 line:-1 position:50% align:center size:80%
+o endereço e oferece o certificado
+
+78
+00:03:03.787 --> 00:03:06.690 line:-1 position:50% align:center size:80%
+do Simulador, que você baixa no terminal.
+
+79
+00:03:07.160 --> 00:03:09.610 line:-1 position:50% align:center size:80%
+O menu leva a cada seção.
+
+80
+00:03:09.620 --> 00:03:12.454 line:-1 position:50% align:center size:80%
+A seção Fluxo resume, em cinco passos,
+
+81
+00:03:12.464 --> 00:03:14.880 line:-1 position:50% align:center size:80%
+o caminho até os recursos FHIR.
+
+82
+00:03:14.890 --> 00:03:16.444 line:-1 position:50% align:center size:80%
+Gerar o certificado,
+
+83
+00:03:16.454 --> 00:03:19.571 line:-1 position:50% align:center size:80%
+registrar o cliente, gerar a assertion,
+
+84
+00:03:19.581 --> 00:03:23.793 line:-1 position:50% align:center size:80%
+obter o token com mTLS e acessar o FHIR.
+
+85
+00:03:23.803 --> 00:03:25.201 line:-1 position:50% align:center size:80%
+Os dois primeiros passos
+
+86
+00:03:25.211 --> 00:03:26.890 line:-1 position:50% align:center size:80%
+formam o cadastro.
+
+87
+00:03:27.140 --> 00:03:29.464 line:-1 position:50% align:center size:80%
+A seção Gerar Certificado do Cliente
+
+88
+00:03:29.474 --> 00:03:30.850 line:-1 position:50% align:center size:80%
+traz os comandos para criar
+
+89
+00:03:30.860 --> 00:03:32.600 line:-1 position:50% align:center size:80%
+e conferir o certificado de teste,
+
+90
+00:03:32.610 --> 00:03:34.200 line:-1 position:50% align:center size:80%
+prontos para copiar.
+
+91
+00:03:34.500 --> 00:03:36.313 line:-1 position:50% align:center size:80%
+Em Gerenciamento de Clientes,
+
+92
+00:03:36.323 --> 00:03:38.821 line:-1 position:50% align:center size:80%
+o registro informa o client_id,
+
+93
+00:03:38.831 --> 00:03:42.088 line:-1 position:50% align:center size:80%
+o certificado X.509 e os escopos.
+
+94
+00:03:42.098 --> 00:03:44.671 line:-1 position:50% align:center size:80%
+O Simulador vincula ao client_id
+
+95
+00:03:44.681 --> 00:03:47.310 line:-1 position:50% align:center size:80%
+a impressão digital do certificado.
+
+96
+00:03:47.500 --> 00:03:49.463 line:-1 position:50% align:center size:80%
+Repare que o exemplo da página usa
+
+97
+00:03:49.473 --> 00:03:52.348 line:-1 position:50% align:center size:80%
+valores próprios, como my-backend-app.
+
+98
+00:03:52.358 --> 00:03:54.245 line:-1 position:50% align:center size:80%
+No curso, substitua-os por
+
+99
+00:03:54.255 --> 00:03:57.110 line:-1 position:50% align:center size:80%
+meu-sistema e pelos três escopos.
+
+100
+00:03:57.360 --> 00:04:00.321 line:-1 position:50% align:center size:80%
+As seções Autenticação e FHIR trazem
+
+101
+00:04:00.331 --> 00:04:02.226 line:-1 position:50% align:center size:80%
+os próximos módulos: o token,
+
+102
+00:04:02.236 --> 00:04:04.816 line:-1 position:50% align:center size:80%
+obtido por mTLS, e o envio,
+
+103
+00:04:04.826 --> 00:04:06.700 line:-1 position:50% align:center size:80%
+acompanhado pela Task.
+
+104
+00:04:07.450 --> 00:04:09.749 line:-1 position:50% align:center size:80%
+Agora, o mesmo cadastro no terminal,
+
+105
+00:04:09.759 --> 00:04:12.596 line:-1 position:50% align:center size:80%
+na pasta curso-hubsaude: o equivalente
+
+106
+00:04:12.606 --> 00:04:14.520 line:-1 position:50% align:center size:80%
+local do que o Ganesha faz.
+
+107
+00:04:14.530 --> 00:04:16.059 line:-1 position:50% align:center size:80%
+Se quiser, pause o vídeo
+
+108
+00:04:16.069 --> 00:04:18.420 line:-1 position:50% align:center size:80%
+e execute cada comando junto.
+
+109
+00:04:18.610 --> 00:04:20.187 line:-1 position:50% align:center size:80%
+O primeiro comando gera o par
+
+110
+00:04:20.197 --> 00:04:22.152 line:-1 position:50% align:center size:80%
+de chaves e o certificado de teste,
+
+111
+00:04:22.162 --> 00:04:25.325 line:-1 position:50% align:center size:80%
+autoassinado, válido por 365 dias,
+
+112
+00:04:25.335 --> 00:04:27.640 line:-1 position:50% align:center size:80%
+para o titular meu-sistema.
+
+113
+00:04:27.650 --> 00:04:30.220 line:-1 position:50% align:center size:80%
+Os pontos e sinais mostram o progresso.
+
+114
+00:04:30.230 --> 00:04:33.503 line:-1 position:50% align:center size:80%
+Ao final, a pasta tem client-cert.pem,
+
+115
+00:04:33.513 --> 00:04:36.629 line:-1 position:50% align:center size:80%
+a parte pública, e client-key.pem,
+
+116
+00:04:36.639 --> 00:04:38.240 line:-1 position:50% align:center size:80%
+a chave privada.
+
+117
+00:04:38.580 --> 00:04:40.283 line:-1 position:50% align:center size:80%
+O segundo comando confere o titular
+
+118
+00:04:40.293 --> 00:04:43.070 line:-1 position:50% align:center size:80%
+e o fim da validade, um ano depois.
+
+119
+00:04:43.560 --> 00:04:46.407 line:-1 position:50% align:center size:80%
+O terceiro registra o sistema: o curl
+
+120
+00:04:46.417 --> 00:04:48.662 line:-1 position:50% align:center size:80%
+envia o client_id, o arquivo da parte
+
+121
+00:04:48.672 --> 00:04:51.519 line:-1 position:50% align:center size:80%
+pública e os três escopos. A opção -k
+
+122
+00:04:51.529 --> 00:04:54.360 line:-1 position:50% align:center size:80%
+aceita o certificado próprio do Simulador.
+
+123
+00:04:54.630 --> 00:04:57.513 line:-1 position:50% align:center size:80%
+A resposta repete o cadastro: o client_id,
+
+124
+00:04:57.523 --> 00:04:59.368 line:-1 position:50% align:center size:80%
+os escopos liberados e o titular
+
+125
+00:04:59.378 --> 00:05:01.370 line:-1 position:50% align:center size:80%
+do certificado. No ambiente oficial,
+
+126
+00:05:01.380 --> 00:05:04.030 line:-1 position:50% align:center size:80%
+o client_id vem do Ganesha.
+
+127
+00:05:04.400 --> 00:05:06.863 line:-1 position:50% align:center size:80%
+Por fim, baixe o certificado do Simulador.
+
+128
+00:05:06.873 --> 00:05:08.603 line:-1 position:50% align:center size:80%
+Com ele, os seus programas confiam
+
+129
+00:05:08.613 --> 00:05:10.630 line:-1 position:50% align:center size:80%
+na conexão sem a opção -k.
+
+130
+00:05:11.040 --> 00:05:12.545 line:-1 position:50% align:center size:80%
+O curl mostra o andamento
+
+131
+00:05:12.555 --> 00:05:14.336 line:-1 position:50% align:center size:80%
+da transferência, e a pasta passa a ter
+
+132
+00:05:14.346 --> 00:05:16.900 line:-1 position:50% align:center size:80%
+os três arquivos dos próximos módulos.
+
+133
+00:05:17.270 --> 00:05:19.721 line:-1 position:50% align:center size:80%
+Atenção: o Simulador guarda os cadastros
+
+134
+00:05:19.731 --> 00:05:21.749 line:-1 position:50% align:center size:80%
+só na memória. Se ele for encerrado,
+
+135
+00:05:21.759 --> 00:05:24.570 line:-1 position:50% align:center size:80%
+inicie-o de novo e repita o cadastro.
+
+136
+00:05:25.320 --> 00:05:26.957 line:-1 position:50% align:center size:80%
+Em resumo: no Simulador,
+
+137
+00:05:26.967 --> 00:05:28.455 line:-1 position:50% align:center size:80%
+você faz o papel do Ganesha,
+
+138
+00:05:28.465 --> 00:05:30.444 line:-1 position:50% align:center size:80%
+com o certificado de teste e o client_id
+
+139
+00:05:30.454 --> 00:05:32.647 line:-1 position:50% align:center size:80%
+meu-sistema. Os escopos definem
+
+140
+00:05:32.657 --> 00:05:34.594 line:-1 position:50% align:center size:80%
+o que o sistema pode fazer. E a chave
+
+141
+00:05:34.604 --> 00:05:37.200 line:-1 position:50% align:center size:80%
+privada nunca sai do seu computador.
+
+142
+00:05:37.570 --> 00:05:39.421 line:-1 position:50% align:center size:80%
+No próximo vídeo, do módulo 3,
+
+143
+00:05:39.431 --> 00:05:41.568 line:-1 position:50% align:center size:80%
+você começa a montar registros FHIR,
+
+144
+00:05:41.578 --> 00:05:43.358 line:-1 position:50% align:center size:80%
+conhecendo as partes de um registro,
+
+145
+00:05:43.368 --> 00:05:45.650 line:-1 position:50% align:center size:80%
+do recurso ao Bundle.

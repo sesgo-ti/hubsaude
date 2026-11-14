@@ -118,8 +118,8 @@ test('home entries, brand, support and navbar work, including the 360px layout',
     expect(searchBox.x + searchBox.width).toBeLessThanOrEqual(360);
   }
   await screenshot(page, testInfo, 'home');
-  for (const route of ['gestor/', 'fluxos/']) {
-    await expect(page.locator('main a[href]:visible')).toHaveCount(2);
+  for (const route of ['gestor/', 'fluxos/', 'curso/']) {
+    await expect(page.locator('main a[href]:visible')).toHaveCount(3);
     await page.locator(`main a[href="/hubsaude/${route}"]`).click();
     await expect(page).toHaveURL(new URL(`/hubsaude/${route}`, page.url()).href);
     await expect(page.locator('main h1')).toBeVisible();
@@ -127,7 +127,7 @@ test('home entries, brand, support and navbar work, including the 360px layout',
     await brand.click();
     await expect(page).toHaveURL(new URL('/hubsaude/', page.url()).href);
   }
-  for (const route of ['gestor/', 'fluxos/']) {
+  for (const route of ['gestor/', 'fluxos/', 'curso/']) {
     if (mobile) await page.locator('.navbar__toggle').click();
     const nav = page.locator(mobile ? '.navbar-sidebar' : '.navbar__items');
     await nav.locator(`a[href="/hubsaude/${route}"]`).click();
@@ -312,7 +312,8 @@ test.describe('progressive enhancement', () => {
   test.use({javaScriptEnabled: false});
   test('home, authentication and manager initial content remains usable without JavaScript', async ({page}) => {
     await visit(page);
-    await expect(page.locator('main a[href]:visible')).toHaveCount(2);
+    await expect(page.locator('main a[href]:visible')).toHaveCount(3);
+    await expect(page.locator('main a[href="/hubsaude/curso/"]')).toBeVisible();
     const gestor = page.locator('main a[href="/hubsaude/gestor/"]');
     await expect(page.locator('main a[href="/hubsaude/fluxos/"]')).toBeVisible();
     await gestor.focus();

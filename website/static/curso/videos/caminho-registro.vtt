@@ -1,0 +1,462 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:03.271 line:-1 position:50% align:center size:80%
+Neste vídeo,
+
+2
+00:00:03.281 --> 00:00:05.260 line:-1 position:50% align:center size:80%
+você acompanha o caminho de um registro,
+
+3
+00:00:05.270 --> 00:00:07.249 line:-1 position:50% align:center size:80%
+do credenciamento da instituição
+
+4
+00:00:07.259 --> 00:00:09.238 line:-1 position:50% align:center size:80%
+até a confirmação do resultado,
+
+5
+00:00:09.248 --> 00:00:12.250 line:-1 position:50% align:center size:80%
+e entende por que cada etapa existe.
+
+6
+00:00:13.000 --> 00:00:15.477 line:-1 position:50% align:center size:80%
+Antes de enviar dados ao ambiente oficial,
+
+7
+00:00:15.487 --> 00:00:17.883 line:-1 position:50% align:center size:80%
+a instituição precisa ser credenciada.
+
+8
+00:00:17.893 --> 00:00:19.969 line:-1 position:50% align:center size:80%
+Quem cuida disso é o gestor,
+
+9
+00:00:19.979 --> 00:00:21.814 line:-1 position:50% align:center size:80%
+a pessoa responsável pela relação
+
+10
+00:00:21.824 --> 00:00:24.420 line:-1 position:50% align:center size:80%
+da instituição com o HubSaúde.
+
+11
+00:00:24.640 --> 00:00:26.998 line:-1 position:50% align:center size:80%
+O gestor solicita o acesso no Ganesha,
+
+12
+00:00:27.008 --> 00:00:28.602 line:-1 position:50% align:center size:80%
+o Sistema de Credenciamento,
+
+13
+00:00:28.612 --> 00:00:30.971 line:-1 position:50% align:center size:80%
+e anexa somente o arquivo .cer,
+
+14
+00:00:30.981 --> 00:00:32.422 line:-1 position:50% align:center size:80%
+a parte pública do certificado
+
+15
+00:00:32.432 --> 00:00:34.255 line:-1 position:50% align:center size:80%
+ICP-Brasil da instituição.
+
+16
+00:00:34.265 --> 00:00:37.060 line:-1 position:50% align:center size:80%
+A chave privada nunca é enviada.
+
+17
+00:00:37.090 --> 00:00:38.333 line:-1 position:50% align:center size:80%
+A Secretaria de Estado
+
+18
+00:00:38.343 --> 00:00:39.977 line:-1 position:50% align:center size:80%
+da Saúde valida o pedido,
+
+19
+00:00:39.987 --> 00:00:42.248 line:-1 position:50% align:center size:80%
+confirma que o solicitante é quem diz ser
+
+20
+00:00:42.258 --> 00:00:45.066 line:-1 position:50% align:center size:80%
+e atribui o nível de credenciamento: N1,
+
+21
+00:00:45.076 --> 00:00:48.825 line:-1 position:50% align:center size:80%
+N2 ou N3. O nível define até onde
+
+22
+00:00:48.835 --> 00:00:51.690 line:-1 position:50% align:center size:80%
+vai o acesso aos dados de saúde.
+
+23
+00:00:52.080 --> 00:00:54.373 line:-1 position:50% align:center size:80%
+Aprovado o pedido, o Ganesha cadastra
+
+24
+00:00:54.383 --> 00:00:56.676 line:-1 position:50% align:center size:80%
+a chave pública no servidor de autorização
+
+25
+00:00:56.686 --> 00:00:59.127 line:-1 position:50% align:center size:80%
+e devolve o client_id, a credencial
+
+26
+00:00:59.137 --> 00:01:01.270 line:-1 position:50% align:center size:80%
+do sistema para aquele serviço.
+
+27
+00:01:01.610 --> 00:01:03.885 line:-1 position:50% align:center size:80%
+No Simulador, o próprio integrador faz
+
+28
+00:01:03.895 --> 00:01:05.836 line:-1 position:50% align:center size:80%
+esse papel: registra um certificado
+
+29
+00:01:05.846 --> 00:01:08.121 line:-1 position:50% align:center size:80%
+de teste e escolhe o client_id.
+
+30
+00:01:08.131 --> 00:01:10.254 line:-1 position:50% align:center size:80%
+Por isso, o desenvolvimento não precisa
+
+31
+00:01:10.264 --> 00:01:12.670 line:-1 position:50% align:center size:80%
+esperar a aprovação do credenciamento.
+
+32
+00:01:13.090 --> 00:01:15.067 line:-1 position:50% align:center size:80%
+O certificado e o client_id são
+
+33
+00:01:15.077 --> 00:01:17.125 line:-1 position:50% align:center size:80%
+detalhados no módulo 4. Aqui,
+
+34
+00:01:17.135 --> 00:01:19.330 line:-1 position:50% align:center size:80%
+basta saber de onde eles vêm.
+
+35
+00:01:20.080 --> 00:01:21.786 line:-1 position:50% align:center size:80%
+Com a credencial definida,
+
+36
+00:01:21.796 --> 00:01:24.288 line:-1 position:50% align:center size:80%
+todo registro enviado ao HubSaúde percorre
+
+37
+00:01:24.298 --> 00:01:26.650 line:-1 position:50% align:center size:80%
+o mesmo caminho, em cinco etapas.
+
+38
+00:01:26.770 --> 00:01:27.446 line:-1 position:50% align:center size:80%
+Primeiro,
+
+39
+00:01:27.456 --> 00:01:29.960 line:-1 position:50% align:center size:80%
+o sistema monta o registro no padrão FHIR,
+
+40
+00:01:29.970 --> 00:01:31.865 line:-1 position:50% align:center size:80%
+em formato JSON, seguindo as regras
+
+41
+00:01:31.875 --> 00:01:33.923 line:-1 position:50% align:center size:80%
+do Guia de Implementação do assunto.
+
+42
+00:01:33.933 --> 00:01:36.209 line:-1 position:50% align:center size:80%
+Com o padrão comum, sistemas diferentes
+
+43
+00:01:36.219 --> 00:01:38.550 line:-1 position:50% align:center size:80%
+entendem a mesma informação.
+
+44
+00:01:38.840 --> 00:01:39.878 line:-1 position:50% align:center size:80%
+Antes do envio,
+
+45
+00:01:39.888 --> 00:01:41.675 line:-1 position:50% align:center size:80%
+o Validador confere o registro
+
+46
+00:01:41.685 --> 00:01:43.697 line:-1 position:50% align:center size:80%
+e aponta o que precisa ser corrigido.
+
+47
+00:01:43.707 --> 00:01:45.644 line:-1 position:50% align:center size:80%
+Corrigir no seu computador evita que o
+
+48
+00:01:45.654 --> 00:01:48.550 line:-1 position:50% align:center size:80%
+registro seja recusado depois do envio.
+
+49
+00:01:48.790 --> 00:01:50.693 line:-1 position:50% align:center size:80%
+Em seguida, o sistema comprova
+
+50
+00:01:50.703 --> 00:01:52.377 line:-1 position:50% align:center size:80%
+a sua identidade com o certificado
+
+51
+00:01:52.387 --> 00:01:54.903 line:-1 position:50% align:center size:80%
+digital e recebe um token de acesso,
+
+52
+00:01:54.913 --> 00:01:57.122 line:-1 position:50% align:center size:80%
+uma autorização temporária. Assim,
+
+53
+00:01:57.132 --> 00:01:59.801 line:-1 position:50% align:center size:80%
+o HubSaúde sabe quem envia cada registro
+
+54
+00:01:59.811 --> 00:02:02.380 line:-1 position:50% align:center size:80%
+e o que esse sistema pode fazer.
+
+55
+00:02:02.790 --> 00:02:05.790 line:-1 position:50% align:center size:80%
+Com o token, o sistema envia o registro.
+
+56
+00:02:05.820 --> 00:02:08.849 line:-1 position:50% align:center size:80%
+O HubSaúde confirma o recebimento na hora
+
+57
+00:02:08.859 --> 00:02:11.187 line:-1 position:50% align:center size:80%
+e devolve um endereço de acompanhamento,
+
+58
+00:02:11.197 --> 00:02:13.875 line:-1 position:50% align:center size:80%
+semelhante a um número de protocolo.
+
+59
+00:02:13.885 --> 00:02:15.984 line:-1 position:50% align:center size:80%
+O conteúdo é processado depois.
+
+60
+00:02:15.994 --> 00:02:17.657 line:-1 position:50% align:center size:80%
+Por isso, o sistema consulta esse
+
+61
+00:02:17.667 --> 00:02:20.480 line:-1 position:50% align:center size:80%
+endereço até o fim do processamento.
+
+62
+00:02:20.490 --> 00:02:23.013 line:-1 position:50% align:center size:80%
+O resultado informa se o registro foi
+
+63
+00:02:23.023 --> 00:02:26.417 line:-1 position:50% align:center size:80%
+aceito ou, em caso de recusa, um motivo,
+
+64
+00:02:26.427 --> 00:02:29.310 line:-1 position:50% align:center size:80%
+que indica o que precisa ser corrigido.
+
+65
+00:02:30.060 --> 00:02:32.930 line:-1 position:50% align:center size:80%
+Esse caminho existe em dois ambientes.
+
+66
+00:02:32.940 --> 00:02:35.570 line:-1 position:50% align:center size:80%
+O Simulador funciona no seu computador,
+
+67
+00:02:35.580 --> 00:02:37.330 line:-1 position:50% align:center size:80%
+com um cadastro feito por você
+
+68
+00:02:37.340 --> 00:02:39.250 line:-1 position:50% align:center size:80%
+e apenas dados fictícios,
+
+69
+00:02:39.260 --> 00:02:42.000 line:-1 position:50% align:center size:80%
+apagados quando ele é reiniciado.
+
+70
+00:02:42.010 --> 00:02:45.134 line:-1 position:50% align:center size:80%
+O ambiente oficial é o HubSaúde real,
+
+71
+00:02:45.144 --> 00:02:47.196 line:-1 position:50% align:center size:80%
+também chamado de produção.
+
+72
+00:02:47.206 --> 00:02:50.000 line:-1 position:50% align:center size:80%
+Ele usa o client_id do credenciamento,
+
+73
+00:02:50.010 --> 00:02:51.897 line:-1 position:50% align:center size:80%
+o certificado ICP-Brasil
+
+74
+00:02:51.907 --> 00:02:54.206 line:-1 position:50% align:center size:80%
+da instituição e dados reais,
+
+75
+00:02:54.216 --> 00:02:57.525 line:-1 position:50% align:center size:80%
+limitados ao nível de acesso concedido.
+
+76
+00:02:57.535 --> 00:02:59.453 line:-1 position:50% align:center size:80%
+O Simulador exige as mesmas
+
+77
+00:02:59.463 --> 00:03:01.458 line:-1 position:50% align:center size:80%
+etapas de segurança. Por isso,
+
+78
+00:03:01.468 --> 00:03:03.617 line:-1 position:50% align:center size:80%
+um sistema que funciona nele precisa
+
+79
+00:03:03.627 --> 00:03:06.239 line:-1 position:50% align:center size:80%
+apenas de ajustes de configuração: mudam
+
+80
+00:03:06.249 --> 00:03:09.530 line:-1 position:50% align:center size:80%
+o endereço, o client_id e o certificado.
+
+81
+00:03:10.280 --> 00:03:11.064 line:-1 position:50% align:center size:80%
+Na prática,
+
+82
+00:03:11.074 --> 00:03:13.085 line:-1 position:50% align:center size:80%
+este módulo não exige instalação.
+
+83
+00:03:13.095 --> 00:03:15.178 line:-1 position:50% align:center size:80%
+O HubSaúde descreve o que oferece
+
+84
+00:03:15.188 --> 00:03:16.333 line:-1 position:50% align:center size:80%
+em endereços públicos,
+
+85
+00:03:16.343 --> 00:03:18.920 line:-1 position:50% align:center size:80%
+que podem ser abertos no navegador.
+
+86
+00:03:18.930 --> 00:03:21.702 line:-1 position:50% align:center size:80%
+O endereço /metadata devolve
+
+87
+00:03:21.712 --> 00:03:24.166 line:-1 position:50% align:center size:80%
+um CapabilityStatement, a descrição
+
+88
+00:03:24.176 --> 00:03:26.233 line:-1 position:50% align:center size:80%
+técnica do que o servidor oferece.
+
+89
+00:03:26.243 --> 00:03:28.660 line:-1 position:50% align:center size:80%
+Veja um trecho simplificado.
+
+90
+00:03:28.830 --> 00:03:31.446 line:-1 position:50% align:center size:80%
+Procure a lista rest.resource.
+
+91
+00:03:31.456 --> 00:03:33.220 line:-1 position:50% align:center size:80%
+Cada item dessa lista é um tipo
+
+92
+00:03:33.230 --> 00:03:35.770 line:-1 position:50% align:center size:80%
+de registro aceito pelo servidor.
+
+93
+00:03:35.780 --> 00:03:37.109 line:-1 position:50% align:center size:80%
+No ambiente oficial,
+
+94
+00:03:37.119 --> 00:03:39.471 line:-1 position:50% align:center size:80%
+a lista traz tipos como Bundle,
+
+95
+00:03:39.481 --> 00:03:42.430 line:-1 position:50% align:center size:80%
+Task, Provenance e Consent.
+
+96
+00:03:42.630 --> 00:03:44.527 line:-1 position:50% align:center size:80%
+Os registros clínicos chegam dentro
+
+97
+00:03:44.537 --> 00:03:46.358 line:-1 position:50% align:center size:80%
+de um Bundle, conforme o Guia
+
+98
+00:03:46.368 --> 00:03:48.188 line:-1 position:50% align:center size:80%
+de Implementação de cada assunto.
+
+99
+00:03:48.198 --> 00:03:50.782 line:-1 position:50% align:center size:80%
+E a Task é o endereço de acompanhamento
+
+100
+00:03:50.792 --> 00:03:52.820 line:-1 position:50% align:center size:80%
+que você usa no módulo 5.
+
+101
+00:03:52.960 --> 00:03:54.287 line:-1 position:50% align:center size:80%
+Outro endereço público,
+
+102
+00:03:54.297 --> 00:03:56.411 line:-1 position:50% align:center size:80%
+terminado em smart-configuration,
+
+103
+00:03:56.421 --> 00:03:58.771 line:-1 position:50% align:center size:80%
+mostra como a segurança está configurada.
+
+104
+00:03:58.781 --> 00:04:01.255 line:-1 position:50% align:center size:80%
+Ele volta no módulo 4.
+
+105
+00:04:02.005 --> 00:04:04.087 line:-1 position:50% align:center size:80%
+Em resumo: o client_id
+
+106
+00:04:04.097 --> 00:04:05.404 line:-1 position:50% align:center size:80%
+vem do credenciamento,
+
+107
+00:04:05.414 --> 00:04:07.651 line:-1 position:50% align:center size:80%
+feito pelo gestor no Ganesha.
+
+108
+00:04:07.661 --> 00:04:10.877 line:-1 position:50% align:center size:80%
+Todo registro passa por montar, conferir,
+
+109
+00:04:10.887 --> 00:04:13.666 line:-1 position:50% align:center size:80%
+autenticar, enviar e acompanhar.
+
+110
+00:04:13.676 --> 00:04:15.603 line:-1 position:50% align:center size:80%
+E todo o caminho pode ser praticado
+
+111
+00:04:15.613 --> 00:04:18.830 line:-1 position:50% align:center size:80%
+no Simulador, antes do ambiente oficial.
+
+112
+00:04:18.940 --> 00:04:21.114 line:-1 position:50% align:center size:80%
+No próximo vídeo, do módulo 2,
+
+113
+00:04:21.124 --> 00:04:23.148 line:-1 position:50% align:center size:80%
+você prepara o ambiente: instala
+
+114
+00:04:23.158 --> 00:04:26.236 line:-1 position:50% align:center size:80%
+o HubSaúde CLI e coloca o Simulador
+
+115
+00:04:26.246 --> 00:04:28.780 line:-1 position:50% align:center size:80%
+em funcionamento no seu computador.

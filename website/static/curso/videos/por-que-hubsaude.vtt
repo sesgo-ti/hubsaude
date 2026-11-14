@@ -1,0 +1,286 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:04.411 line:-1 position:50% align:center size:80%
+Neste vídeo, você entende o problema
+
+2
+00:00:04.421 --> 00:00:06.365 line:-1 position:50% align:center size:80%
+que o HubSaúde resolve na rede
+
+3
+00:00:06.375 --> 00:00:08.463 line:-1 position:50% align:center size:80%
+de saúde de Goiás e o que muda
+
+4
+00:00:08.473 --> 00:00:10.055 line:-1 position:50% align:center size:80%
+quando os sistemas passam a trocar
+
+5
+00:00:10.065 --> 00:00:13.020 line:-1 position:50% align:center size:80%
+informações por uma plataforma comum.
+
+6
+00:00:13.770 --> 00:00:16.280 line:-1 position:50% align:center size:80%
+Pense no percurso de um paciente. Ele é
+
+7
+00:00:16.290 --> 00:00:18.417 line:-1 position:50% align:center size:80%
+atendido na unidade básica do bairro,
+
+8
+00:00:18.427 --> 00:00:20.402 line:-1 position:50% align:center size:80%
+faz exames em um laboratório e,
+
+9
+00:00:20.412 --> 00:00:22.388 line:-1 position:50% align:center size:80%
+dias depois, chega a um hospital,
+
+10
+00:00:22.398 --> 00:00:24.570 line:-1 position:50% align:center size:80%
+às vezes em outra cidade.
+
+11
+00:00:24.580 --> 00:00:25.765 line:-1 position:50% align:center size:80%
+Cada um desses lugares
+
+12
+00:00:25.775 --> 00:00:27.185 line:-1 position:50% align:center size:80%
+usa o próprio sistema,
+
+13
+00:00:27.195 --> 00:00:29.277 line:-1 position:50% align:center size:80%
+e cada sistema guarda as informações
+
+14
+00:00:29.287 --> 00:00:31.430 line:-1 position:50% align:center size:80%
+do jeito em que foi construído.
+
+15
+00:00:31.630 --> 00:00:33.398 line:-1 position:50% align:center size:80%
+Sem um meio comum de troca,
+
+16
+00:00:33.408 --> 00:00:35.472 line:-1 position:50% align:center size:80%
+o resultado do exame feito no laboratório
+
+17
+00:00:35.482 --> 00:00:37.769 line:-1 position:50% align:center size:80%
+não chega ao hospital. A equipe precisa
+
+18
+00:00:37.779 --> 00:00:40.870 line:-1 position:50% align:center size:80%
+pedir o exame de novo ou decidir sem ele.
+
+19
+00:00:41.620 --> 00:00:43.718 line:-1 position:50% align:center size:80%
+Uma saída seria ligar cada sistema
+
+20
+00:00:43.728 --> 00:00:46.050 line:-1 position:50% align:center size:80%
+diretamente a cada um dos outros.
+
+21
+00:00:46.350 --> 00:00:49.183 line:-1 position:50% align:center size:80%
+Com quatro sistemas, já são seis ligações.
+
+22
+00:00:49.193 --> 00:00:51.501 line:-1 position:50% align:center size:80%
+Com dez, são quarenta e cinco.
+
+23
+00:00:51.511 --> 00:00:53.297 line:-1 position:50% align:center size:80%
+Cada nova instituição precisaria
+
+24
+00:00:53.307 --> 00:00:56.200 line:-1 position:50% align:center size:80%
+de uma ligação com todas as anteriores.
+
+25
+00:00:56.510 --> 00:00:58.656 line:-1 position:50% align:center size:80%
+E cada ligação teria o próprio formato
+
+26
+00:00:58.666 --> 00:01:00.516 line:-1 position:50% align:center size:80%
+e as próprias regras de segurança,
+
+27
+00:01:00.526 --> 00:01:02.997 line:-1 position:50% align:center size:80%
+combinados caso a caso, sem um registro
+
+28
+00:01:03.007 --> 00:01:05.960 line:-1 position:50% align:center size:80%
+uniforme de quem acessou cada informação.
+
+29
+00:01:06.710 --> 00:01:09.567 line:-1 position:50% align:center size:80%
+O HubSaúde substitui essa rede de ligações
+
+30
+00:01:09.577 --> 00:01:11.625 line:-1 position:50% align:center size:80%
+diretas por um ponto de encontro.
+
+31
+00:01:11.635 --> 00:01:13.169 line:-1 position:50% align:center size:80%
+Cada sistema se conecta
+
+32
+00:01:13.179 --> 00:01:15.440 line:-1 position:50% align:center size:80%
+uma única vez à plataforma.
+
+33
+00:01:15.680 --> 00:01:17.530 line:-1 position:50% align:center size:80%
+E todos seguem as mesmas regras,
+
+34
+00:01:17.540 --> 00:01:19.020 line:-1 position:50% align:center size:80%
+em três frentes.
+
+35
+00:01:19.310 --> 00:01:20.876 line:-1 position:50% align:center size:80%
+A primeira é o padrão.
+
+36
+00:01:20.886 --> 00:01:23.427 line:-1 position:50% align:center size:80%
+Os registros são escritos no padrão FHIR,
+
+37
+00:01:23.437 --> 00:01:25.153 line:-1 position:50% align:center size:80%
+seguindo os Guias de Implementação,
+
+38
+00:01:25.163 --> 00:01:26.954 line:-1 position:50% align:center size:80%
+e por isso são entendidos da mesma
+
+39
+00:01:26.964 --> 00:01:28.890 line:-1 position:50% align:center size:80%
+forma por quem os recebe.
+
+40
+00:01:29.180 --> 00:01:31.279 line:-1 position:50% align:center size:80%
+A segunda é a identidade.
+
+41
+00:01:31.289 --> 00:01:33.463 line:-1 position:50% align:center size:80%
+Antes de enviar ou consultar dados,
+
+42
+00:01:33.473 --> 00:01:35.346 line:-1 position:50% align:center size:80%
+cada sistema comprova quem é,
+
+43
+00:01:35.356 --> 00:01:37.530 line:-1 position:50% align:center size:80%
+com um certificado digital, e recebe
+
+44
+00:01:37.540 --> 00:01:40.150 line:-1 position:50% align:center size:80%
+apenas o acesso que lhe foi concedido.
+
+45
+00:01:40.430 --> 00:01:43.024 line:-1 position:50% align:center size:80%
+A terceira é o registro das operações.
+
+46
+00:01:43.034 --> 00:01:44.958 line:-1 position:50% align:center size:80%
+Cada envio e cada consulta ficam
+
+47
+00:01:44.968 --> 00:01:46.818 line:-1 position:50% align:center size:80%
+registrados, de modo que é possível
+
+48
+00:01:46.828 --> 00:01:49.410 line:-1 position:50% align:center size:80%
+saber quem acessou cada informação.
+
+49
+00:01:50.160 --> 00:01:51.699 line:-1 position:50% align:center size:80%
+Para o paciente, a informação
+
+50
+00:01:51.709 --> 00:01:53.318 line:-1 position:50% align:center size:80%
+produzida em um atendimento pode
+
+51
+00:01:53.328 --> 00:01:55.860 line:-1 position:50% align:center size:80%
+acompanhá-lo nos atendimentos seguintes.
+
+52
+00:01:56.130 --> 00:01:57.256 line:-1 position:50% align:center size:80%
+Para a instituição,
+
+53
+00:01:57.266 --> 00:01:59.458 line:-1 position:50% align:center size:80%
+uma única integração dá acesso à rede,
+
+54
+00:01:59.468 --> 00:02:02.090 line:-1 position:50% align:center size:80%
+em vez de uma ligação para cada parceiro.
+
+55
+00:02:02.200 --> 00:02:04.615 line:-1 position:50% align:center size:80%
+E, para a Secretaria de Estado da Saúde,
+
+56
+00:02:04.625 --> 00:02:07.125 line:-1 position:50% align:center size:80%
+que administra a plataforma, as mesmas
+
+57
+00:02:07.135 --> 00:02:10.300 line:-1 position:50% align:center size:80%
+regras valem para todos os participantes.
+
+58
+00:02:11.050 --> 00:02:12.515 line:-1 position:50% align:center size:80%
+Para entrar nessa rede,
+
+59
+00:02:12.525 --> 00:02:15.000 line:-1 position:50% align:center size:80%
+a instituição avança em duas frentes.
+
+60
+00:02:15.010 --> 00:02:16.242 line:-1 position:50% align:center size:80%
+O gestor solicita
+
+61
+00:02:16.252 --> 00:02:18.028 line:-1 position:50% align:center size:80%
+o credenciamento no Ganesha,
+
+62
+00:02:18.038 --> 00:02:20.358 line:-1 position:50% align:center size:80%
+e o integrador prepara o sistema para
+
+63
+00:02:20.368 --> 00:02:23.280 line:-1 position:50% align:center size:80%
+se identificar e enviar registros.
+
+64
+00:02:23.590 --> 00:02:26.020 line:-1 position:50% align:center size:80%
+As duas frentes avançam ao mesmo tempo,
+
+65
+00:02:26.030 --> 00:02:27.850 line:-1 position:50% align:center size:80%
+porque toda a preparação do sistema
+
+66
+00:02:27.860 --> 00:02:29.451 line:-1 position:50% align:center size:80%
+pode ser feita no Simulador
+
+67
+00:02:29.461 --> 00:02:31.870 line:-1 position:50% align:center size:80%
+enquanto o pedido é analisado.
+
+68
+00:02:32.620 --> 00:02:33.697 line:-1 position:50% align:center size:80%
+No próximo vídeo,
+
+69
+00:02:33.707 --> 00:02:35.871 line:-1 position:50% align:center size:80%
+você acompanha o caminho de um registro,
+
+70
+00:02:35.881 --> 00:02:37.828 line:-1 position:50% align:center size:80%
+do credenciamento da instituição
+
+71
+00:02:37.838 --> 00:02:40.290 line:-1 position:50% align:center size:80%
+até a confirmação do resultado.

@@ -1,0 +1,506 @@
+WEBVTT
+Language: pt-BR
+
+1
+00:00:02.250 --> 00:00:06.171 line:-1 position:50% align:center size:80%
+Neste vídeo, você instala o HubSaúde CLI,
+
+2
+00:00:06.181 --> 00:00:08.098 line:-1 position:50% align:center size:80%
+confere as ferramentas e coloca
+
+3
+00:00:08.108 --> 00:00:09.948 line:-1 position:50% align:center size:80%
+o Simulador em funcionamento.
+
+4
+00:00:09.958 --> 00:00:11.566 line:-1 position:50% align:center size:80%
+É nesse ambiente de testes,
+
+5
+00:00:11.576 --> 00:00:12.954 line:-1 position:50% align:center size:80%
+no seu próprio computador,
+
+6
+00:00:12.964 --> 00:00:14.726 line:-1 position:50% align:center size:80%
+que o seu sistema será desenvolvido
+
+7
+00:00:14.736 --> 00:00:16.653 line:-1 position:50% align:center size:80%
+durante todo o curso. Primeiro,
+
+8
+00:00:16.663 --> 00:00:18.966 line:-1 position:50% align:center size:80%
+o que é o CLI e por que testar
+
+9
+00:00:18.976 --> 00:00:20.507 line:-1 position:50% align:center size:80%
+no seu computador; depois,
+
+10
+00:00:20.517 --> 00:00:22.640 line:-1 position:50% align:center size:80%
+a instalação no terminal.
+
+11
+00:00:23.390 --> 00:00:26.302 line:-1 position:50% align:center size:80%
+O HubSaúde CLI é um programa de linha
+
+12
+00:00:26.312 --> 00:00:28.474 line:-1 position:50% align:center size:80%
+de comando: você o usa digitando
+
+13
+00:00:28.484 --> 00:00:30.123 line:-1 position:50% align:center size:80%
+comandos no terminal, e ele não
+
+14
+00:00:30.133 --> 00:00:32.730 line:-1 position:50% align:center size:80%
+exige permissão de administrador.
+
+15
+00:00:32.760 --> 00:00:34.744 line:-1 position:50% align:center size:80%
+Ele instala e controla as demais
+
+16
+00:00:34.754 --> 00:00:36.431 line:-1 position:50% align:center size:80%
+ferramentas do ambiente de testes.
+
+17
+00:00:36.441 --> 00:00:38.348 line:-1 position:50% align:center size:80%
+Você instala apenas o CLI,
+
+18
+00:00:38.358 --> 00:00:40.036 line:-1 position:50% align:center size:80%
+e ele baixa as outras ferramentas
+
+19
+00:00:40.046 --> 00:00:41.416 line:-1 position:50% align:center size:80%
+quando elas são necessárias,
+
+20
+00:00:41.426 --> 00:00:44.230 line:-1 position:50% align:center size:80%
+inclusive o Java que elas utilizam.
+
+21
+00:00:44.390 --> 00:00:46.750 line:-1 position:50% align:center size:80%
+A primeira ferramenta é o Validador.
+
+22
+00:00:46.760 --> 00:00:49.269 line:-1 position:50% align:center size:80%
+Ele confere se um registro segue as regras
+
+23
+00:00:49.279 --> 00:00:51.640 line:-1 position:50% align:center size:80%
+dos Guias de Implementação e aponta o que
+
+24
+00:00:51.650 --> 00:00:54.370 line:-1 position:50% align:center size:80%
+precisa ser corrigido antes do envio.
+
+25
+00:00:54.850 --> 00:00:56.962 line:-1 position:50% align:center size:80%
+A segunda é o Simulador,
+
+26
+00:00:56.972 --> 00:00:58.431 line:-1 position:50% align:center size:80%
+uma cópia do HubSaúde
+
+27
+00:00:58.441 --> 00:01:00.179 line:-1 position:50% align:center size:80%
+que funciona no seu computador.
+
+28
+00:01:00.369 --> 00:01:02.808 line:-1 position:50% align:center size:80%
+Ele responde como o ambiente oficial,
+
+29
+00:01:02.818 --> 00:01:04.359 line:-1 position:50% align:center size:80%
+inclusive nas exigências
+
+30
+00:01:04.369 --> 00:01:07.052 line:-1 position:50% align:center size:80%
+de segurança: certificado de cliente,
+
+31
+00:01:07.062 --> 00:01:10.840 line:-1 position:50% align:center size:80%
+token de acesso e envio em duas etapas.
+
+32
+00:01:11.590 --> 00:01:13.108 line:-1 position:50% align:center size:80%
+Testar no seu computador antes
+
+33
+00:01:13.118 --> 00:01:15.783 line:-1 position:50% align:center size:80%
+do ambiente oficial traz duas vantagens.
+
+34
+00:01:15.793 --> 00:01:17.847 line:-1 position:50% align:center size:80%
+A primeira: o desenvolvimento não
+
+35
+00:01:17.857 --> 00:01:20.270 line:-1 position:50% align:center size:80%
+precisa esperar o credenciamento.
+
+36
+00:01:20.290 --> 00:01:22.358 line:-1 position:50% align:center size:80%
+Enquanto o gestor da instituição solicita
+
+37
+00:01:22.368 --> 00:01:24.437 line:-1 position:50% align:center size:80%
+o acesso no Ganesha e a Secretaria
+
+38
+00:01:24.447 --> 00:01:26.669 line:-1 position:50% align:center size:80%
+de Estado da Saúde analisa o pedido,
+
+39
+00:01:26.679 --> 00:01:28.594 line:-1 position:50% align:center size:80%
+você cadastra o seu sistema no próprio
+
+40
+00:01:28.604 --> 00:01:30.672 line:-1 position:50% align:center size:80%
+Simulador, com o certificado de teste,
+
+41
+00:01:30.682 --> 00:01:32.880 line:-1 position:50% align:center size:80%
+e avança na integração.
+
+42
+00:01:33.210 --> 00:01:35.011 line:-1 position:50% align:center size:80%
+A segunda: no Simulador,
+
+43
+00:01:35.021 --> 00:01:37.199 line:-1 position:50% align:center size:80%
+circulam apenas dados fictícios.
+
+44
+00:01:37.209 --> 00:01:39.387 line:-1 position:50% align:center size:80%
+No ambiente de testes e durante o curso,
+
+45
+00:01:39.397 --> 00:01:41.348 line:-1 position:50% align:center size:80%
+nunca use informações reais de pacientes
+
+46
+00:01:41.358 --> 00:01:43.670 line:-1 position:50% align:center size:80%
+no Validador nem no Simulador.
+
+47
+00:01:43.950 --> 00:01:46.229 line:-1 position:50% align:center size:80%
+E, como o Simulador exige as mesmas etapas
+
+48
+00:01:46.239 --> 00:01:48.517 line:-1 position:50% align:center size:80%
+de segurança, um sistema que funciona nele
+
+49
+00:01:48.527 --> 00:01:50.501 line:-1 position:50% align:center size:80%
+precisa apenas de ajustes de configuração
+
+50
+00:01:50.511 --> 00:01:52.637 line:-1 position:50% align:center size:80%
+para passar à produção: o endereço,
+
+51
+00:01:52.647 --> 00:01:54.980 line:-1 position:50% align:center size:80%
+o client_id e o certificado.
+
+52
+00:01:55.730 --> 00:01:58.256 line:-1 position:50% align:center size:80%
+Agora, no terminal. Se quiser,
+
+53
+00:01:58.266 --> 00:02:00.079 line:-1 position:50% align:center size:80%
+pause o vídeo e execute cada
+
+54
+00:02:00.089 --> 00:02:03.170 line:-1 position:50% align:center size:80%
+comando junto. No macOS e no Linux,
+
+55
+00:02:03.180 --> 00:02:06.102 line:-1 position:50% align:center size:80%
+a instalação usa um único comando: o curl,
+
+56
+00:02:06.112 --> 00:02:08.083 line:-1 position:50% align:center size:80%
+um programa que baixa arquivos,
+
+57
+00:02:08.093 --> 00:02:11.015 line:-1 position:50% align:center size:80%
+baixa o script de instalação, e o bash,
+
+58
+00:02:11.025 --> 00:02:14.060 line:-1 position:50% align:center size:80%
+o interpretador de comandos, o executa.
+
+59
+00:02:14.070 --> 00:02:15.810 line:-1 position:50% align:center size:80%
+No Windows, o comando equivalente
+
+60
+00:02:15.820 --> 00:02:18.200 line:-1 position:50% align:center size:80%
+é executado no PowerShell.
+
+61
+00:02:18.800 --> 00:02:20.789 line:-1 position:50% align:center size:80%
+Acompanhe a saída do instalador.
+
+62
+00:02:20.799 --> 00:02:22.713 line:-1 position:50% align:center size:80%
+Primeiro, ele identifica a plataforma
+
+63
+00:02:22.723 --> 00:02:24.712 line:-1 position:50% align:center size:80%
+do computador e descobre a versão
+
+64
+00:02:24.722 --> 00:02:26.700 line:-1 position:50% align:center size:80%
+mais recente do programa.
+
+65
+00:02:27.250 --> 00:02:28.549 line:-1 position:50% align:center size:80%
+Antes de instalar,
+
+66
+00:02:28.559 --> 00:02:30.781 line:-1 position:50% align:center size:80%
+ele baixa a lista de somas de verificação
+
+67
+00:02:30.791 --> 00:02:32.552 line:-1 position:50% align:center size:80%
+da versão e compara a soma
+
+68
+00:02:32.562 --> 00:02:34.707 line:-1 position:50% align:center size:80%
+do arquivo baixado com a da lista.
+
+69
+00:02:34.717 --> 00:02:36.246 line:-1 position:50% align:center size:80%
+Se os valores não conferem,
+
+70
+00:02:36.256 --> 00:02:38.300 line:-1 position:50% align:center size:80%
+a instalação é interrompida.
+
+71
+00:02:38.480 --> 00:02:41.333 line:-1 position:50% align:center size:80%
+Só depois dessa conferência o programa é
+
+72
+00:02:41.343 --> 00:02:43.719 line:-1 position:50% align:center size:80%
+copiado para a pasta pessoal do usuário.
+
+73
+00:02:43.729 --> 00:02:45.787 line:-1 position:50% align:center size:80%
+Se o instalador avisar que essa pasta
+
+74
+00:02:45.797 --> 00:02:48.014 line:-1 position:50% align:center size:80%
+não está no PATH, siga a orientação
+
+75
+00:02:48.024 --> 00:02:50.840 line:-1 position:50% align:center size:80%
+exibida e abra um novo terminal.
+
+76
+00:02:51.290 --> 00:02:52.645 line:-1 position:50% align:center size:80%
+Para conferir a instalação,
+
+77
+00:02:52.655 --> 00:02:54.919 line:-1 position:50% align:center size:80%
+peça ao CLI que informe as versões,
+
+78
+00:02:54.929 --> 00:02:57.420 line:-1 position:50% align:center size:80%
+com o comando hubsaude version.
+
+79
+00:02:57.430 --> 00:02:59.315 line:-1 position:50% align:center size:80%
+Cada linha da resposta corresponde
+
+80
+00:02:59.325 --> 00:03:01.040 line:-1 position:50% align:center size:80%
+a uma peça do ambiente.
+
+81
+00:03:01.110 --> 00:03:02.764 line:-1 position:50% align:center size:80%
+A primeira mostra a versão do próprio
+
+82
+00:03:02.774 --> 00:03:05.620 line:-1 position:50% align:center size:80%
+CLI e a plataforma em que ele funciona.
+
+83
+00:03:06.220 --> 00:03:07.592 line:-1 position:50% align:center size:80%
+Nas linhas seguintes,
+
+84
+00:03:07.602 --> 00:03:09.434 line:-1 position:50% align:center size:80%
+o Validador e o Simulador
+
+85
+00:03:09.444 --> 00:03:11.661 line:-1 position:50% align:center size:80%
+aparecem como não provisionados,
+
+86
+00:03:11.671 --> 00:03:13.810 line:-1 position:50% align:center size:80%
+ao lado da versão disponível. Isso é
+
+87
+00:03:13.820 --> 00:03:16.550 line:-1 position:50% align:center size:80%
+esperado: eles ainda não foram baixados.
+
+88
+00:03:16.860 --> 00:03:19.058 line:-1 position:50% align:center size:80%
+As duas últimas linhas tratam do servidor
+
+89
+00:03:19.068 --> 00:03:21.341 line:-1 position:50% align:center size:80%
+FHIR local, que o curso não utiliza,
+
+90
+00:03:21.351 --> 00:03:23.917 line:-1 position:50% align:center size:80%
+e do Java usado pelas ferramentas. Tudo é
+
+91
+00:03:23.927 --> 00:03:26.780 line:-1 position:50% align:center size:80%
+obtido automaticamente no primeiro uso.
+
+92
+00:03:27.230 --> 00:03:28.934 line:-1 position:50% align:center size:80%
+Agora, inicie o Simulador,
+
+93
+00:03:28.944 --> 00:03:31.094 line:-1 position:50% align:center size:80%
+com o comando hubsaude sim start.
+
+94
+00:03:31.104 --> 00:03:32.212 line:-1 position:50% align:center size:80%
+Na primeira execução,
+
+95
+00:03:32.222 --> 00:03:34.894 line:-1 position:50% align:center size:80%
+o CLI baixa o Java e o próprio Simulador,
+
+96
+00:03:34.904 --> 00:03:37.340 line:-1 position:50% align:center size:80%
+o que pode levar alguns minutos.
+
+97
+00:03:37.520 --> 00:03:39.731 line:-1 position:50% align:center size:80%
+Quando a mensagem de pronto aparece,
+
+98
+00:03:39.741 --> 00:03:41.722 line:-1 position:50% align:center size:80%
+o Simulador já responde no endereço
+
+99
+00:03:41.732 --> 00:03:46.140 line:-1 position:50% align:center size:80%
+indicado, na porta 8443 do seu computador.
+
+100
+00:03:46.400 --> 00:03:48.095 line:-1 position:50% align:center size:80%
+Para saber, a qualquer momento,
+
+101
+00:03:48.105 --> 00:03:49.799 line:-1 position:50% align:center size:80%
+se ele continua em funcionamento,
+
+102
+00:03:49.809 --> 00:03:51.891 line:-1 position:50% align:center size:80%
+consulte a situação com hubsaude
+
+103
+00:03:51.901 --> 00:03:54.128 line:-1 position:50% align:center size:80%
+sim status. A resposta confirma
+
+104
+00:03:54.138 --> 00:03:56.375 line:-1 position:50% align:center size:80%
+que o Simulador está em execução e informa
+
+105
+00:03:56.385 --> 00:03:58.750 line:-1 position:50% align:center size:80%
+o endereço e o número do processo.
+
+106
+00:03:59.070 --> 00:04:01.442 line:-1 position:50% align:center size:80%
+Peça as versões outra vez. Agora,
+
+107
+00:04:01.452 --> 00:04:03.824 line:-1 position:50% align:center size:80%
+o Simulador e o Java aparecem com a versão
+
+108
+00:04:03.834 --> 00:04:06.821 line:-1 position:50% align:center size:80%
+instalada. O Validador continua como não
+
+109
+00:04:06.831 --> 00:04:09.433 line:-1 position:50% align:center size:80%
+provisionado, porque só é baixado quando
+
+110
+00:04:09.443 --> 00:04:12.790 line:-1 position:50% align:center size:80%
+for usado pela primeira vez, no módulo 3.
+
+111
+00:04:13.300 --> 00:04:15.512 line:-1 position:50% align:center size:80%
+Quando quiser encerrar o Simulador,
+
+112
+00:04:15.522 --> 00:04:18.030 line:-1 position:50% align:center size:80%
+use o comando de parada. Atenção: ele
+
+113
+00:04:18.040 --> 00:04:19.956 line:-1 position:50% align:center size:80%
+guarda os dados apenas na memória.
+
+114
+00:04:19.966 --> 00:04:22.104 line:-1 position:50% align:center size:80%
+Ao ser encerrado, apaga os registros
+
+115
+00:04:22.114 --> 00:04:24.390 line:-1 position:50% align:center size:80%
+e os sistemas cadastrados.
+
+116
+00:04:25.140 --> 00:04:28.923 line:-1 position:50% align:center size:80%
+Em resumo: o HubSaúde CLI instala
+
+117
+00:04:28.933 --> 00:04:31.478 line:-1 position:50% align:center size:80%
+e controla o Validador e o Simulador.
+
+118
+00:04:31.488 --> 00:04:33.955 line:-1 position:50% align:center size:80%
+O instalador confere a integridade
+
+119
+00:04:33.965 --> 00:04:36.046 line:-1 position:50% align:center size:80%
+do programa antes de instalá-lo.
+
+120
+00:04:36.056 --> 00:04:38.755 line:-1 position:50% align:center size:80%
+E o Simulador, no seu computador, permite
+
+121
+00:04:38.765 --> 00:04:41.232 line:-1 position:50% align:center size:80%
+desenvolver sem esperar o credenciamento
+
+122
+00:04:41.242 --> 00:04:43.760 line:-1 position:50% align:center size:80%
+e apenas com dados fictícios.
+
+123
+00:04:44.000 --> 00:04:45.086 line:-1 position:50% align:center size:80%
+No próximo vídeo,
+
+124
+00:04:45.096 --> 00:04:47.199 line:-1 position:50% align:center size:80%
+você abre o Simulador no navegador,
+
+125
+00:04:47.209 --> 00:04:49.312 line:-1 position:50% align:center size:80%
+conhece a sua interface e vê como
+
+126
+00:04:49.322 --> 00:04:51.550 line:-1 position:50% align:center size:80%
+registrar nele o seu próprio sistema.

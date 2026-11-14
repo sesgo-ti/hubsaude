@@ -1,0 +1,212 @@
+---
+id: safira
+title: "Extra: assinar com o Safira"
+slug: /curso/safira/
+pagination_next: null
+---
+
+import Details from '@theme/Details';
+import {Trilha, Etapa} from '@site/src/components/Trilha';
+import {Video} from '@site/src/components/Video';
+import {Cartoes, Cartao} from '@site/src/components/Cartoes';
+import {Baixar, BaixarPdf} from '@site/src/components/Baixar';
+
+# Extra: assinar com o Safira
+
+Este módulo é opcional. O Safira é uma ferramenta auxiliar que assina registros FHIR e confere assinaturas de acordo com a política de assinatura do HubSaúde. Ele é útil quando o Guia de Implementação exige assinatura para o tipo de registro enviado.
+
+<BaixarPdf arquivo="curso-hubsaude-modulo-extra-safira.pdf" />
+
+:::info Disponibilidade
+
+O Safira ainda não foi publicado: ele não está disponível no HubSaúde CLI nem na página de releases. Os conceitos e o vídeo deste módulo já podem ser estudados, e a prática passa a funcionar quando a ferramenta for publicada em uma próxima versão.
+
+:::
+
+## Objetivos
+
+Ao final deste módulo, você será capaz de:
+
+- explicar o que a assinatura digital comprova;
+- identificar o papel do `Bundle`, do `Provenance` e da `Signature`;
+- assinar e validar um registro no modo simulação, sem certificado ICP-Brasil;
+- interpretar a recusa de uma assinatura.
+
+## Conteúdo
+
+:::info Em poucas palavras
+
+- A assinatura digital comprova **quem** produziu um registro e que ele **não foi alterado** depois.
+- O `Provenance` aponta os registros assinados e quem assina; a `Signature` é o resultado.
+- O número de quem assina no `Provenance` precisa ser o **mesmo do certificado**.
+- O **modo simulação** permite praticar sem certificado ICP-Brasil.
+
+:::
+
+<Video titulo="Como a assinatura protege um registro" formato="misto" duracao="5 min 5 s" src="/curso/videos/assinatura-safira.mp4" poster="/curso/videos/assinatura-safira.jpg" legenda="/curso/videos/assinatura-safira.vtt">
+
+A diferença entre o certificado do sistema, usado na autenticação, e o certificado de quem assina, e o `Provenance` que aponta os registros assinados. No terminal, o Safira em modo simulação gera certificados fictícios, assina um `Bundle`, valida a assinatura e a recusa quando um valor é alterado depois de assinado.
+
+</Video>
+
+### O que a assinatura comprova
+
+A assinatura digital comprova **quem** produziu um registro e garante que ele **não foi alterado** depois de assinado. Ela é feita com a chave privada de um certificado ICP-Brasil e conferida com a parte pública.
+
+### Os três elementos
+
+<Cartoes>
+  <Cartao titulo="Bundle">Reúne os registros que serão assinados.</Cartao>
+  <Cartao titulo="Provenance">Indica quais registros são assinados e quem assina.</Cartao>
+  <Cartao titulo="Signature">O resultado da assinatura, gravado em `Provenance.signature`.</Cartao>
+</Cartoes>
+
+:::warning Mesmo número do certificado
+
+Quem assina é identificado no `Provenance` pelo mesmo número que consta no certificado: o **CNPJ** da instituição ou o **CPF** da pessoa. Números diferentes resultam em recusa.
+
+:::
+
+### Modo simulação
+
+O modo simulação executa o mesmo processo com certificados fictícios, criados pelo próprio Safira. É o modo usado na prática deste módulo.
+
+:::note
+
+As assinaturas simuladas **não têm validade jurídica** e são recusadas fora desse modo.
+
+:::
+
+Para aprofundar: [Safira](../ferramentas/safira.mdx).
+
+## Prática
+
+A prática usa o programa do Safira diretamente, sem o HubSaúde CLI. É preciso ter o **Java 21** instalado e o arquivo do Safira baixado e renomeado como `hubsaude-safira.jar`, conforme [Testar sem certificado ICP-Brasil](../ferramentas/safira.mdx#testar-sem-certificado-icp-brasil). Execute os comandos a partir da pasta `curso-hubsaude`.
+
+<Trilha>
+
+<Etapa id="curso-extra-arquivos" marcador="1" titulo="Salvar os arquivos de exemplo" resumo="Prepare o Bundle e o Provenance que serão assinados." ambiente="testes">
+
+**O que você faz:** salve os dois blocos de [Como funciona a assinatura](../ferramentas/safira.mdx#como-funciona-a-assinatura) como `bundle-assinatura.json` e `provenance.json`. O `Provenance` identifica quem assina pelo CPF do certificado fictício.
+
+<Baixar arquivo="bundle-assinatura.json" />
+
+<Baixar arquivo="provenance.json" />
+
+</Etapa>
+
+<Etapa id="curso-extra-pki" marcador="2" titulo="Gerar os certificados fictícios" resumo="Crie a autoridade certificadora e os certificados do modo simulação." ambiente="testes">
+
+**O que você faz:** gere os certificados fictícios.
+
+```bash
+java -jar hubsaude-safira.jar simulador pki
+```
+
+Os arquivos ficam na pasta `.safira-simulador/pki`, dentro da pasta do usuário: um certificado válido, `signatario.p12`, um certificado revogado, `revogado.p12`, e a senha, em `senha.txt`.
+
+</Etapa>
+
+<Etapa id="curso-extra-assinar" marcador="3" titulo="Assinar" resumo="Assine o Bundle com o certificado fictício válido." ambiente="testes">
+
+**O que você faz:** assine e separe a assinatura e o `Provenance` assinado.
+
+```bash
+PKI=~/.safira-simulador/pki
+java -jar hubsaude-safira.jar assinar --modo simulacao \
+    --bundle bundle-assinatura.json --provenance provenance.json \
+    --p12 $PKI/signatario.p12 --senha-arquivo $PKI/senha.txt \
+    --estrategia iat --saida assinada.json
+
+jq '.signature' assinada.json > assinatura.json
+jq '.provenance' assinada.json > provenance-assinado.json
+```
+
+No `Provenance` assinado, o campo `signature` traz o momento da assinatura e quem assinou, identificado pelo mesmo CPF do `agent`:
+
+```bash
+jq '.signature[0] | {when, who}' provenance-assinado.json
+```
+
+```json
+{
+  "when": "2026-10-30T23:33:52Z",
+  "who": {
+    "identifier": {
+      "system": "urn:brasil:cpf",
+      "value": "52998224725"
+    }
+  }
+}
+```
+
+</Etapa>
+
+<Etapa id="curso-extra-validar" marcador="4" titulo="Validar" resumo="Confira a assinatura criada." ambiente="testes">
+
+**O que você faz:** valide a assinatura.
+
+```bash
+java -jar hubsaude-safira.jar validar --modo simulacao \
+    --signature assinatura.json --bundle bundle-assinatura.json \
+    --provenance provenance-assinado.json | jq -r '.issue[].details.text'
+```
+
+O resultado informa que a assinatura foi validada e que se trata de uma simulação, sem validade jurídica.
+
+</Etapa>
+
+<Etapa id="curso-extra-recusa" marcador="5" titulo="Provocar recusas" resumo="Altere o registro depois de assinado e assine com um certificado revogado." ambiente="testes">
+
+**O que você faz:** execute cada situação abaixo.
+
+**Alterar o registro.** Abra `bundle-assinatura.json` no editor de texto e, na `Observation`, mude o valor do exame (`valueQuantity.value`) de `13.50` para `14.50`. Salve o arquivo e repita o passo 4. O Safira informa `CRYPTO.HASH-VERIFICATION-FAILED`, porque o conteúdo não corresponde mais ao que foi assinado.
+
+Para tratar a recusa em um script, grave o resultado em arquivo com a opção `--saida` e consulte o código de saída:
+
+```bash
+java -jar hubsaude-safira.jar validar --modo simulacao \
+    --signature assinatura.json --bundle bundle-assinatura.json \
+    --provenance provenance-assinado.json --saida resultado.json
+echo $?
+jq -r '.issue[] | .details.coding[].code, .diagnostics' resultado.json
+```
+
+O código de saída é `6`, que indica assinatura recusada. O arquivo `resultado.json` traz o código do problema e o diagnóstico:
+
+```text
+CRYPTO.HASH-VERIFICATION-FAILED
+O SHA-256 do artefato enquadrado recomputado difere do payload assinado.
+```
+
+Ao terminar, desfaça a alteração no editor, voltando o valor para `13.50`.
+
+**Usar um certificado revogado.** Repita o passo 3 com `$PKI/revogado.p12` no lugar de `$PKI/signatario.p12`. O Safira informa `CERT.REVOKED`.
+
+</Etapa>
+
+</Trilha>
+
+## Verificação
+
+**1. Um registro assinado teve um valor corrigido depois da assinatura. A assinatura continua válida?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Não. Qualquer alteração depois da assinatura faz a validação falhar com `CRYPTO.HASH-VERIFICATION-FAILED`. O registro corrigido precisa ser assinado novamente.
+
+</Details>
+
+**2. Uma assinatura feita no modo simulação pode ser enviada ao ambiente oficial?**
+
+<Details summary={<summary>Ver resposta</summary>}>
+
+Não. As assinaturas simuladas não têm validade jurídica e são recusadas por qualquer Safira fora do modo simulação. No ambiente oficial, a assinatura é feita com o certificado ICP-Brasil, nos tipos aceitos pela política.
+
+</Details>
+
+## Conte o que foi mais difícil
+
+Se algum passo deste módulo não funcionou, escreva para o [suporte do HubSaúde](mailto:suporte@saude.go.gov.br) com o assunto "Curso para integradores, módulo extra", informando a mensagem exibida.
+
+Este é o último módulo do curso. Para consultar qualquer assunto novamente, use a [referência do integrador](../fluxos/index.mdx).

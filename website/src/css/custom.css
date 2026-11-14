@@ -39,6 +39,9 @@
 .navbar__logo {height: 3rem;}
 .navbar__title {font-size: 1.35rem; letter-spacing: -0.04em;}
 .navbar__link {font-size: 0.9rem;}
+.navbar__link--curso {margin-left: 0.25rem; background: #eaf6ef; border: 1px solid #b9dcc6; border-radius: 999px; color: #036a4c; font-weight: 600;}
+.navbar__link--curso:hover, .navbar__link--curso.navbar__link--active {background: #036a4c; border-color: #036a4c; color: #fff;}
+.navbar-sidebar .navbar__link--curso {margin: 0.25rem 0; border-radius: 0.65rem;}
 .navbar__search-input {width: 15rem; color: #10301f;}
 .navbar__search-input::placeholder {color: #3a5446; opacity: 1;}
 .footer {padding-block: 3rem;}
@@ -50,7 +53,7 @@
 .theme-doc-markdown h1 {font-size: clamp(2rem, 4vw, 2.75rem); letter-spacing: -0.04em; line-height: 1.2;}
 .theme-doc-markdown h2 {border-top: 1px solid #dce9e0; padding-top: 1.5rem; letter-spacing: -0.025em;}
 .theme-doc-markdown > p:first-of-type {font-size: 1.1rem; color: #3a5446;}
-.theme-doc-markdown a:not(.hash-link) {text-decoration: underline; text-underline-offset: 0.2em;}
+.theme-doc-markdown a:not(.hash-link):not([data-arquivo]):not([data-pdf]) {text-decoration: underline; text-underline-offset: 0.2em;}
 .theme-doc-markdown table {font-size: 0.9rem;}
 .theme-doc-markdown th {background: #eaf6ef; text-align: left;}
 .theme-doc-markdown td {vertical-align: top;}
@@ -59,6 +62,12 @@
 .tabs__item--active {background: #eaf6ef;}
 .pagination-nav__link:hover {background: #f5faf7;}
 .theme-doc-markdown details {--ifm-alert-background-color: #f5faf7; --ifm-alert-border-color: #cddfd3; --ifm-alert-foreground-color: #10301f;}
+.alert--info {--ifm-alert-background-color: #f5faf7; --ifm-alert-background-color-highlight: #eaf6ef; --ifm-alert-border-color: #036a4c; --ifm-alert-foreground-color: #10301f;}
+.alert--info [class*="admonitionHeading"] {color: #036a4c;}
+.alert--info [class*="admonitionIcon"] svg {fill: #036a4c;}
+.alert--success {--ifm-alert-background-color: #eaf6ef; --ifm-alert-background-color-highlight: #dcefe3; --ifm-alert-border-color: #036a4c; --ifm-alert-foreground-color: #10301f;}
+.alert--success [class*="admonitionHeading"] {color: #035a41;}
+.alert--success [class*="admonitionIcon"] svg {fill: #035a41;}
 :focus-visible {outline: 3px solid #036a4c; outline-offset: 3px;}
 pre :focus-visible, .theme-code-block button:focus-visible, .footer :focus-visible {outline-color: #7eecc0;}
 
