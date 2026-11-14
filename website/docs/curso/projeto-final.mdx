@@ -151,7 +151,7 @@ Cada item traz a mensagem como ela aparece na resposta, a causa e a correção.
 
 **Causa:** o token não tem o escopo exigido pela operação, como `system/Patient.c` para criar um paciente.
 
-**Correção:** peça o escopo na obtenção do token e confirme que ele está liberado para o seu `client_id` no cadastro do Simulador. Na produção, os escopos são os autorizados no credenciamento.
+**Correção:** peça o escopo na obtenção do token e confirme que ele está liberado para o seu `client_id` no cadastro do Simulador. Em produção, os escopos são os autorizados no credenciamento.
 
 </Details>
 
@@ -208,9 +208,9 @@ hubsaude auth verify --fhir-base https://localhost:8443 --client-id meu-sistema 
   --scope "system/Patient.c system/Patient.rs system/Task.rs"
 ```
 
-O comando exibe os dados do token obtido e termina com a mensagem `[OK] Credenciamento verificado. Acesso ao HubSaúde está funcionando.` Na produção, o comando é o mesmo, com o endereço oficial, o `client_id` e o certificado da instituição, e sem a opção `--trust`.
+O comando exibe os dados do token obtido e termina com a mensagem `[OK] Credenciamento verificado. Acesso ao HubSaúde está funcionando.` Em produção, o comando é o mesmo, com o endereço oficial, o `client_id` e o certificado da instituição, e sem a opção `--trust`.
 
-| Item | No Simulador | Na produção |
+| Item | No Simulador | Em produção |
 | --- | --- | --- |
 | Endereço | `https://localhost:8443` | `https://hub.saude.go.gov.br` |
 | `client_id` | `meu-sistema` | O identificador entregue no credenciamento |
