@@ -14,9 +14,10 @@ export function Video({titulo, formato, duracao, src, legenda, poster, children}
   const enderecoPoster = useBaseUrl(poster ?? '');
   const descricaoFormato = [formatos[formato], 'com narração e legendas'].filter(Boolean).join(', ');
   const detalhes = [descricaoFormato, duracao].filter(Boolean).join(' · ');
+  const ancora = `video-${src.split('/').pop().replace(/\.mp4$/, '')}`;
 
   return (
-    <figure className={styles.video}>
+    <figure id={ancora} className={styles.video}>
       <video controls preload="metadata" poster={poster ? enderecoPoster : undefined} src={endereco}>
         <track kind="captions" srcLang="pt-BR" label="Português" src={enderecoLegenda} />
       </video>
