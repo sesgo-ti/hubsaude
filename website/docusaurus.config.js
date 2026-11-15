@@ -26,6 +26,7 @@ export default {
       sitemap: {changefreq: null, priority: null, ignorePatterns: ['/hubsaude/search/**']},
     }],
   ],
+  plugins: ['./plugins/etapas-do-curso.mjs'],
   themes: [
     ['@easyops-cn/docusaurus-search-local', {
       hashed: 'filename',
